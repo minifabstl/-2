@@ -3,17 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VidFlow — Watch, Share & Discover Videos</title>
-    <meta name="description" content="VidFlow is a premium video sharing platform. Upload, discover, and share videos with the world.">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>▶</text></svg>">
+    <title>Leakedfap — Watch, Share & Discover Videos</title>
+    <meta name="description" content="Leakedfap is a premium video sharing platform. Upload, discover, and share videos.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23ff0033'/><polygon points='38,30 72,50 38,70' fill='white'/></svg>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
             --accent: #ff0033;
-            --accent-hover: #cc0029;
+            --accent-hover: #e6002e;
             --font-family: 'Inter', system-ui, -apple-system, sans-serif;
             --radius-sm: 6px;
             --radius-md: 10px;
@@ -27,27 +26,27 @@
         }
 
         html[data-theme="dark"] {
-            --bg-primary: #0f0f12;
-            --bg-secondary: #17181f;
-            --bg-surface: #20222c;
-            --bg-elevated: #282a36;
-            --text-primary: #f8f9fa;
-            --text-secondary: #a0a3bd;
-            --text-tertiary: #6b6f8a;
-            --border-color: #2b2d3d;
-            --border-subtle: #212330;
+            --bg-primary: #0a0a0d;
+            --bg-secondary: #121318;
+            --bg-surface: #1a1b23;
+            --bg-elevated: #222430;
+            --text-primary: #ffffff;
+            --text-secondary: #9fa3bc;
+            --text-tertiary: #656986;
+            --border-color: #262838;
+            --border-subtle: #1c1d29;
         }
 
         html[data-theme="light"] {
-            --bg-primary: #f8f9fc;
+            --bg-primary: #f6f7fa;
             --bg-secondary: #ffffff;
-            --bg-surface: #f1f3f7;
+            --bg-surface: #eef1f6;
             --bg-elevated: #ffffff;
-            --text-primary: #12141d;
-            --text-secondary: #4a4d68;
-            --text-tertiary: #8b8ea8;
-            --border-color: #e2e5f0;
-            --border-subtle: #edf0fa;
+            --text-primary: #0d0f17;
+            --text-secondary: #4b4f69;
+            --text-tertiary: #878ba8;
+            --border-color: #e0e3ed;
+            --border-subtle: #ecf0f8;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -62,8 +61,15 @@
         a { color: inherit; text-decoration: none; }
         button, input, select, textarea { font-family: inherit; font-size: inherit; }
 
-        #app { display: flex; flex-direction: column; min-height: 100vh; }
+        .svg-icon {
+            width: 20px; height: 20px;
+            fill: currentColor;
+            display: inline-block;
+            vertical-align: middle;
+            flex-shrink: 0;
+        }
 
+        /* Navbar Header */
         .navbar {
             position: fixed;
             top: 0; left: 0; width: 100%; height: var(--navbar-height);
@@ -73,31 +79,54 @@
             padding: 0 20px; z-index: 1000;
         }
 
-        .nav-left { display: flex; align-items: center; gap: 16px; width: 25%; }
-        .nav-center { flex: 1; display: flex; justify-content: center; max-width: 600px; }
-        .nav-right { display: flex; align-items: center; justify-content: flex-end; gap: 12px; width: 25%; }
+        .nav-left { display: flex; align-items: center; gap: 16px; min-width: 200px; }
+        .nav-center { flex: 1; display: flex; justify-content: center; max-width: 620px; margin: 0 20px; }
+        .nav-right { display: flex; align-items: center; justify-content: flex-end; gap: 12px; min-width: 200px; }
 
-        .logo { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 20px; cursor: pointer; }
-        .logo-icon { color: var(--accent); font-size: 28px; }
+        /* Leakedfap Logo */
+        .logo {
+            display: flex; align-items: center; gap: 6px;
+            cursor: pointer; user-select: none;
+            text-decoration: none;
+        }
+        .logo-text {
+            font-weight: 900;
+            font-size: 22px;
+            letter-spacing: -0.8px;
+            color: var(--text-primary);
+            text-transform: none;
+        }
+        .logo-text span {
+            color: var(--accent);
+        }
 
+        /* Search Bar */
         .search-bar {
             display: flex; width: 100%;
             background: var(--bg-surface);
             border: 1px solid var(--border-color);
             border-radius: var(--radius-pill);
             overflow: hidden;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .search-bar:focus-within {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(255, 0, 51, 0.15);
         }
         .search-bar input {
-            flex: 1; padding: 8px 16px;
+            flex: 1; padding: 10px 18px;
             background: transparent; border: none; outline: none;
-            color: var(--text-primary);
+            color: var(--text-primary); font-size: 14px;
         }
+        .search-bar input::placeholder { color: var(--text-tertiary); }
         .search-bar .search-btn {
-            padding: 0 16px; background: var(--bg-elevated);
+            padding: 0 20px; background: var(--bg-elevated);
             border: none; border-left: 1px solid var(--border-color);
             color: var(--text-secondary); cursor: pointer;
-            display: flex; align-items: center;
+            display: flex; align-items: center; justify-content: center;
+            transition: color 0.2s, background 0.2s;
         }
+        .search-bar .search-btn:hover { color: var(--text-primary); background: var(--bg-surface); }
 
         .icon-btn {
             width: 40px; height: 40px; border-radius: 50%;
@@ -108,18 +137,20 @@
         .icon-btn:hover { background: var(--bg-surface); }
 
         .btn {
-            padding: 8px 16px; border-radius: var(--radius-pill);
-            border: none; font-weight: 600; cursor: pointer;
+            padding: 8px 18px; border-radius: var(--radius-pill);
+            border: none; font-weight: 700; cursor: pointer;
             display: inline-flex; align-items: center; gap: 6px;
-            transition: opacity 0.2s, background 0.2s;
+            font-size: 13px; transition: opacity 0.2s, background 0.2s, transform 0.1s;
         }
+        .btn:active { transform: scale(0.98); }
         .btn-primary { background: var(--accent); color: #fff; }
         .btn-primary:hover { background: var(--accent-hover); }
         .btn-secondary { background: var(--bg-surface); color: var(--text-primary); }
         .btn-secondary:hover { background: var(--bg-elevated); }
-        .btn-sm { padding: 6px 14px; font-size: 13px; }
+        .btn-sm { padding: 6px 14px; font-size: 12px; }
         .full-width { width: 100%; justify-content: center; }
 
+        /* Sidebar */
         .sidebar {
             position: fixed; top: var(--navbar-height); left: 0;
             width: var(--sidebar-width); height: calc(100vh - var(--navbar-height));
@@ -135,17 +166,18 @@
         .sidebar.collapsed .sidebar-link { justify-content: center; padding: 12px 0; }
 
         .sidebar-link {
-            display: flex; align-items: center; gap: 16px;
+            display: flex; align-items: center; gap: 14px;
             padding: 10px 16px; border-radius: var(--radius-md);
             color: var(--text-primary); cursor: pointer;
             transition: background 0.15s; margin-bottom: 2px;
             font-size: 14px; font-weight: 500;
         }
         .sidebar-link:hover { background: var(--bg-surface); }
-        .sidebar-link.active { background: var(--bg-surface); color: var(--accent); font-weight: 600; }
-        .sidebar-heading { padding: 8px 16px; font-size: 11px; font-weight: 700; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.5px; }
+        .sidebar-link.active { background: var(--bg-surface); color: var(--accent); font-weight: 700; }
+        .sidebar-heading { padding: 10px 16px 4px; font-size: 11px; font-weight: 800; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.8px; }
         .divider { height: 1px; background: var(--border-color); margin: 8px 0; }
 
+        /* Main Content */
         #main-content {
             margin-left: var(--sidebar-width);
             margin-top: var(--navbar-height);
@@ -155,6 +187,7 @@
         }
         .sidebar.collapsed ~ #main-content { margin-left: 72px; }
 
+        /* Video Grid & Cards */
         .video-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -172,8 +205,8 @@
         }
         .duration-badge {
             position: absolute; bottom: 8px; right: 8px;
-            background: rgba(0,0,0,0.8); color: #fff;
-            padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 600;
+            background: rgba(0,0,0,0.85); color: #fff;
+            padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 700;
         }
         .video-info { display: flex; gap: 12px; }
         .channel-avatar {
@@ -191,6 +224,7 @@
         }
         .video-card.horizontal .thumbnail { aspect-ratio: 16/9; }
 
+        /* Chips */
         .category-scroll { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 24px; padding-bottom: 4px; }
         .category-scroll::-webkit-scrollbar { display: none; }
         .chip {
@@ -201,11 +235,13 @@
         }
         .chip.active { background: var(--accent); color: #fff; }
 
+        /* Watch Page Layout */
         .watch-page { display: grid; grid-template-columns: 1fr 380px; gap: 24px; max-width: 1700px; margin: 0 auto; }
         .watch-main { min-width: 0; }
         .watch-player-box { background: #000; aspect-ratio: 16/9; border-radius: var(--radius-lg); overflow: hidden; display: flex; align-items: center; justify-content: center; }
         .watch-player-box video { width: 100%; height: 100%; object-fit: contain; }
 
+        /* Toast Container */
         #toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 2000; display: flex; flex-direction: column; gap: 10px; }
         .toast {
             background: var(--bg-elevated); color: var(--text-primary);
@@ -229,8 +265,8 @@
             .sidebar { transform: translateX(-100%); width: 240px; }
             .sidebar.mobile-open { transform: translateX(0); }
             #main-content { margin-left: 0; padding: 16px; }
-            .nav-left { width: auto; }
-            .nav-right { width: auto; }
+            .nav-left { min-width: auto; }
+            .nav-right { min-width: auto; }
             .nav-center { display: none; }
         }
     </style>
@@ -247,6 +283,22 @@
     <script>
         (function() {
             'use strict';
+
+            const ICONS = {
+                menu: '<svg class="svg-icon" viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>',
+                search: '<svg class="svg-icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>',
+                sun: '<svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58a.996.996 0 0 0-1.41 0 .996.996 0 0 0 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37a.996.996 0 0 0-1.41 0 .996.996 0 0 0 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41l-1.06-1.06zm1.06-10.96a.996.996 0 0 0 0-1.41.996.996 0 0 0-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06zM7.05 18.36a.996.996 0 0 0 0-1.41.996.996 0 0 0-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06z"/></svg>',
+                moon: '<svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-3.03 0-5.5-2.47-5.5-5.5 0-1.82.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z"/></svg>',
+                video: '<svg class="svg-icon" viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4zM14 13h-3v3H9v-3H6v-2h3V8h2v3h3v2z"/></svg>',
+                home: '<svg class="svg-icon" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>',
+                fire: '<svg class="svg-icon" viewBox="0 0 24 24"><path d="M13.5.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67zM11.71 19c-1.78 0-3.22-1.4-3.22-3.14 0-1.62 1.05-2.76 2.81-3.12 1.77-.36 3.6-1.21 4.62-2.58.39 1.29.59 2.65.59 4.04 0 2.65-2.15 4.8-4.8 4.8z"/></svg>',
+                subs: '<svg class="svg-icon" viewBox="0 0 24 24"><path d="M20 8H4V6h16v2zm-2-6H6v2h12V2zm4 10v8c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2v-8c0-1.1.9-2 2-2h16c1.1 0 2 .9 2 2zm-6 4l-6-3.27v6.53L16 16z"/></svg>',
+                category: '<svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 2l-5.5 9h11z M3 13.5h8v8H3z M17.5 13c-2.48 0-4.5 2.02-4.5 4.5s2.02 4.5 4.5 4.5 4.5-2.02 4.5-4.5-2.02-4.5-4.5-4.5z"/></svg>',
+                play: '<svg class="svg-icon" viewBox="0 0 24 24" style="width:48px;height:48px;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>',
+                thumbUp: '<svg class="svg-icon" viewBox="0 0 24 24"><path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z"/></svg>',
+                share: '<svg class="svg-icon" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>',
+                uploadCloud: '<svg class="svg-icon" viewBox="0 0 24 24" style="width:56px;height:56px;color:var(--accent);"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>'
+            };
 
             function formatViews(count) {
                 if (!count) return '0 views';
@@ -275,14 +327,14 @@
             function generateId() { return 'id_' + Math.random().toString(36).substr(2, 9); }
             function escapeHtml(s) { if (!s) return ''; return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
             function getInitials(name) { if (!name) return '?'; const p = name.trim().split(' '); return (p[0][0] + (p[1] ? p[1][0] : '')).toUpperCase(); }
-            function getRandomColor() { const c=['#ef4444','#f97316','#f59e0b','#10b981','#06b6d4','#3b82f6','#6366f1','#8b5cf6','#d946ef']; return c[Math.floor(Math.random()*c.length)]; }
+            function getRandomColor() { const c=['#ff0033','#f97316','#f59e0b','#10b981','#06b6d4','#3b82f6','#6366f1','#8b5cf6','#d946ef']; return c[Math.floor(Math.random()*c.length)]; }
 
             function showToast(msg) {
                 const box = document.getElementById('toast-container');
                 if (!box) return;
                 const t = document.createElement('div');
                 t.className = 'toast';
-                t.innerHTML = '<span class="material-icons" style="font-size:18px;color:var(--accent);">info</span> ' + escapeHtml(msg);
+                t.innerHTML = escapeHtml(msg);
                 box.appendChild(t);
                 setTimeout(() => t.remove(), 3000);
             }
@@ -307,7 +359,7 @@
                     { u: 'comedygold', n: 'Comedy Vault', c: 'Comedy', b: 'Standup clips, funny sketches, and bloopers.' }
                 ];
                 const titles = [
-                    "Building a YouTube Clone with Vanilla JS", "Top 10 Unreal Engine 5 Games in 2025",
+                    "Building a Video Sharing Platform from Scratch", "Top 10 Unreal Engine 5 Games in 2025",
                     "24/7 Lofi Hip Hop Beats to Study / Relax", "Understanding Quantum Computing Simply",
                     "Epic Comeback in Championship Final", "Funniest Standup Comedy Live Special",
                     "Next.js vs Vite - The Ultimate Benchmark", "Baking the Perfect Artisan Sourdough",
@@ -381,25 +433,24 @@
                 const me = getCurUser();
                 nav.innerHTML = `
                     <div class="nav-left">
-                        <button id="nav-toggle-sb" class="icon-btn"><span class="material-icons">menu</span></button>
+                        <button id="nav-toggle-sb" class="icon-btn" aria-label="Menu">${ICONS.menu}</button>
                         <div class="logo" id="nav-logo">
-                            <span class="material-icons logo-icon">play_circle_filled</span>
-                            <span>VidFlow</span>
+                            <span class="logo-text">Leaked<span>fap</span></span>
                         </div>
                     </div>
                     <div class="nav-center">
                         <form id="nav-search-form" class="search-bar">
                             <input type="text" id="nav-search-in" placeholder="Search videos...">
-                            <button type="submit" class="search-btn"><span class="material-icons">search</span></button>
+                            <button type="submit" class="search-btn" aria-label="Search">${ICONS.search}</button>
                         </form>
                     </div>
                     <div class="nav-right">
                         <button id="nav-theme-btn" class="icon-btn" title="Toggle Theme">
-                            <span class="material-icons">${curTheme === 'dark' ? 'light_mode' : 'dark_mode'}</span>
+                            ${curTheme === 'dark' ? ICONS.sun : ICONS.moon}
                         </button>
                         ${me ? `
-                            <button id="nav-upload-btn" class="btn btn-primary btn-sm"><span class="material-icons" style="font-size:18px;">video_call</span> Upload</button>
-                            <div class="channel-avatar" style="background:${me.avatarBg||'#ef4444'};cursor:pointer;" id="nav-profile-btn">${getInitials(me.displayName)}</div>
+                            <button id="nav-upload-btn" class="btn btn-primary btn-sm">${ICONS.video} Upload</button>
+                            <div class="channel-avatar" style="background:${me.avatarBg||'#ff0033'};cursor:pointer;" id="nav-profile-btn">${getInitials(me.displayName)}</div>
                             <button id="nav-logout-btn" class="btn btn-secondary btn-sm">Sign Out</button>
                         ` : `
                             <button id="nav-signin-btn" class="btn btn-primary btn-sm">Sign In</button>
@@ -424,7 +475,7 @@
                     nav.querySelector('#nav-profile-btn').onclick = () => navTo('/channel/' + me.id);
                     nav.querySelector('#nav-logout-btn').onclick = () => {
                         setCurUser(null);
-                        showToast('Signed out successfully');
+                        showToast('Signed out');
                         renderApp();
                     };
                 } else {
@@ -440,12 +491,12 @@
                 const cats = ['Music', 'Gaming', 'Education', 'Sports', 'Technology', 'Comedy'];
 
                 sb.innerHTML = `
-                    <div class="sidebar-link ${route==='/'?'active':''}" data-href="/"><span class="material-icons">home</span><span class="text">Home</span></div>
-                    <div class="sidebar-link ${route==='/trending'?'active':''}" data-href="/trending"><span class="material-icons">local_fire_department</span><span class="text">Trending</span></div>
-                    ${me ? `<div class="sidebar-link ${route==='/subscriptions'?'active':''}" data-href="/subscriptions"><span class="material-icons">subscriptions</span><span class="text">Subscriptions</span></div>` : ''}
+                    <div class="sidebar-link ${route==='/'?'active':''}" data-href="/">${ICONS.home}<span class="text">Home</span></div>
+                    <div class="sidebar-link ${route==='/trending'?'active':''}" data-href="/trending">${ICONS.fire}<span class="text">Trending</span></div>
+                    ${me ? `<div class="sidebar-link ${route==='/subscriptions'?'active':''}" data-href="/subscriptions">${ICONS.subs}<span class="text">Subscriptions</span></div>` : ''}
                     <div class="divider"></div>
-                    <div class="sidebar-heading">Explore</div>
-                    ${cats.map(c => `<div class="sidebar-link" data-href="/category/${c}"><span class="material-icons" style="font-size:20px;">category</span><span class="text">${c}</span></div>`).join('')}
+                    <div class="sidebar-heading">Categories</div>
+                    ${cats.map(c => `<div class="sidebar-link" data-href="/category/${c}">${ICONS.category}<span class="text">${c}</span></div>`).join('')}
                 `;
 
                 sb.querySelectorAll('.sidebar-link').forEach(l => {
@@ -460,11 +511,11 @@
 
                 el.innerHTML = `
                     <div class="thumbnail" style="background:${grad}">
-                        <span class="material-icons" style="font-size:44px;color:rgba(255,255,255,0.85);filter:drop-shadow(0 2px 8px rgba(0,0,0,0.3));">play_circle_filled</span>
+                        ${ICONS.play}
                         <span class="duration-badge">${formatDuration(v.duration)}</span>
                     </div>
                     <div class="video-info">
-                        ${!horiz ? `<div class="channel-avatar" style="background:${v.channelAvatar||'#ef4444'}">${getInitials(v.channelName)}</div>` : ''}
+                        ${!horiz ? `<div class="channel-avatar" style="background:${v.channelAvatar||'#ff0033'}">${getInitials(v.channelName)}</div>` : ''}
                         <div class="video-details">
                             <h3>${escapeHtml(v.title)}</h3>
                             <div class="channel-name">${escapeHtml(v.channelName)}</div>
@@ -491,17 +542,17 @@
                     ${!isTrend ? `
                     <div class="featured-box" style="background:${grad};border-radius:16px;display:grid;grid-template-columns:1.4fr 1fr;min-height:280px;cursor:pointer;margin-bottom:32px;overflow:hidden;box-shadow:var(--shadow-md);" id="feat-btn">
                         <div style="display:flex;align-items:center;justify-content:center;position:relative;">
-                            <span class="material-icons" style="font-size:72px;color:#fff;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.4));">play_circle</span>
+                            ${ICONS.play}
                             <span class="duration-badge">${formatDuration(feat.duration)}</span>
                         </div>
                         <div style="padding:28px;background:rgba(0,0,0,0.3);backdrop-filter:blur(8px);color:#fff;display:flex;flex-direction:column;justify-content:center;">
-                            <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;opacity:0.9;">Featured Video</span>
-                            <h2 style="font-size:22px;font-weight:700;margin-bottom:10px;line-height:1.3;">${escapeHtml(feat.title)}</h2>
+                            <span style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;opacity:0.9;">Featured Video</span>
+                            <h2 style="font-size:22px;font-weight:800;margin-bottom:10px;line-height:1.3;">${escapeHtml(feat.title)}</h2>
                             <p style="font-size:13px;opacity:0.9;margin-bottom:8px;">${escapeHtml(feat.channelName)} • ${formatViews(feat.views)}</p>
                             <p style="font-size:13px;opacity:0.8;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${escapeHtml(feat.description)}</p>
                         </div>
                     </div>` : ''}
-                    <h2 style="font-size:20px;font-weight:700;margin-bottom:16px;">${isTrend ? '🔥 Trending Now' : 'Recommended Videos'}</h2>
+                    <h2 style="font-size:20px;font-weight:800;margin-bottom:16px;">${isTrend ? '🔥 Trending Now' : 'Recommended Videos'}</h2>
                     <div class="video-grid" id="v-grid"></div>
                 `;
 
@@ -541,30 +592,30 @@
                     <div class="watch-page">
                         <div class="watch-main">
                             <div class="watch-player-box" style="background:${grad};">
-                                ${v.videoUrl ? `<video src="${v.videoUrl}" controls autoplay></video>` : `<span class="material-icons" style="font-size:80px;color:#fff;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.4));">play_circle_filled</span>`}
+                                ${v.videoUrl ? `<video src="${v.videoUrl}" controls autoplay></video>` : ICONS.play}
                             </div>
-                            <h1 style="font-size:20px;font-weight:700;margin:16px 0 12px;">${escapeHtml(v.title)}</h1>
+                            <h1 style="font-size:20px;font-weight:800;margin:16px 0 12px;">${escapeHtml(v.title)}</h1>
                             <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;padding-bottom:16px;border-bottom:1px solid var(--border-color);">
                                 <div style="display:flex;align-items:center;gap:12px;">
-                                    <div class="channel-avatar" style="width:40px;height:40px;background:${v.channelAvatar||'#ef4444'};">${getInitials(v.channelName)}</div>
+                                    <div class="channel-avatar" style="width:40px;height:40px;background:${v.channelAvatar||'#ff0033'};">${getInitials(v.channelName)}</div>
                                     <div>
-                                        <div style="font-weight:600;font-size:15px;cursor:pointer;" id="ch-link">${escapeHtml(v.channelName)}</div>
+                                        <div style="font-weight:700;font-size:15px;cursor:pointer;" id="ch-link">${escapeHtml(v.channelName)}</div>
                                         <div style="font-size:12px;color:var(--text-tertiary);">${formatViews(ch.subscriberCount)} subscribers</div>
                                     </div>
                                     <button class="btn ${isSub?'btn-secondary':'btn-primary'} btn-sm" id="sub-btn" style="margin-left:12px;">${isSub?'Subscribed':'Subscribe'}</button>
                                 </div>
                                 <div style="display:flex;gap:8px;">
-                                    <button class="btn btn-secondary btn-sm" id="like-btn"><span class="material-icons" style="font-size:18px;">thumb_up</span> Like</button>
-                                    <button class="btn btn-secondary btn-sm" onclick="navigator.clipboard.writeText(location.href);showToast('Link copied!');"><span class="material-icons" style="font-size:18px;">share</span> Share</button>
+                                    <button class="btn btn-secondary btn-sm" id="like-btn">${ICONS.thumbUp} Like</button>
+                                    <button class="btn btn-secondary btn-sm" onclick="navigator.clipboard.writeText(location.href);showToast('Link copied!');">${ICONS.share} Share</button>
                                 </div>
                             </div>
                             <div style="background:var(--bg-surface);padding:16px;border-radius:12px;margin-top:16px;font-size:14px;line-height:1.5;">
-                                <div style="font-weight:600;margin-bottom:6px;">${formatViews(v.views)} • ${formatDate(v.uploadDate)}</div>
+                                <div style="font-weight:700;margin-bottom:6px;">${formatViews(v.views)} • ${formatDate(v.uploadDate)}</div>
                                 <p>${escapeHtml(v.description)}</p>
                             </div>
                         </div>
                         <div class="watch-sidebar">
-                            <h3 style="font-size:16px;font-weight:700;margin-bottom:16px;">Recommended Videos</h3>
+                            <h3 style="font-size:16px;font-weight:800;margin-bottom:16px;">Recommended Videos</h3>
                             <div id="rec-list" style="display:flex;flex-direction:column;gap:12px;"></div>
                         </div>
                     </div>
@@ -587,9 +638,9 @@
 
                 main.innerHTML = `
                     <div style="max-width:650px;margin:30px auto;background:var(--bg-secondary);padding:28px;border-radius:16px;border:1px solid var(--border-color);">
-                        <h2 style="font-size:22px;font-weight:700;margin-bottom:20px;">Upload Video</h2>
+                        <h2 style="font-size:22px;font-weight:800;margin-bottom:20px;">Upload Video</h2>
                         <div id="drop-box" style="border:2px dashed var(--border-color);border-radius:12px;padding:40px;text-align:center;cursor:pointer;margin-bottom:20px;">
-                            <span class="material-icons" style="font-size:56px;color:var(--accent);">cloud_upload</span>
+                            ${ICONS.uploadCloud}
                             <p style="margin-top:10px;font-weight:600;">Select a video file from your computer</p>
                             <input type="file" id="f-in" accept="video/*" hidden>
                         </div>
@@ -645,7 +696,7 @@
                 function draw() {
                     main.innerHTML = `
                         <div style="max-width:400px;margin:50px auto;background:var(--bg-secondary);padding:28px;border-radius:16px;border:1px solid var(--border-color);box-shadow:var(--shadow-md);">
-                            <h2 style="font-size:22px;font-weight:700;text-align:center;margin-bottom:20px;">${isSignUp ? 'Create Account' : 'Sign In to VidFlow'}</h2>
+                            <h2 style="font-size:22px;font-weight:800;text-align:center;margin-bottom:20px;">${isSignUp ? 'Create Account' : 'Sign In to Leakedfap'}</h2>
                             <form id="auth-f" style="display:flex;flex-direction:column;gap:14px;">
                                 ${isSignUp ? `
                                 <div>
@@ -663,7 +714,7 @@
                                 <button type="submit" class="btn btn-primary full-width" style="padding:12px;margin-top:6px;">${isSignUp ? 'Sign Up' : 'Sign In'}</button>
                             </form>
                             <div style="text-align:center;margin-top:16px;font-size:13px;color:var(--text-secondary);">
-                                ${isSignUp ? 'Already have an account? <a href="#" id="sw-btn" style="color:var(--accent);font-weight:600;">Sign in</a>' : 'Don\'t have an account? <a href="#" id="sw-btn" style="color:var(--accent);font-weight:600;">Sign up</a>'}
+                                ${isSignUp ? 'Already have an account? <a href="#" id="sw-btn" style="color:var(--accent);font-weight:700;">Sign in</a>' : 'Don\'t have an account? <a href="#" id="sw-btn" style="color:var(--accent);font-weight:700;">Sign up</a>'}
                             </div>
                         </div>
                     `;
@@ -685,7 +736,7 @@
                 const vids = getVideos();
                 const filter = q ? vids.filter(v => v.title.toLowerCase().includes(q.toLowerCase()) || v.channelName.toLowerCase().includes(q.toLowerCase())) : vids;
                 main.innerHTML = `
-                    <h2 style="font-size:20px;font-weight:700;margin-bottom:20px;">Search Results for "${escapeHtml(q)}" (${filter.length})</h2>
+                    <h2 style="font-size:20px;font-weight:800;margin-bottom:20px;">Search Results for "${escapeHtml(q)}" (${filter.length})</h2>
                     <div style="display:flex;flex-direction:column;gap:16px;" id="s-grid"></div>
                 `;
                 const g = main.querySelector('#s-grid');
@@ -695,7 +746,7 @@
             function renderCategory(main, cat) {
                 const vids = getVideos().filter(v => v.category === cat);
                 main.innerHTML = `
-                    <h2 style="font-size:22px;font-weight:700;margin-bottom:20px;">${escapeHtml(cat)} Videos (${vids.length})</h2>
+                    <h2 style="font-size:22px;font-weight:800;margin-bottom:20px;">${escapeHtml(cat)} Videos (${vids.length})</h2>
                     <div class="video-grid" id="cat-grid"></div>
                 `;
                 const g = main.querySelector('#cat-grid');
