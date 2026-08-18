@@ -49,6 +49,12 @@ function initApp() {
         renderSidebar('sidebar');
         renderPage(route, params);
     });
+
+    // 6. Initial render on page load
+    const initialRoute = parseRoute(window.location.hash);
+    renderNavbar('navbar');
+    renderSidebar('sidebar');
+    renderPage(initialRoute.route, initialRoute.params);
 }
 
 function renderPage(route, params) {
