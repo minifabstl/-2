@@ -5,28 +5,733 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VidFlow — Watch, Share & Discover Videos</title>
     <meta name="description" content="VidFlow is a premium video sharing platform. Upload, discover, and share videos with the world.">
-    <meta name="theme-color" content="#12161f">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>▶</text></svg>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link rel="stylesheet" href="css/reset.css">
-    <link rel="stylesheet" href="css/tokens.css">
-    <link rel="stylesheet" href="css/animations.css">
-    <link rel="stylesheet" href="css/global.css">
-    <link rel="stylesheet" href="css/components.css">
-    <link rel="stylesheet" href="css/layout.css">
-    <link rel="stylesheet" href="css/pages.css">
+    <style>
+        :root {
+            --accent: #ff0033;
+            --accent-hover: #cc0029;
+            --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 16px;
+            --radius-pill: 100px;
+            --navbar-height: 60px;
+            --sidebar-width: 240px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.2);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.3);
+            --shadow-lg: 0 8px 24px rgba(0,0,0,0.4);
+        }
+
+        html[data-theme="dark"] {
+            --bg-primary: #0f0f12;
+            --bg-secondary: #17181f;
+            --bg-surface: #20222c;
+            --bg-elevated: #282a36;
+            --text-primary: #f8f9fa;
+            --text-secondary: #a0a3bd;
+            --text-tertiary: #6b6f8a;
+            --border-color: #2b2d3d;
+            --border-subtle: #212330;
+        }
+
+        html[data-theme="light"] {
+            --bg-primary: #f8f9fc;
+            --bg-secondary: #ffffff;
+            --bg-surface: #f1f3f7;
+            --bg-elevated: #ffffff;
+            --text-primary: #12141d;
+            --text-secondary: #4a4d68;
+            --text-tertiary: #8b8ea8;
+            --border-color: #e2e5f0;
+            --border-subtle: #edf0fa;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        a { color: inherit; text-decoration: none; }
+        button, input, select, textarea { font-family: inherit; font-size: inherit; }
+
+        #app { display: flex; flex-direction: column; min-height: 100vh; }
+
+        .navbar {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: var(--navbar-height);
+            background-color: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 20px; z-index: 1000;
+        }
+
+        .nav-left { display: flex; align-items: center; gap: 16px; width: 25%; }
+        .nav-center { flex: 1; display: flex; justify-content: center; max-width: 600px; }
+        .nav-right { display: flex; align-items: center; justify-content: flex-end; gap: 12px; width: 25%; }
+
+        .logo { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 20px; cursor: pointer; }
+        .logo-icon { color: var(--accent); font-size: 28px; }
+
+        .search-bar {
+            display: flex; width: 100%;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-pill);
+            overflow: hidden;
+        }
+        .search-bar input {
+            flex: 1; padding: 8px 16px;
+            background: transparent; border: none; outline: none;
+            color: var(--text-primary);
+        }
+        .search-bar .search-btn {
+            padding: 0 16px; background: var(--bg-elevated);
+            border: none; border-left: 1px solid var(--border-color);
+            color: var(--text-secondary); cursor: pointer;
+            display: flex; align-items: center;
+        }
+
+        .icon-btn {
+            width: 40px; height: 40px; border-radius: 50%;
+            background: transparent; border: none; color: var(--text-primary);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: background 0.2s;
+        }
+        .icon-btn:hover { background: var(--bg-surface); }
+
+        .btn {
+            padding: 8px 16px; border-radius: var(--radius-pill);
+            border: none; font-weight: 600; cursor: pointer;
+            display: inline-flex; align-items: center; gap: 6px;
+            transition: opacity 0.2s, background 0.2s;
+        }
+        .btn-primary { background: var(--accent); color: #fff; }
+        .btn-primary:hover { background: var(--accent-hover); }
+        .btn-secondary { background: var(--bg-surface); color: var(--text-primary); }
+        .btn-secondary:hover { background: var(--bg-elevated); }
+        .btn-sm { padding: 6px 14px; font-size: 13px; }
+        .full-width { width: 100%; justify-content: center; }
+
+        .sidebar {
+            position: fixed; top: var(--navbar-height); left: 0;
+            width: var(--sidebar-width); height: calc(100vh - var(--navbar-height));
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            overflow-y: auto; z-index: 900;
+            transition: width 0.2s ease, transform 0.2s ease;
+            padding: 12px 8px;
+        }
+        .sidebar.collapsed { width: 72px; }
+        .sidebar.collapsed .sidebar-link span.text,
+        .sidebar.collapsed .sidebar-heading { display: none; }
+        .sidebar.collapsed .sidebar-link { justify-content: center; padding: 12px 0; }
+
+        .sidebar-link {
+            display: flex; align-items: center; gap: 16px;
+            padding: 10px 16px; border-radius: var(--radius-md);
+            color: var(--text-primary); cursor: pointer;
+            transition: background 0.15s; margin-bottom: 2px;
+            font-size: 14px; font-weight: 500;
+        }
+        .sidebar-link:hover { background: var(--bg-surface); }
+        .sidebar-link.active { background: var(--bg-surface); color: var(--accent); font-weight: 600; }
+        .sidebar-heading { padding: 8px 16px; font-size: 11px; font-weight: 700; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.5px; }
+        .divider { height: 1px; background: var(--border-color); margin: 8px 0; }
+
+        #main-content {
+            margin-left: var(--sidebar-width);
+            margin-top: var(--navbar-height);
+            min-height: calc(100vh - var(--navbar-height));
+            padding: 24px;
+            transition: margin-left 0.2s ease;
+        }
+        .sidebar.collapsed ~ #main-content { margin-left: 72px; }
+
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        .video-card {
+            display: flex; flex-direction: column; gap: 10px;
+            cursor: pointer; transition: transform 0.2s;
+        }
+        .video-card:hover { transform: translateY(-3px); }
+        .video-card .thumbnail {
+            aspect-ratio: 16/9; border-radius: var(--radius-md);
+            position: relative; overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .duration-badge {
+            position: absolute; bottom: 8px; right: 8px;
+            background: rgba(0,0,0,0.8); color: #fff;
+            padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 600;
+        }
+        .video-info { display: flex; gap: 12px; }
+        .channel-avatar {
+            width: 36px; height: 36px; border-radius: 50%;
+            color: #fff; font-weight: 700; font-size: 13px;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .video-details h3 { font-size: 14px; font-weight: 600; line-height: 1.4; margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .channel-name { font-size: 13px; color: var(--text-secondary); }
+        .video-meta { font-size: 12px; color: var(--text-tertiary); margin-top: 2px; }
+
+        .video-card.horizontal {
+            display: grid; grid-template-columns: 160px 1fr; gap: 12px;
+        }
+        .video-card.horizontal .thumbnail { aspect-ratio: 16/9; }
+
+        .category-scroll { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 24px; padding-bottom: 4px; }
+        .category-scroll::-webkit-scrollbar { display: none; }
+        .chip {
+            padding: 8px 16px; border-radius: var(--radius-pill);
+            background: var(--bg-surface); color: var(--text-primary);
+            border: none; cursor: pointer; font-size: 13px; font-weight: 600;
+            white-space: nowrap; transition: background 0.2s;
+        }
+        .chip.active { background: var(--accent); color: #fff; }
+
+        .watch-page { display: grid; grid-template-columns: 1fr 380px; gap: 24px; max-width: 1700px; margin: 0 auto; }
+        .watch-main { min-width: 0; }
+        .watch-player-box { background: #000; aspect-ratio: 16/9; border-radius: var(--radius-lg); overflow: hidden; display: flex; align-items: center; justify-content: center; }
+        .watch-player-box video { width: 100%; height: 100%; object-fit: contain; }
+
+        #toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 2000; display: flex; flex-direction: column; gap: 10px; }
+        .toast {
+            background: var(--bg-elevated); color: var(--text-primary);
+            padding: 12px 18px; border-radius: var(--radius-md);
+            box-shadow: var(--shadow-lg); border-left: 4px solid var(--accent);
+            display: flex; align-items: center; gap: 10px; font-size: 14px;
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        .hidden { display: none !important; }
+
+        @media (max-width: 1024px) {
+            .watch-page { grid-template-columns: 1fr; }
+            .sidebar { width: 72px; }
+            .sidebar .sidebar-link span.text, .sidebar .sidebar-heading { display: none; }
+            .sidebar .sidebar-link { justify-content: center; padding: 12px 0; }
+            #main-content { margin-left: 72px; }
+        }
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); width: 240px; }
+            .sidebar.mobile-open { transform: translateX(0); }
+            #main-content { margin-left: 0; padding: 16px; }
+            .nav-left { width: auto; }
+            .nav-right { width: auto; }
+            .nav-center { display: none; }
+        }
+    </style>
 </head>
 <body>
     <div id="app">
-        <nav id="navbar"></nav>
-        <aside id="sidebar"></aside>
+        <nav id="navbar" class="navbar"></nav>
+        <aside id="sidebar" class="sidebar"></aside>
         <main id="main-content"></main>
         <div id="modal-root"></div>
         <div id="toast-container"></div>
     </div>
-    <script src="js/app.js"></script>
+
+    <script>
+        (function() {
+            'use strict';
+
+            function formatViews(count) {
+                if (!count) return '0 views';
+                if (count >= 1000000) return (count / 1000000).toFixed(1).replace(/\.0$/, '') + 'M views';
+                if (count >= 1000) return (count / 1000).toFixed(1).replace(/\.0$/, '') + 'K views';
+                return count.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + ' views';
+            }
+
+            function formatDate(iso) {
+                if (!iso) return '';
+                const diff = Math.floor((new Date() - new Date(iso)) / 1000);
+                if (diff < 60) return 'Just now';
+                if (diff < 3600) return Math.floor(diff / 60) + ' mins ago';
+                if (diff < 86400) return Math.floor(diff / 3600) + ' hours ago';
+                if (diff < 604800) return Math.floor(diff / 86400) + ' days ago';
+                return Math.floor(diff / 604800) + ' weeks ago';
+            }
+
+            function formatDuration(sec) {
+                if (!sec) return '0:00';
+                const m = Math.floor(sec / 60);
+                const s = Math.floor(sec % 60);
+                return m + ':' + (s < 10 ? '0' : '') + s;
+            }
+
+            function generateId() { return 'id_' + Math.random().toString(36).substr(2, 9); }
+            function escapeHtml(s) { if (!s) return ''; return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+            function getInitials(name) { if (!name) return '?'; const p = name.trim().split(' '); return (p[0][0] + (p[1] ? p[1][0] : '')).toUpperCase(); }
+            function getRandomColor() { const c=['#ef4444','#f97316','#f59e0b','#10b981','#06b6d4','#3b82f6','#6366f1','#8b5cf6','#d946ef']; return c[Math.floor(Math.random()*c.length)]; }
+
+            function showToast(msg) {
+                const box = document.getElementById('toast-container');
+                if (!box) return;
+                const t = document.createElement('div');
+                t.className = 'toast';
+                t.innerHTML = '<span class="material-icons" style="font-size:18px;color:var(--accent);">info</span> ' + escapeHtml(msg);
+                box.appendChild(t);
+                setTimeout(() => t.remove(), 3000);
+            }
+
+            const K = { U: 'vf_u', V: 'vf_v', C: 'vf_c', ME: 'vf_me', T: 'vf_t' };
+            function getStore(k, def) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : def; } catch(e) { return def; } }
+            function setStore(k, val) { try { localStorage.setItem(k, JSON.stringify(val)); } catch(e) {} }
+
+            function getUsers() { return getStore(K.U, []); }
+            function getVideos() { return getStore(K.V, []); }
+            function getCurUser() { return getStore(K.ME, null); }
+            function setCurUser(u) { setStore(K.ME, u); }
+
+            function initData() {
+                if (localStorage.getItem('vf_init')) return;
+                const channels = [
+                    { u: 'techhub', n: 'TechVision Hub', c: 'Technology', b: 'Daily programming, AI models, and next-gen tech.' },
+                    { u: 'gamers', n: 'GameZone Pro', c: 'Gaming', b: 'Speedruns, AAA gameplay, and esports tournaments.' },
+                    { u: 'musicvibes', n: 'Lofi Chill Vibes', c: 'Music', b: 'Relaxing beats to study, code, and sleep to.' },
+                    { u: 'codecraft', n: 'CodeCraft Academy', c: 'Education', b: 'Learn full-stack web development step-by-step.' },
+                    { u: 'sportsnet', n: 'Apex Sports', c: 'Sports', b: 'Championship highlights, top goals, and reactions.' },
+                    { u: 'comedygold', n: 'Comedy Vault', c: 'Comedy', b: 'Standup clips, funny sketches, and bloopers.' }
+                ];
+                const titles = [
+                    "Building a YouTube Clone with Vanilla JS", "Top 10 Unreal Engine 5 Games in 2025",
+                    "24/7 Lofi Hip Hop Beats to Study / Relax", "Understanding Quantum Computing Simply",
+                    "Epic Comeback in Championship Final", "Funniest Standup Comedy Live Special",
+                    "Next.js vs Vite - The Ultimate Benchmark", "Baking the Perfect Artisan Sourdough",
+                    "Speedrunning Minecraft Blindfolded", "10 CSS Tricks You Wish You Knew Earlier"
+                ];
+
+                const users = channels.map(ch => ({
+                    id: generateId(), username: ch.u, displayName: ch.n, category: ch.c, bio: ch.b,
+                    avatarBg: getRandomColor(), subscriberCount: Math.floor(Math.random()*600000)+20000,
+                    subscriptions: []
+                }));
+
+                const videos = titles.map((t, idx) => {
+                    const u = users[idx % users.length];
+                    return {
+                        id: 'vid_' + (idx + 1), title: t, description: 'Welcome to ' + u.displayName + '! Enjoy watching ' + t + '.',
+                        channelId: u.id, channelName: u.displayName, channelAvatar: u.avatarBg,
+                        category: u.category, views: Math.floor(Math.random()*850000)+3000,
+                        likes: ['u1', 'u2'], dislikes: [], duration: Math.floor(Math.random()*1200)+90,
+                        uploadDate: new Date(Date.now() - (idx * 2 * 86400 * 1000)).toISOString()
+                    };
+                });
+
+                setStore(K.U, users);
+                setStore(K.V, videos);
+                localStorage.setItem('vf_init', '1');
+            }
+
+            let curTheme = getStore(K.T, 'dark');
+            document.documentElement.setAttribute('data-theme', curTheme);
+            function toggleTheme() {
+                curTheme = curTheme === 'dark' ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', curTheme);
+                setStore(K.T, curTheme);
+                renderNavbar();
+            }
+
+            const GRADS = {
+                'Music': 'linear-gradient(135deg, #a18cd1, #fbc2eb)',
+                'Gaming': 'linear-gradient(135deg, #84fab0, #8fd3f4)',
+                'Education': 'linear-gradient(135deg, #667eea, #764ba2)',
+                'Sports': 'linear-gradient(135deg, #f6d365, #fda085)',
+                'Technology': 'linear-gradient(135deg, #00c6ff, #0072ff)',
+                'Comedy': 'linear-gradient(135deg, #fccb90, #d57eeb)'
+            };
+
+            function parseHash() {
+                const h = window.location.hash.replace(/^#\//, '') || '/';
+                const parts = h.split('?');
+                const path = parts[0];
+                const p = path.split('/').filter(Boolean);
+                if (p[0] === 'watch' && p[1]) return { r: '/watch', id: p[1] };
+                if (p[0] === 'channel' && p[1]) return { r: '/channel', id: p[1] };
+                if (p[0] === 'category' && p[1]) return { r: '/category', name: decodeURIComponent(p[1]) };
+                if (p[0] === 'search') {
+                    const q = parts[1] ? new URLSearchParams(parts[1]).get('q') : '';
+                    return { r: '/search', q: q || '' };
+                }
+                if (p[0] === 'upload') return { r: '/upload' };
+                if (p[0] === 'auth') return { r: '/auth' };
+                if (p[0] === 'trending') return { r: '/trending' };
+                if (p[0] === 'subscriptions') return { r: '/subscriptions' };
+                return { r: '/' };
+            }
+
+            function navTo(p) { window.location.hash = p.startsWith('#/') ? p : '#/' + p.replace(/^\//, ''); }
+
+            function renderNavbar() {
+                const nav = document.getElementById('navbar');
+                if (!nav) return;
+                const me = getCurUser();
+                nav.innerHTML = `
+                    <div class="nav-left">
+                        <button id="nav-toggle-sb" class="icon-btn"><span class="material-icons">menu</span></button>
+                        <div class="logo" id="nav-logo">
+                            <span class="material-icons logo-icon">play_circle_filled</span>
+                            <span>VidFlow</span>
+                        </div>
+                    </div>
+                    <div class="nav-center">
+                        <form id="nav-search-form" class="search-bar">
+                            <input type="text" id="nav-search-in" placeholder="Search videos...">
+                            <button type="submit" class="search-btn"><span class="material-icons">search</span></button>
+                        </form>
+                    </div>
+                    <div class="nav-right">
+                        <button id="nav-theme-btn" class="icon-btn" title="Toggle Theme">
+                            <span class="material-icons">${curTheme === 'dark' ? 'light_mode' : 'dark_mode'}</span>
+                        </button>
+                        ${me ? `
+                            <button id="nav-upload-btn" class="btn btn-primary btn-sm"><span class="material-icons" style="font-size:18px;">video_call</span> Upload</button>
+                            <div class="channel-avatar" style="background:${me.avatarBg||'#ef4444'};cursor:pointer;" id="nav-profile-btn">${getInitials(me.displayName)}</div>
+                            <button id="nav-logout-btn" class="btn btn-secondary btn-sm">Sign Out</button>
+                        ` : `
+                            <button id="nav-signin-btn" class="btn btn-primary btn-sm">Sign In</button>
+                        `}
+                    </div>
+                `;
+
+                nav.querySelector('#nav-logo').onclick = () => navTo('/');
+                nav.querySelector('#nav-theme-btn').onclick = toggleTheme;
+                nav.querySelector('#nav-toggle-sb').onclick = () => {
+                    document.getElementById('sidebar').classList.toggle('collapsed');
+                };
+
+                nav.querySelector('#nav-search-form').onsubmit = (e) => {
+                    e.preventDefault();
+                    const q = nav.querySelector('#nav-search-in').value.trim();
+                    if (q) navTo('/search?q=' + encodeURIComponent(q));
+                };
+
+                if (me) {
+                    nav.querySelector('#nav-upload-btn').onclick = () => navTo('/upload');
+                    nav.querySelector('#nav-profile-btn').onclick = () => navTo('/channel/' + me.id);
+                    nav.querySelector('#nav-logout-btn').onclick = () => {
+                        setCurUser(null);
+                        showToast('Signed out successfully');
+                        renderApp();
+                    };
+                } else {
+                    nav.querySelector('#nav-signin-btn').onclick = () => navTo('/auth');
+                }
+            }
+
+            function renderSidebar() {
+                const sb = document.getElementById('sidebar');
+                if (!sb) return;
+                const me = getCurUser();
+                const route = parseHash().r;
+                const cats = ['Music', 'Gaming', 'Education', 'Sports', 'Technology', 'Comedy'];
+
+                sb.innerHTML = `
+                    <div class="sidebar-link ${route==='/'?'active':''}" data-href="/"><span class="material-icons">home</span><span class="text">Home</span></div>
+                    <div class="sidebar-link ${route==='/trending'?'active':''}" data-href="/trending"><span class="material-icons">local_fire_department</span><span class="text">Trending</span></div>
+                    ${me ? `<div class="sidebar-link ${route==='/subscriptions'?'active':''}" data-href="/subscriptions"><span class="material-icons">subscriptions</span><span class="text">Subscriptions</span></div>` : ''}
+                    <div class="divider"></div>
+                    <div class="sidebar-heading">Explore</div>
+                    ${cats.map(c => `<div class="sidebar-link" data-href="/category/${c}"><span class="material-icons" style="font-size:20px;">category</span><span class="text">${c}</span></div>`).join('')}
+                `;
+
+                sb.querySelectorAll('.sidebar-link').forEach(l => {
+                    l.onclick = () => navTo(l.dataset.href);
+                });
+            }
+
+            function makeVideoCard(v, horiz = false) {
+                const el = document.createElement('div');
+                el.className = 'video-card' + (horiz ? ' horizontal' : '');
+                const grad = GRADS[v.category] || 'linear-gradient(135deg, #667eea, #764ba2)';
+
+                el.innerHTML = `
+                    <div class="thumbnail" style="background:${grad}">
+                        <span class="material-icons" style="font-size:44px;color:rgba(255,255,255,0.85);filter:drop-shadow(0 2px 8px rgba(0,0,0,0.3));">play_circle_filled</span>
+                        <span class="duration-badge">${formatDuration(v.duration)}</span>
+                    </div>
+                    <div class="video-info">
+                        ${!horiz ? `<div class="channel-avatar" style="background:${v.channelAvatar||'#ef4444'}">${getInitials(v.channelName)}</div>` : ''}
+                        <div class="video-details">
+                            <h3>${escapeHtml(v.title)}</h3>
+                            <div class="channel-name">${escapeHtml(v.channelName)}</div>
+                            <div class="video-meta">${formatViews(v.views)} • ${formatDate(v.uploadDate)}</div>
+                        </div>
+                    </div>
+                `;
+                el.onclick = () => navTo('/watch/' + v.id);
+                return el;
+            }
+
+            function renderHome(main, isTrend) {
+                const vids = getVideos();
+                const sorted = [...vids].sort((a,b) => b.views - a.views);
+                const feat = sorted[0];
+
+                const cats = ['All', 'Technology', 'Gaming', 'Music', 'Education', 'Sports', 'Comedy'];
+                const grad = GRADS[feat.category] || 'linear-gradient(135deg, #667eea, #764ba2)';
+
+                main.innerHTML = `
+                    <div class="category-scroll">
+                        ${cats.map(c => `<button class="chip ${c==='All'?'active':''}" data-cat="${c}">${c}</button>`).join('')}
+                    </div>
+                    ${!isTrend ? `
+                    <div class="featured-box" style="background:${grad};border-radius:16px;display:grid;grid-template-columns:1.4fr 1fr;min-height:280px;cursor:pointer;margin-bottom:32px;overflow:hidden;box-shadow:var(--shadow-md);" id="feat-btn">
+                        <div style="display:flex;align-items:center;justify-content:center;position:relative;">
+                            <span class="material-icons" style="font-size:72px;color:#fff;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.4));">play_circle</span>
+                            <span class="duration-badge">${formatDuration(feat.duration)}</span>
+                        </div>
+                        <div style="padding:28px;background:rgba(0,0,0,0.3);backdrop-filter:blur(8px);color:#fff;display:flex;flex-direction:column;justify-content:center;">
+                            <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;opacity:0.9;">Featured Video</span>
+                            <h2 style="font-size:22px;font-weight:700;margin-bottom:10px;line-height:1.3;">${escapeHtml(feat.title)}</h2>
+                            <p style="font-size:13px;opacity:0.9;margin-bottom:8px;">${escapeHtml(feat.channelName)} • ${formatViews(feat.views)}</p>
+                            <p style="font-size:13px;opacity:0.8;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${escapeHtml(feat.description)}</p>
+                        </div>
+                    </div>` : ''}
+                    <h2 style="font-size:20px;font-weight:700;margin-bottom:16px;">${isTrend ? '🔥 Trending Now' : 'Recommended Videos'}</h2>
+                    <div class="video-grid" id="v-grid"></div>
+                `;
+
+                const grid = main.querySelector('#v-grid');
+                sorted.forEach(v => grid.appendChild(makeVideoCard(v)));
+
+                const featBtn = main.querySelector('#feat-btn');
+                if (featBtn) featBtn.onclick = () => navTo('/watch/' + feat.id);
+
+                main.querySelectorAll('.chip').forEach(ch => {
+                    ch.onclick = () => {
+                        main.querySelectorAll('.chip').forEach(x => x.classList.remove('active'));
+                        ch.classList.add('active');
+                        grid.innerHTML = '';
+                        const filtered = ch.dataset.cat === 'All' ? sorted : sorted.filter(v => v.category === ch.dataset.cat);
+                        filtered.forEach(v => grid.appendChild(makeVideoCard(v)));
+                    };
+                });
+            }
+
+            function renderWatch(main, vidId) {
+                const vids = getVideos();
+                const v = vids.find(x => x.id === vidId);
+                if (!v) { main.innerHTML = '<h2>Video not found</h2>'; return; }
+
+                v.views = (v.views || 0) + 1;
+                setStore(K.V, vids);
+
+                const users = getUsers();
+                const ch = users.find(u => u.id === v.channelId) || { subscriberCount: 45000, displayName: v.channelName };
+                const me = getCurUser();
+                const isSub = me && me.subscriptions && me.subscriptions.includes(v.channelId);
+
+                const grad = GRADS[v.category] || 'linear-gradient(135deg, #667eea, #764ba2)';
+
+                main.innerHTML = `
+                    <div class="watch-page">
+                        <div class="watch-main">
+                            <div class="watch-player-box" style="background:${grad};">
+                                ${v.videoUrl ? `<video src="${v.videoUrl}" controls autoplay></video>` : `<span class="material-icons" style="font-size:80px;color:#fff;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.4));">play_circle_filled</span>`}
+                            </div>
+                            <h1 style="font-size:20px;font-weight:700;margin:16px 0 12px;">${escapeHtml(v.title)}</h1>
+                            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;padding-bottom:16px;border-bottom:1px solid var(--border-color);">
+                                <div style="display:flex;align-items:center;gap:12px;">
+                                    <div class="channel-avatar" style="width:40px;height:40px;background:${v.channelAvatar||'#ef4444'};">${getInitials(v.channelName)}</div>
+                                    <div>
+                                        <div style="font-weight:600;font-size:15px;cursor:pointer;" id="ch-link">${escapeHtml(v.channelName)}</div>
+                                        <div style="font-size:12px;color:var(--text-tertiary);">${formatViews(ch.subscriberCount)} subscribers</div>
+                                    </div>
+                                    <button class="btn ${isSub?'btn-secondary':'btn-primary'} btn-sm" id="sub-btn" style="margin-left:12px;">${isSub?'Subscribed':'Subscribe'}</button>
+                                </div>
+                                <div style="display:flex;gap:8px;">
+                                    <button class="btn btn-secondary btn-sm" id="like-btn"><span class="material-icons" style="font-size:18px;">thumb_up</span> Like</button>
+                                    <button class="btn btn-secondary btn-sm" onclick="navigator.clipboard.writeText(location.href);showToast('Link copied!');"><span class="material-icons" style="font-size:18px;">share</span> Share</button>
+                                </div>
+                            </div>
+                            <div style="background:var(--bg-surface);padding:16px;border-radius:12px;margin-top:16px;font-size:14px;line-height:1.5;">
+                                <div style="font-weight:600;margin-bottom:6px;">${formatViews(v.views)} • ${formatDate(v.uploadDate)}</div>
+                                <p>${escapeHtml(v.description)}</p>
+                            </div>
+                        </div>
+                        <div class="watch-sidebar">
+                            <h3 style="font-size:16px;font-weight:700;margin-bottom:16px;">Recommended Videos</h3>
+                            <div id="rec-list" style="display:flex;flex-direction:column;gap:12px;"></div>
+                        </div>
+                    </div>
+                `;
+
+                const rec = main.querySelector('#rec-list');
+                vids.filter(x => x.id !== vidId).slice(0, 8).forEach(x => rec.appendChild(makeVideoCard(x, true)));
+
+                main.querySelector('#ch-link').onclick = () => navTo('/channel/' + v.channelId);
+                main.querySelector('#sub-btn').onclick = () => {
+                    if (!me) return showToast('Please sign in to subscribe');
+                    showToast('Subscription updated');
+                };
+                main.querySelector('#like-btn').onclick = () => showToast('Liked video');
+            }
+
+            function renderUpload(main) {
+                const me = getCurUser();
+                if (!me) { showToast('Please sign in to upload'); navTo('/auth'); return; }
+
+                main.innerHTML = `
+                    <div style="max-width:650px;margin:30px auto;background:var(--bg-secondary);padding:28px;border-radius:16px;border:1px solid var(--border-color);">
+                        <h2 style="font-size:22px;font-weight:700;margin-bottom:20px;">Upload Video</h2>
+                        <div id="drop-box" style="border:2px dashed var(--border-color);border-radius:12px;padding:40px;text-align:center;cursor:pointer;margin-bottom:20px;">
+                            <span class="material-icons" style="font-size:56px;color:var(--accent);">cloud_upload</span>
+                            <p style="margin-top:10px;font-weight:600;">Select a video file from your computer</p>
+                            <input type="file" id="f-in" accept="video/*" hidden>
+                        </div>
+                        <form id="up-form">
+                            <div style="margin-bottom:16px;">
+                                <label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px;">Title *</label>
+                                <input type="text" id="up-title" required placeholder="Enter video title" style="width:100%;padding:10px 14px;background:var(--bg-surface);border:1px solid var(--border-color);border-radius:8px;color:var(--text-primary);">
+                            </div>
+                            <div style="margin-bottom:16px;">
+                                <label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px;">Category</label>
+                                <select id="up-cat" style="width:100%;padding:10px 14px;background:var(--bg-surface);border:1px solid var(--border-color);border-radius:8px;color:var(--text-primary);">
+                                    <option>Technology</option><option>Gaming</option><option>Music</option><option>Education</option><option>Sports</option><option>Comedy</option>
+                                </select>
+                            </div>
+                            <div style="margin-bottom:20px;">
+                                <label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px;">Description</label>
+                                <textarea id="up-desc" rows="3" placeholder="Tell viewers about your video" style="width:100%;padding:10px 14px;background:var(--bg-surface);border:1px solid var(--border-color);border-radius:8px;color:var(--text-primary);"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary full-width" style="padding:12px;">Publish Video</button>
+                        </form>
+                    </div>
+                `;
+
+                let vidUrl = null;
+                const fIn = main.querySelector('#f-in');
+                main.querySelector('#drop-box').onclick = () => fIn.click();
+                fIn.onchange = (e) => {
+                    if (e.target.files[0]) {
+                        vidUrl = URL.createObjectURL(e.target.files[0]);
+                        main.querySelector('#drop-box p').textContent = 'Selected: ' + e.target.files[0].name;
+                    }
+                };
+
+                main.querySelector('#up-form').onsubmit = (e) => {
+                    e.preventDefault();
+                    const title = main.querySelector('#up-title').value.trim();
+                    if (!title) return;
+                    const vids = getVideos();
+                    vids.unshift({
+                        id: generateId(), title: title, description: main.querySelector('#up-desc').value.trim(),
+                        channelId: me.id, channelName: me.displayName, channelAvatar: me.avatarBg,
+                        category: main.querySelector('#up-cat').value, views: 1, duration: 150,
+                        uploadDate: new Date().toISOString(), videoUrl: vidUrl
+                    });
+                    setStore(K.V, vids);
+                    showToast('Video published successfully!');
+                    navTo('/');
+                };
+            }
+
+            function renderAuth(main) {
+                let isSignUp = false;
+                function draw() {
+                    main.innerHTML = `
+                        <div style="max-width:400px;margin:50px auto;background:var(--bg-secondary);padding:28px;border-radius:16px;border:1px solid var(--border-color);box-shadow:var(--shadow-md);">
+                            <h2 style="font-size:22px;font-weight:700;text-align:center;margin-bottom:20px;">${isSignUp ? 'Create Account' : 'Sign In to VidFlow'}</h2>
+                            <form id="auth-f" style="display:flex;flex-direction:column;gap:14px;">
+                                ${isSignUp ? `
+                                <div>
+                                    <label style="display:block;font-size:12px;font-weight:600;margin-bottom:4px;">Display Name</label>
+                                    <input type="text" id="au-name" required placeholder="John Doe" style="width:100%;padding:10px;background:var(--bg-surface);border:1px solid var(--border-color);border-radius:8px;color:var(--text-primary);">
+                                </div>` : ''}
+                                <div>
+                                    <label style="display:block;font-size:12px;font-weight:600;margin-bottom:4px;">Email</label>
+                                    <input type="email" id="au-email" required placeholder="user@example.com" style="width:100%;padding:10px;background:var(--bg-surface);border:1px solid var(--border-color);border-radius:8px;color:var(--text-primary);">
+                                </div>
+                                <div>
+                                    <label style="display:block;font-size:12px;font-weight:600;margin-bottom:4px;">Password</label>
+                                    <input type="password" id="au-pass" required placeholder="••••••••" style="width:100%;padding:10px;background:var(--bg-surface);border:1px solid var(--border-color);border-radius:8px;color:var(--text-primary);">
+                                </div>
+                                <button type="submit" class="btn btn-primary full-width" style="padding:12px;margin-top:6px;">${isSignUp ? 'Sign Up' : 'Sign In'}</button>
+                            </form>
+                            <div style="text-align:center;margin-top:16px;font-size:13px;color:var(--text-secondary);">
+                                ${isSignUp ? 'Already have an account? <a href="#" id="sw-btn" style="color:var(--accent);font-weight:600;">Sign in</a>' : 'Don\'t have an account? <a href="#" id="sw-btn" style="color:var(--accent);font-weight:600;">Sign up</a>'}
+                            </div>
+                        </div>
+                    `;
+                    main.querySelector('#sw-btn').onclick = (e) => { e.preventDefault(); isSignUp = !isSignUp; draw(); };
+                    main.querySelector('#auth-f').onsubmit = (e) => {
+                        e.preventDefault();
+                        const email = main.querySelector('#au-email').value.trim();
+                        const name = isSignUp ? main.querySelector('#au-name').value.trim() : email.split('@')[0];
+                        const u = { id: generateId(), username: name.toLowerCase().replace(/\s+/g,''), displayName: name, email: email, avatarBg: getRandomColor() };
+                        setCurUser(u);
+                        showToast('Welcome, ' + name + '!');
+                        navTo('/');
+                    };
+                }
+                draw();
+            }
+
+            function renderSearch(main, q) {
+                const vids = getVideos();
+                const filter = q ? vids.filter(v => v.title.toLowerCase().includes(q.toLowerCase()) || v.channelName.toLowerCase().includes(q.toLowerCase())) : vids;
+                main.innerHTML = `
+                    <h2 style="font-size:20px;font-weight:700;margin-bottom:20px;">Search Results for "${escapeHtml(q)}" (${filter.length})</h2>
+                    <div style="display:flex;flex-direction:column;gap:16px;" id="s-grid"></div>
+                `;
+                const g = main.querySelector('#s-grid');
+                filter.forEach(v => g.appendChild(makeVideoCard(v, true)));
+            }
+
+            function renderCategory(main, cat) {
+                const vids = getVideos().filter(v => v.category === cat);
+                main.innerHTML = `
+                    <h2 style="font-size:22px;font-weight:700;margin-bottom:20px;">${escapeHtml(cat)} Videos (${vids.length})</h2>
+                    <div class="video-grid" id="cat-grid"></div>
+                `;
+                const g = main.querySelector('#cat-grid');
+                vids.forEach(v => g.appendChild(makeVideoCard(v)));
+            }
+
+            function renderApp() {
+                initData();
+                renderNavbar();
+                renderSidebar();
+
+                const parsed = parseHash();
+                const main = document.getElementById('main-content');
+                if (!main) return;
+                main.innerHTML = '';
+
+                switch (parsed.r) {
+                    case '/': renderHome(main, false); break;
+                    case '/trending': renderHome(main, true); break;
+                    case '/watch': renderWatch(main, parsed.id); break;
+                    case '/upload': renderUpload(main); break;
+                    case '/auth': renderAuth(main); break;
+                    case '/search': renderSearch(main, parsed.q); break;
+                    case '/category': renderCategory(main, parsed.name); break;
+                    default: renderHome(main, false); break;
+                }
+            }
+
+            window.addEventListener('hashchange', renderApp);
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', renderApp);
+            } else {
+                renderApp();
+            }
+
+        })();
+    </script>
 </body>
 </html>
