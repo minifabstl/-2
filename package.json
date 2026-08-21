@@ -4,10 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build && npx opennextjs-cloudflare build",
+    "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "deploy": "npm run build && npx wrangler deploy"
+    "cf-build": "opennextjs-cloudflare build",
+    "deploy": "npm run cf-build && npx wrangler deploy"
   },
   "dependencies": {
     "drizzle-orm": "^0.45.2",

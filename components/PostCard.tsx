@@ -26,11 +26,17 @@ export default function PostCard({
   return (
     <div className="flex flex-col border border-[var(--border)] rounded-[14px] overflow-hidden bg-[var(--surface)]">
       <div
-        className="relative w-full h-[150px] flex items-center justify-center"
+        className="relative w-full h-[150px] flex items-center justify-center overflow-hidden"
         style={{ background: `linear-gradient(135deg, oklch(0.86 0.06 ${gradientHue}), oklch(0.94 0.03 ${gradientHue}))` }}
       >
+        {post.type === "photo" ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={post.mediaUrl} alt={post.title} className="absolute inset-0 w-full h-full object-cover" />
+        ) : (
+          <video src={post.mediaUrl} className="absolute inset-0 w-full h-full object-cover" preload="metadata" muted playsInline />
+        )}
         {post.type === "video" && (
-          <div className="w-[38px] h-[38px] rounded-full bg-white/90 flex items-center justify-center">
+          <div className="relative w-[38px] h-[38px] rounded-full bg-white/90 flex items-center justify-center">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="#18181b"><path d="M6 4l14 8-14 8V4z" /></svg>
           </div>
         )}
