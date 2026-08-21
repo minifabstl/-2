@@ -8,7 +8,7 @@ const display = Space_Grotesk({ variable: "--font-display", subsets: ["latin"], 
 const body = IBM_Plex_Sans({ variable: "--font-body", subsets: ["latin"], weight: ["400", "500", "600"] });
 
 export const metadata: Metadata = {
-  title: "Akış — Paylaştıkça Kazan",
+  title: "LeakedFap — Paylaştıkça Kazan",
   description: "Video ve fotoğraf paylaşım platformu. İzlenme başına kazanç, Bitcoin ile ödeme.",
 };
 

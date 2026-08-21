@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useState } from "react";
 import type { SafeUser } from "@/lib/auth";
 import LoginPromptModal from "@/components/LoginPromptModal";
+import Logo from "@/components/Logo";
 
 const NAV = [
   { href: "/", label: "Ana Sayfa", locked: false, icon: "home" },
@@ -43,11 +44,8 @@ export default function AppShell({ user, children }: { user: SafeUser | null; ch
   return (
     <div className="flex min-h-screen bg-[var(--bg)]">
       <aside className="w-60 min-w-60 border-r border-[var(--border)] bg-[var(--surface)] flex flex-col gap-6 p-3.5 sticky top-0 h-screen">
-        <Link href="/" className="flex items-center gap-2 px-2 py-1">
-          <span className="w-7 h-7 rounded-lg bg-[var(--accent)] flex items-center justify-center">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 3l14 9-14 9V3z" fill="white" /></svg>
-          </span>
-          <span className="font-display text-[17px] font-bold">Akış</span>
+        <Link href="/" className="flex items-center px-2 py-1">
+          <Logo />
         </Link>
 
         <nav className="flex flex-col gap-0.5">

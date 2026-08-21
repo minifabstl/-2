@@ -41,9 +41,12 @@ export default function LoginPage() {
       <div className="hidden md:flex w-[640px] min-h-screen flex-col justify-between p-12 text-white" style={{ background: "linear-gradient(160deg, oklch(0.64 0.19 25), oklch(0.5 0.17 20))" }}>
         <div className="flex items-center gap-2">
           <span className="w-7 h-7 rounded-lg bg-white/20 flex items-center justify-center">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 3l14 9-14 9V3z" fill="white" /></svg>
+            <svg width="18" height="18" viewBox="0 0 28 28" fill="none">
+              <path d="M8.2 6.2h2.7v12.1h6.3v2.4H8.2V6.2z" fill="white" />
+              <path d="M17.4 6.2h6.1v2.35h-3.4v3.1h3.05v2.3h-3.05v3.9h-2.7V6.2z" fill="white" fillOpacity="0.92" />
+            </svg>
           </span>
-          <span className="font-display text-[17px] font-bold">Akış</span>
+          <span className="font-display text-[17px] font-bold">LeakedFap</span>
         </div>
         <div className="flex flex-col gap-[18px]">
           <div className="font-display text-[34px] font-bold leading-[1.25] max-w-[440px]">Paylaştıkça kazan.</div>

@@ -5,6 +5,7 @@ import type { FeedPost } from "@/lib/posts";
 import PostCard from "@/components/PostCard";
 import CommentsModal from "@/components/CommentsModal";
 import LoginPromptModal from "@/components/LoginPromptModal";
+import MediaLightbox from "@/components/MediaLightbox";
 
 const GRADIENTS = [25, 230, 90, 300, 160, 15, 260, 45];
 
@@ -13,6 +14,7 @@ export default function PostGrid({ posts, isLoggedIn, title }: { posts: FeedPost
   const [promptOpen, setPromptOpen] = useState(false);
   const [promptText, setPromptText] = useState("Beğenmek için üye ol");
   const [openComments, setOpenComments] = useState<string | null>(null);
+  const [openMedia, setOpenMedia] = useState<string | null>(null);
 
   function requireLogin(message: string) {
     setPromptText(message);
@@ -46,6 +48,7 @@ export default function PostGrid({ posts, isLoggedIn, title }: { posts: FeedPost
   }
 
   const activePost = items.find((p) => p.id === openComments) ?? null;
+  const activeMediaPost = items.find((p) => p.id === openMedia) ?? null;
 
   return (
     <div className="p-7 pb-16">
@@ -58,6 +61,7 @@ export default function PostGrid({ posts, isLoggedIn, title }: { posts: FeedPost
             gradientHue={GRADIENTS[i % GRADIENTS.length]}
             onLike={() => toggleLike(post.id)}
             onComment={() => openCommentsFor(post.id)}
+            onOpen={() => setOpenMedia(post.id)}
           />
         ))}
       </div>
@@ -75,6 +79,8 @@ export default function PostGrid({ posts, isLoggedIn, title }: { posts: FeedPost
       )}
 
       <LoginPromptModal open={promptOpen} onClose={() => setPromptOpen(false)} title={promptText} />
+
+      {activeMediaPost && <MediaLightbox post={activeMediaPost} onClose={() => setOpenMedia(null)} />}
     </div>
   );
 }

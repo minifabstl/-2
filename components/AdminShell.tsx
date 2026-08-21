@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { LogoMark } from "@/components/Logo";
 
 const NAV = [
   { href: "/admin", label: "Genel Bakış" },
@@ -17,11 +18,11 @@ export default function AdminShell({ username, children }: { username: string; c
     <div className="flex min-h-screen bg-[var(--bg)]">
       <aside className="w-[230px] min-w-[230px] min-h-screen border-r border-[var(--border)] bg-[var(--surface)] flex flex-col p-3.5 gap-6 sticky top-0 h-screen">
         <Link href="/" className="flex items-center gap-2 px-2 py-1">
-          <span className="w-7 h-7 rounded-lg bg-[var(--accent)] flex items-center justify-center">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 3l14 9-14 9V3z" fill="white" /></svg>
-          </span>
+          <LogoMark size={26} />
           <div>
-            <div className="font-display text-[15px] font-bold">Akış</div>
+            <div className="font-display text-[15px] font-bold">
+              Leaked<span className="text-[var(--accent)]">Fap</span>
+            </div>
             <div className="text-[10.5px] text-[var(--text-faint)] tracking-wide">YÖNETİM PANELİ</div>
           </div>
         </Link>

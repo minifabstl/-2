@@ -8,11 +8,13 @@ export default function PostCard({
   gradientHue,
   onLike,
   onComment,
+  onOpen,
 }: {
   post: FeedPost;
   gradientHue: number;
   onLike: () => void;
   onComment: () => void;
+  onOpen: () => void;
 }) {
   const counted = useRef(false);
 
@@ -26,7 +28,11 @@ export default function PostCard({
   return (
     <div className="flex flex-col border border-[var(--border)] rounded-[14px] overflow-hidden bg-[var(--surface)]">
       <div
-        className="relative w-full h-[150px] flex items-center justify-center overflow-hidden"
+        onClick={onOpen}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => e.key === "Enter" && onOpen()}
+        className="relative w-full h-[150px] flex items-center justify-center overflow-hidden cursor-pointer"
         style={{ background: `linear-gradient(135deg, oklch(0.86 0.06 ${gradientHue}), oklch(0.94 0.03 ${gradientHue}))` }}
       >
         {post.type === "photo" ? (

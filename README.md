@@ -1,13 +1,13 @@
-# Akış — Video/Foto Paylaşım Platformu
+# LeakedFap — Video/Foto Paylaşım Platformu
 
 Next.js + Cloudflare (D1 veritabanı + R2 medya deposu) ile kurulmuş, video ve
 fotoğraf paylaşım/kazanç platformu. Beyaz/açık tema, Türkçe arayüz.
 
+Canlı adres: **leakedfap.org**
+
 ## ⚠️ Bu paketin durumu (nerede kaldık)
 
-Bu proje **iskelet olarak çalışır durumda** teslim edildi, ama zaman/kredi
-kısıtı nedeniyle tamamı bitmedi. Devam edeceğiz dediğinde kaldığımız yerden
-sürdüreceğiz. Şu an:
+Proje çalışır durumda ve yayında. Şu an:
 
 **Tamamlanan:**
 - Veritabanı şeması + ilk migration (`drizzle/0000_*.sql`)
@@ -15,17 +15,19 @@ sürdüreceğiz. Şu an:
 - Ana akış: üye olmadan izleme, giriş yapanlar için beğeni + yorum
 - Görüntülenme sayacı, kategori filtreleme (Keşfet sayfası)
 - Yeni içerik yükleme (`/upload`) — Cloudflare R2'ye kaydeder
+- Fotoğraf/video kartına tıklayınca tam ekran büyüteç (lightbox) görünümü
 - Profil & Kazanç sayfası: 0,20$/1000 izlenme hesaplama, Bitcoin cüzdan adresi, ödeme talebi
-- Yönetici paneli: Genel Bakış + Kullanıcılar sayfası (askıya alma, **şifresiz** güvenli sıfırlama akışı)
+- Yönetici paneli: Genel Bakış, Kullanıcılar (askıya alma, **şifresiz** güvenli sıfırlama akışı),
+  İçerikler (moderasyon — yayından kaldır/geri yükle), Ödemeler (bekleyen BTC ödeme kuyruğu, "ödendi" işaretleme)
 - Şifre sıfırlama: admin tetikler → kullanıcıya e-posta ile tek kullanımlık link gider → kullanıcı kendi yeni şifresini belirler
+- Marka: LeakedFap adı ve özel "Lf" logosu (sidebar, admin paneli, giriş ekranı, favicon)
 
-**Henüz eksik (bir sonraki oturumda tamamlanacak):**
-- `/admin/content` sayfası (içerik moderasyon tablosu — API route'u hazır: `app/api/admin/content/[id]/remove/route.ts`, sadece arayüz eksik)
-- `/admin/payouts` sayfası (ödeme kuyruğu tablosu — API route'u hazır: `app/api/admin/payouts/[id]/mark-paid/route.ts`, sadece arayüz eksik)
+**Henüz eksik (isteğe bağlı, gelecekte eklenebilir):**
 - Gerçek e-posta gönderimi (şu an sadece konsola yazıyor, bkz. `lib/email.ts` — Resend API key eklenince otomatik gerçek gönterime geçer)
 - Gerçek otomatik Bitcoin transferi (şu an sadece "ödeme talebi" kaydı oluşturuyor, admin manuel gönderip "ödendi" işaretliyor — bkz. aşağıdaki "Bitcoin ödemeleri" bölümü)
+- Görüntülenme sayacı için hız sınırlama (bkz. Güvenlik notları)
 
-`npx tsc --noEmit` hatasız geçiyor, yani mevcut kod derleniyor.
+`npx tsc --noEmit` ve `npm run build` hatasız geçiyor, yani mevcut kod derleniyor.
 
 ## Teknoloji
 
@@ -63,23 +65,27 @@ npm run dev
 
 İlk yönetici hesabını oluşturmak için `scripts/make-admin.sql.md` dosyasına bak.
 
-## Cloudflare Pages'e deploy (GoDaddy alan adınla)
+## Cloudflare Workers'a deploy (leakedfap.org üzerinde canlı)
 
-Alan adını GoDaddy'den aldığını ve Cloudflare üzerinden yayınladığını
-belirttin — bu proje tam olarak bunun için kuruldu:
+Bu proje bir Cloudflare **Workers** projesi olarak (`wrangler deploy`) yayınlanır,
+Pages değil. `package.json`'daki script'ler:
 
 ```bash
-# Üretim veritabanına migration'ı uygula
+# Üretim veritabanına migration'ı uygula (sadece ilk kurulumda / şema değiştiğinde)
 npx wrangler d1 migrations apply video-app-db --remote
 
-# Build + deploy
-npm run build
-npx wrangler pages deploy .open-next/assets --project-name video-app
+# Build (next build) + Cloudflare paketleme (opennextjs-cloudflare) + deploy
+npm run deploy
 ```
 
-Deploy sonrası Cloudflare Pages panelinden:
-1. **Custom domains** sekmesinden GoDaddy'de aldığın alan adını ekle (Cloudflare zaten DNS'ini yönetiyorsa otomatik doğrulanır).
-2. **Settings → Functions → D1/R2 bindings** kısmından `DB` ve `BUCKET` binding'lerinin bağlı olduğunu doğrula (genelde `wrangler.toml`'dan otomatik gelir).
+`npm run deploy` üç adımı sırayla yapar: `next build` (script: `build`),
+`opennextjs-cloudflare build` (script: `cf-build`), `wrangler deploy`.
+Bunları tek tek de çalıştırabilirsin.
+
+Alan adı zaten Cloudflare üzerinde yönetildiği için (**Workers & Pages → proje "2" → Domains**)
+`leakedfap.org` custom domain olarak eklenmiş durumda; SSL otomatik yönetilir.
+
+`DB` ve `BUCKET` binding'leri `wrangler.toml` içinde tanımlı, deploy ile otomatik bağlanır.
 
 ## Bitcoin ödemeleri hakkında önemli not
 
