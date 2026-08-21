@@ -1,0 +1,22 @@
+name = "video-app"
+compatibility_date = "2026-08-01"
+compatibility_flags = ["nodejs_compat"]
+pages_build_output_dir = ".open-next/assets"
+
+# ---------------------------------------------------------------------------
+# Veritabanı (Cloudflare D1). Önce şu komutla oluştur:
+#   npx wrangler d1 create video-app-db
+# ve dönen database_id değerini aşağıya yapıştır.
+# ---------------------------------------------------------------------------
+[[d1_databases]]
+binding = "DB"
+database_name = "video-app-db"
+database_id = "REPLACE_WITH_YOUR_D1_DATABASE_ID"
+
+# ---------------------------------------------------------------------------
+# Medya deposu (Cloudflare R2). Önce şu komutla oluştur:
+#   npx wrangler r2 bucket create video-app-media
+# ---------------------------------------------------------------------------
+[[r2_buckets]]
+binding = "BUCKET"
+bucket_name = "video-app-media"

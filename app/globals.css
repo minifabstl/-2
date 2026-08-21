@@ -1,0 +1,54 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #fafaf9;
+  --surface: #ffffff;
+  --border: #e7e5e4;
+  --border-soft: #f0efed;
+  --text: #18181b;
+  --text-muted: #78716c;
+  --text-faint: #a8a29e;
+
+  --accent: oklch(0.64 0.19 25);
+  --accent-dark: oklch(0.54 0.19 25);
+  --accent-soft: oklch(0.96 0.02 25);
+
+  --btc: oklch(0.72 0.15 55);
+  --btc-soft: oklch(0.96 0.03 55);
+  --ok: oklch(0.65 0.15 145);
+  --ok-soft: oklch(0.95 0.03 145);
+  --warn: oklch(0.68 0.16 55);
+  --warn-soft: oklch(0.96 0.03 70);
+  --danger: oklch(0.6 0.19 25);
+  --danger-soft: oklch(0.96 0.02 25);
+
+  --background: var(--bg);
+  --foreground: var(--text);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-body);
+  --font-display: var(--font-display);
+}
+
+/* Uygulama bilinçli olarak her zaman açık (beyaz) temada kalır. */
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body), system-ui, sans-serif;
+}
+
+.font-display {
+  font-family: var(--font-display), system-ui, sans-serif;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 8px;
+}
