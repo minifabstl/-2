@@ -79,9 +79,16 @@ export default function AppShell({ user, children }: { user: SafeUser | null; ch
           ))}
         </div>
 
-        <div className="mt-auto p-2.5 rounded-xl bg-[var(--accent-soft)] flex flex-col gap-1.5">
-          <div className="text-[12.5px] font-semibold">1000 izlenme = 0,20$</div>
-          <div className="text-[11.5px] text-[var(--text-muted)] leading-snug">Paylaştıkça kazan, kazancını Bitcoin olarak al.</div>
+        <div className="mt-auto flex flex-col gap-2.5">
+          <div className="p-2.5 rounded-xl bg-[var(--accent-soft)] flex flex-col gap-1.5">
+            <div className="text-[12.5px] font-semibold">1000 izlenme = 0,20$</div>
+            <div className="text-[11.5px] text-[var(--text-muted)] leading-snug">Paylaştıkça kazan, kazancını Bitcoin olarak al.</div>
+          </div>
+          <div className="flex flex-wrap gap-x-2.5 gap-y-1 px-1 text-[10.5px] text-[var(--text-faint)]">
+            <Link href="/sss" className="hover:text-[var(--text-muted)]">SSS</Link>
+            <Link href="/privacy" className="hover:text-[var(--text-muted)]">Gizlilik</Link>
+            <Link href="/terms" className="hover:text-[var(--text-muted)]">Şartlar</Link>
+          </div>
         </div>
       </aside>
 

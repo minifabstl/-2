@@ -112,6 +112,12 @@ export default function LoginPage() {
             <input required type="password" minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" className="input" />
           </Field>
 
+          {!isSignup && (
+            <Link href="/forgot-password" className="text-[12px] text-[var(--accent)] font-semibold -mt-3.5 self-end">
+              Şifremi Unuttum
+            </Link>
+          )}
+
           {isSignup && (
             <Field label="Bitcoin cüzdan adresi" hint="kazançların için, sonra da eklenebilir">
               <input value={bitcoinAddress} onChange={(e) => setBitcoinAddress(e.target.value)} placeholder="bc1q…" className="input" />
@@ -123,8 +129,8 @@ export default function LoginPage() {
           </button>
 
           <div className="text-xs text-[var(--text-faint)] text-center leading-relaxed">
-            Devam ederek <Link href="#" className="text-[var(--accent)]">Kullanım Şartları</Link> ve{" "}
-            <Link href="#" className="text-[var(--accent)]">Gizlilik Politikası</Link>&apos;nı kabul etmiş olursun.
+            Devam ederek <Link href="/terms" className="text-[var(--accent)]">Kullanım Şartları</Link> ve{" "}
+            <Link href="/privacy" className="text-[var(--accent)]">Gizlilik Politikası</Link>&apos;nı kabul etmiş olursun.
           </div>
         </form>
       </div>

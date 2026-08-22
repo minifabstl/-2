@@ -40,6 +40,21 @@ export const passwordResetTokens = sqliteTable("password_reset_tokens", {
 });
 
 // ---------------------------------------------------------------------------
+// Şifre sıfırlama kodları — kullanıcının KENDİSİ "Şifremi Unuttum" akışıyla
+// tetikler. Admin'in yukarıdaki link tabanlı `passwordResetTokens` akışından
+// farklı olarak burada kullanıcının e-postasına 6 haneli bir kod gider,
+// kullanıcı bu kodu girip yeni şifresini kendisi belirler.
+// ---------------------------------------------------------------------------
+export const passwordResetCodes = sqliteTable("password_reset_codes", {
+  id: text("id").primaryKey(), // nanoid
+  userId: text("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  code: text("code").notNull(), // 6 haneli sayısal kod
+  expiresAt: integer("expires_at", { mode: "timestamp" }).notNull(),
+  usedAt: integer("used_at", { mode: "timestamp" }),
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
+});
+
+// ---------------------------------------------------------------------------
 // Gönderiler (video / fotoğraf)
 // ---------------------------------------------------------------------------
 export const posts = sqliteTable("posts", {

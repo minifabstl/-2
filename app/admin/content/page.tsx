@@ -1,6 +1,7 @@
 import { desc, eq } from "drizzle-orm";
 import { getDb, posts, users } from "@/db";
 import { formatViews } from "@/lib/earnings";
+import { mediaUrl } from "@/lib/storage";
 import AdminContentTable from "@/components/AdminContentTable";
 
 export default async function AdminContentPage() {
@@ -16,6 +17,7 @@ export default async function AdminContentPage() {
       viewCount: posts.viewCount,
       createdAt: posts.createdAt,
       username: users.username,
+      mediaKey: posts.mediaKey,
     })
     .from(posts)
     .innerJoin(users, eq(posts.userId, users.id))
@@ -32,6 +34,7 @@ export default async function AdminContentPage() {
       viewsLabel: formatViews(r.viewCount),
       username: r.username,
       createdAt: r.createdAt.toLocaleDateString("tr-TR"),
+      mediaUrl: mediaUrl(r.mediaKey),
     }))
     // Onay bekleyenler en üstte görünsün, admin ilk açtığında hemen fark etsin.
     .sort((a, b) => (a.status === "pending") === (b.status === "pending") ? 0 : a.status === "pending" ? -1 : 1);

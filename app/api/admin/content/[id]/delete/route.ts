@@ -4,16 +4,7 @@ import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { getDb, posts, likes, comments } from "@/db";
 import { AuthError, requireAdmin } from "@/lib/auth";
 
-/**
- * "Kaldır" / "Reddet" aksiyonu.
- *
- * - İçerik hâlâ yayında/beklemedeyse (live, flagged, pending): kalıcı olarak SİLİNİR —
- *   hem veritabanı kaydı hem de Cloudflare R2'deki dosya. Cloud'da gereksiz yer
- *   kaplamasın diye burada ara bir "removed" durumu YOK, doğrudan siliniyor.
- * - İçerik zaten "removed" durumundaysa (eskiden bu uç noktayla yumuşak kaldırılmış
- *   içerikler): bu istek onu tekrar yayına ALIR (geri yükle). Kalıcı silmek için
- *   `/api/admin/content/[id]/delete` kullanılır.
- */
+/** Kalıcı silme — "Kaldırıldı" durumundaki eski içerikler için. R2'deki dosyayı ve veritabanı kaydını tamamen siler, geri alınamaz. */
 export async function POST(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     await requireAdmin();
@@ -28,12 +19,6 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
   const target = rows[0];
   if (!target) return NextResponse.json({ error: "İçerik bulunamadı." }, { status: 404 });
 
-  if (target.status === "removed") {
-    await db.update(posts).set({ status: "live" }).where(eq(posts.id, id));
-    return NextResponse.json({ ok: true, status: "live" });
-  }
-
-  // Kalıcı silme: R2'deki dosyayı ve veritabanı kaydını (beğeni/yorumlarıyla birlikte) sil.
   const { env } = getCloudflareContext();
   await env.BUCKET.delete(target.mediaKey);
   if (target.thumbnailKey) await env.BUCKET.delete(target.thumbnailKey);
