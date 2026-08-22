@@ -7,13 +7,14 @@ type Item = {
   type: "video" | "photo";
   title: string;
   category: string | null;
-  status: "live" | "flagged" | "removed";
+  status: "pending" | "live" | "flagged" | "removed";
   viewsLabel: string;
   username: string;
   createdAt: string;
 };
 
 const STATUS_LABEL: Record<Item["status"], string> = {
+  pending: "Onay Bekliyor",
   live: "Yayında",
   flagged: "İşaretli",
   removed: "Kaldırıldı",
@@ -28,6 +29,15 @@ export default function AdminContentTable({ initialItems }: { initialItems: Item
   async function toggleRemove(id: string) {
     setBusyId(id);
     const res = await fetch(`/api/admin/content/${id}/remove`, { method: "POST" });
+    setBusyId(null);
+    if (!res.ok) return;
+    const data = await res.json();
+    setItems((prev) => prev.map((it) => (it.id === id ? { ...it, status: data.status } : it)));
+  }
+
+  async function approve(id: string) {
+    setBusyId(id);
+    const res = await fetch(`/api/admin/content/${id}/approve`, { method: "POST" });
     setBusyId(null);
     if (!res.ok) return;
     const data = await res.json();
@@ -51,7 +61,7 @@ export default function AdminContentTable({ initialItems }: { initialItems: Item
           className="border border-[var(--border)] rounded-[10px] px-3.5 py-2.5 text-[12.5px] outline-none w-72"
         />
         <div className="flex gap-1">
-          {(["all", "live", "flagged", "removed"] as const).map((f) => (
+          {(["all", "pending", "live", "flagged", "removed"] as const).map((f) => (
             <button
               key={f}
               onClick={() => setFilter(f)}
@@ -93,22 +103,45 @@ export default function AdminContentTable({ initialItems }: { initialItems: Item
               <span
                 className="px-2.5 py-1 rounded-full text-[11px] font-semibold"
                 style={{
-                  background: it.status === "live" ? "var(--ok-soft)" : it.status === "flagged" ? "var(--accent-soft)" : "var(--danger-soft)",
-                  color: it.status === "live" ? "var(--ok)" : it.status === "flagged" ? "var(--accent-dark)" : "var(--danger)",
+                  background:
+                    it.status === "live" ? "var(--ok-soft)" : it.status === "pending" ? "var(--warn-soft)" : it.status === "flagged" ? "var(--accent-soft)" : "var(--danger-soft)",
+                  color:
+                    it.status === "live" ? "var(--ok)" : it.status === "pending" ? "var(--warn)" : it.status === "flagged" ? "var(--accent-dark)" : "var(--danger)",
                 }}
               >
                 {STATUS_LABEL[it.status]}
               </span>
             </div>
-            <div className="w-36">
-              <button
-                onClick={() => toggleRemove(it.id)}
-                disabled={busyId === it.id}
-                className="px-2.5 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--surface)] text-[11px] font-semibold disabled:opacity-60"
-                style={{ color: it.status === "removed" ? "var(--ok)" : "var(--danger)" }}
-              >
-                {busyId === it.id ? "İşleniyor…" : it.status === "removed" ? "Geri Yükle" : "Kaldır"}
-              </button>
+            <div className="w-36 flex gap-1.5">
+              {it.status === "pending" ? (
+                <>
+                  <button
+                    onClick={() => approve(it.id)}
+                    disabled={busyId === it.id}
+                    className="px-2.5 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--surface)] text-[11px] font-semibold disabled:opacity-60"
+                    style={{ color: "var(--ok)" }}
+                  >
+                    {busyId === it.id ? "…" : "Onayla"}
+                  </button>
+                  <button
+                    onClick={() => toggleRemove(it.id)}
+                    disabled={busyId === it.id}
+                    className="px-2.5 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--surface)] text-[11px] font-semibold disabled:opacity-60"
+                    style={{ color: "var(--danger)" }}
+                  >
+                    {busyId === it.id ? "…" : "Reddet"}
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={() => toggleRemove(it.id)}
+                  disabled={busyId === it.id}
+                  className="px-2.5 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--surface)] text-[11px] font-semibold disabled:opacity-60"
+                  style={{ color: it.status === "removed" ? "var(--ok)" : "var(--danger)" }}
+                >
+                  {busyId === it.id ? "İşleniyor…" : it.status === "removed" ? "Geri Yükle" : "Kaldır"}
+                </button>
+              )}
             </div>
           </div>
         ))}

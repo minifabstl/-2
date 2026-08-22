@@ -71,10 +71,11 @@ export async function POST(req: NextRequest) {
     title,
     category,
     mediaKey,
-    status: "live",
+    // Yeni yüklenen içerik doğrudan yayına girmez — admin onayından geçmesi gerekir.
+    status: "pending",
     viewCount: 0,
     createdAt: new Date(),
   });
 
-  return NextResponse.json({ ok: true, id });
+  return NextResponse.json({ ok: true, id, status: "pending" });
 }

@@ -51,7 +51,9 @@ export const posts = sqliteTable("posts", {
   // Cloudflare R2'de saklanan medya dosyasının anahtarı (bkz. lib/storage.ts)
   mediaKey: text("media_key").notNull(),
   thumbnailKey: text("thumbnail_key"),
-  status: text("status", { enum: ["live", "flagged", "removed"] }).notNull().default("live"),
+  // pending: admin onayı bekliyor, akışta görünmez. live: onaylandı, herkese açık akışta görünür.
+  // flagged: kullanıcılar tarafından şikayet edilmiş ama hâlâ yayında. removed: admin tarafından kaldırılmış/reddedilmiş.
+  status: text("status", { enum: ["pending", "live", "flagged", "removed"] }).notNull().default("pending"),
   viewCount: integer("view_count").notNull().default(0),
   createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
 });

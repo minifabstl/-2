@@ -11,7 +11,15 @@ const NAV = [
   { href: "/admin/payouts", label: "Ödemeler" },
 ];
 
-export default function AdminShell({ username, children }: { username: string; children: React.ReactNode }) {
+export default function AdminShell({
+  username,
+  pendingContentCount = 0,
+  children,
+}: {
+  username: string;
+  pendingContentCount?: number;
+  children: React.ReactNode;
+}) {
   const pathname = usePathname();
 
   return (
@@ -34,9 +42,14 @@ export default function AdminShell({ username, children }: { username: string; c
               <Link
                 key={item.href}
                 href={item.href}
-                className={`px-2.5 py-2 rounded-[10px] text-[13.5px] font-semibold ${active ? "bg-[var(--accent-soft)] text-[var(--accent-dark)]" : "text-[var(--text-muted)] hover:bg-[var(--bg)]"}`}
+                className={`flex items-center px-2.5 py-2 rounded-[10px] text-[13.5px] font-semibold ${active ? "bg-[var(--accent-soft)] text-[var(--accent-dark)]" : "text-[var(--text-muted)] hover:bg-[var(--bg)]"}`}
               >
-                {item.label}
+                <span className="flex-1">{item.label}</span>
+                {item.href === "/admin/content" && pendingContentCount > 0 && (
+                  <span className="ml-2 min-w-[18px] h-[18px] px-1 rounded-full bg-[var(--warn)] text-white text-[10.5px] font-bold flex items-center justify-center">
+                    {pendingContentCount}
+                  </span>
+                )}
               </Link>
             );
           })}

@@ -41,7 +41,7 @@ export default function UploadPage() {
       setError(data.error ?? "Yükleme başarısız.");
       return;
     }
-    router.push("/");
+    router.push("/profile?uploaded=1");
     router.refresh();
   }
 

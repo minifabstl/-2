@@ -2,7 +2,14 @@
 
 import { useState } from "react";
 
-type Post = { id: string; type: string; title: string; viewsLabel: string; earnLabel: string };
+type Post = { id: string; type: string; title: string; status: "pending" | "live" | "flagged" | "removed"; viewsLabel: string; earnLabel: string };
+
+const POST_STATUS_LABEL: Record<Post["status"], string> = {
+  pending: "Onay Bekliyor",
+  live: "Yayında",
+  flagged: "İşaretli",
+  removed: "Kaldırıldı",
+};
 type Payout = { id: string; date: string; amountLabel: string; status: string };
 
 export default function ProfileView({
@@ -10,11 +17,13 @@ export default function ProfileView({
   stats,
   posts,
   payouts,
+  justUploaded,
 }: {
   user: { username: string; bitcoinAddress: string | null };
   stats: { totalPosts: number; totalViews: number; totalViewsLabel: string; totalEarnedLabel: string; availableLabel: string };
   posts: Post[];
   payouts: Payout[];
+  justUploaded?: boolean;
 }) {
   const [tab, setTab] = useState<"posts" | "earnings">("posts");
   const [requesting, setRequesting] = useState(false);
@@ -43,6 +52,14 @@ export default function ProfileView({
 
   return (
     <div className="p-9 pb-16 max-w-[1100px]">
+      {justUploaded && (
+        <div className="flex items-center gap-2.5 mb-6 px-4 py-3 rounded-[10px]" style={{ background: "var(--warn-soft)", color: "var(--warn)" }}>
+          <span className="w-1.5 h-1.5 rounded-full bg-[var(--warn)] shrink-0" />
+          <span className="text-[12.5px] font-semibold">
+            Paylaşımın alındı! Yönetici onayından geçtikten sonra herkese açık akışta görünecek — aşağıdan durumunu takip edebilirsin.
+          </span>
+        </div>
+      )}
       <div className="flex items-center gap-5">
         <div className="w-[76px] h-[76px] rounded-full bg-[var(--accent)] text-white flex items-center justify-center text-2xl font-bold font-display">
           {user.username.slice(0, 2).toUpperCase()}
@@ -73,9 +90,21 @@ export default function ProfileView({
           {posts.length === 0 && <div className="text-sm text-[var(--text-muted)] col-span-5">Henüz bir paylaşımın yok.</div>}
           {posts.map((p) => (
             <div key={p.id} className="border border-[var(--border)] rounded-xl overflow-hidden bg-[var(--surface)]">
-              <div className="h-[110px]" style={{ background: "linear-gradient(135deg, oklch(0.86 0.06 25), oklch(0.94 0.03 25))" }} />
+              <div className="h-[110px] relative" style={{ background: "linear-gradient(135deg, oklch(0.86 0.06 25), oklch(0.94 0.03 25))" }}>
+                {p.status !== "live" && (
+                  <span
+                    className="absolute top-1.5 left-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold"
+                    style={{
+                      background: p.status === "pending" ? "var(--warn-soft)" : p.status === "flagged" ? "var(--accent-soft)" : "var(--danger-soft)",
+                      color: p.status === "pending" ? "var(--warn)" : p.status === "flagged" ? "var(--accent-dark)" : "var(--danger)",
+                    }}
+                  >
+                    {POST_STATUS_LABEL[p.status]}
+                  </span>
+                )}
+              </div>
               <div className="px-2.5 py-2.5">
-                <div className="text-[11px] text-[var(--text-muted)]">{p.viewsLabel}</div>
+                <div className="text-[11px] text-[var(--text-muted)]">{p.status === "pending" ? "Onaylanınca sayılmaya başlar" : p.viewsLabel}</div>
                 <div className="text-xs font-semibold text-[var(--ok)] mt-0.5">+{p.earnLabel}</div>
               </div>
             </div>

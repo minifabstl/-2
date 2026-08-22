@@ -14,11 +14,17 @@ Proje çalışır durumda ve yayında. Şu an:
 - Kayıt / giriş / çıkış (şifreler PBKDF2 ile hash'lenir, asla düz metin saklanmaz)
 - Ana akış: üye olmadan izleme, giriş yapanlar için beğeni + yorum
 - Görüntülenme sayacı, kategori filtreleme (Keşfet sayfası)
-- Yeni içerik yükleme (`/upload`) — Cloudflare R2'ye kaydeder
+- Yeni içerik yükleme (`/upload`) — Cloudflare R2'ye kaydeder, **admin onayı bekler** (aşağıya bakınız)
 - Fotoğraf/video kartına tıklayınca tam ekran büyüteç (lightbox) görünümü
 - Profil & Kazanç sayfası: 0,20$/1000 izlenme hesaplama, Bitcoin cüzdan adresi, ödeme talebi
-- Yönetici paneli: Genel Bakış, Kullanıcılar (askıya alma, **şifresiz** güvenli sıfırlama akışı),
-  İçerikler (moderasyon — yayından kaldır/geri yükle), Ödemeler (bekleyen BTC ödeme kuyruğu, "ödendi" işaretleme)
+- Yönetici paneli: Genel Bakış (bekleyen içerik sayısı ve uyarı bandı), Kullanıcılar (askıya alma,
+  **şifresiz** güvenli sıfırlama akışı), İçerikler (moderasyon — onayla / reddet / yayından kaldır / geri yükle),
+  Ödemeler (bekleyen BTC ödeme kuyruğu, "ödendi" işaretleme)
+- **İçerik onay sistemi**: kullanıcı bir video/fotoğraf yüklediğinde içerik doğrudan yayına girmez,
+  `pending` (onay bekliyor) durumunda kalır — herkese açık akışta (Ana Sayfa, Keşfet) görünmez.
+  Admin, **İçerikler** sayfasında "Onayla" derse `live` olur ve akışta görünmeye başlar; "Reddet"
+  derse `removed` olur. Kullanıcı kendi profilinde yüklediği içeriğin durumunu ("Onay Bekliyor" rozeti)
+  görebilir. Admin sidebar'ında ve Genel Bakış'ta bekleyen içerik sayısı rozet olarak gösterilir.
 - Şifre sıfırlama: admin tetikler → kullanıcıya e-posta ile tek kullanımlık link gider → kullanıcı kendi yeni şifresini belirler
 - Marka: LeakedFap adı ve özel "Lf" logosu (sidebar, admin paneli, giriş ekranı, favicon)
 
