@@ -7,6 +7,7 @@ import type { SafeUser } from "@/lib/auth";
 import LoginPromptModal from "@/components/LoginPromptModal";
 import Logo from "@/components/Logo";
 import ProfileMenu from "@/components/ProfileMenu";
+import PromoBanner from "@/components/PromoBanner";
 
 const NAV = [
   { href: "/", label: "Home", locked: false, icon: "home" },
@@ -24,7 +25,7 @@ const CATEGORIES = [
   { slug: "komedi", label: "Comedy" },
 ];
 
-export default function AppShell({ user, children }: { user: SafeUser | null; children: React.ReactNode }) {
+export default function AppShell({ user, avatarUrl, children }: { user: SafeUser | null; avatarUrl?: string | null; children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const [promptOpen, setPromptOpen] = useState(false);
@@ -37,7 +38,9 @@ export default function AppShell({ user, children }: { user: SafeUser | null; ch
   }
 
   return (
-    <div className="flex min-h-screen bg-[var(--bg)]">
+    <div className="flex flex-col min-h-screen bg-[var(--bg)]">
+      <PromoBanner />
+      <div className="flex flex-1 min-h-0">
       <aside className="w-60 min-w-60 border-r border-[var(--border)] bg-[var(--surface)] flex flex-col gap-6 p-3.5 sticky top-0 h-screen">
         <Link href="/" className="flex items-center justify-center px-2 py-3">
           <Logo size={26} />
@@ -99,7 +102,7 @@ export default function AppShell({ user, children }: { user: SafeUser | null; ch
                   Admin Panel
                 </Link>
               )}
-              <ProfileMenu user={user} />
+              <ProfileMenu user={user} avatarUrl={avatarUrl ?? null} />
             </div>
           ) : (
             <Link href="/login" className="px-4 py-2.5 rounded-[10px] border border-[var(--accent)] bg-[var(--accent)] text-white text-[13.5px] font-semibold">
@@ -119,6 +122,7 @@ export default function AppShell({ user, children }: { user: SafeUser | null; ch
         )}
 
         <main className="flex-1 min-w-0">{children}</main>
+      </div>
       </div>
 
       <LoginPromptModal open={promptOpen} onClose={() => setPromptOpen(false)} title="Sign up to use this feature" />

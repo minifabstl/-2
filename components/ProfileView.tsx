@@ -20,7 +20,7 @@ export default function ProfileView({
   justUploaded,
   initialTab = "posts",
 }: {
-  user: { username: string; bitcoinAddress: string | null };
+  user: { username: string; bitcoinAddress: string | null; avatarUrl: string | null };
   stats: { totalPosts: number; totalViews: number; totalViewsLabel: string; totalEarnedLabel: string; availableLabel: string };
   posts: Post[];
   payouts: Payout[];
@@ -63,9 +63,14 @@ export default function ProfileView({
         </div>
       )}
       <div className="flex items-center gap-5">
-        <div className="w-[76px] h-[76px] rounded-full bg-[var(--accent)] text-white flex items-center justify-center text-2xl font-bold font-display">
-          {user.username.slice(0, 2).toUpperCase()}
-        </div>
+        {user.avatarUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={user.avatarUrl} alt="" className="w-[76px] h-[76px] rounded-full object-cover" />
+        ) : (
+          <div className="w-[76px] h-[76px] rounded-full bg-[var(--accent)] text-white flex items-center justify-center text-2xl font-bold font-display">
+            {user.username.slice(0, 2).toUpperCase()}
+          </div>
+        )}
         <div className="flex-1">
           <div className="font-display text-[22px] font-bold">@{user.username}</div>
         </div>

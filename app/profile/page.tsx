@@ -3,6 +3,7 @@ import { desc, eq } from "drizzle-orm";
 import { getDb, posts, payouts, bonuses } from "@/db";
 import { getCurrentUser } from "@/lib/auth";
 import { calculateEarningsUsd, formatUsd, formatViews } from "@/lib/earnings";
+import { mediaUrl } from "@/lib/storage";
 import ProfileView from "@/components/ProfileView";
 
 export default async function ProfilePage({ searchParams }: { searchParams: Promise<{ uploaded?: string; tab?: string }> }) {
@@ -38,7 +39,7 @@ export default async function ProfilePage({ searchParams }: { searchParams: Prom
     <ProfileView
       justUploaded={uploaded === "1"}
       initialTab={tab === "earnings" ? "earnings" : "posts"}
-      user={{ username: user.username, bitcoinAddress: user.bitcoinAddress }}
+      user={{ username: user.username, bitcoinAddress: user.bitcoinAddress, avatarUrl: user.avatarKey ? mediaUrl(user.avatarKey) : null }}
       stats={{
         totalPosts: myPosts.length,
         totalViews,

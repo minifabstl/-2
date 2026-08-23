@@ -14,6 +14,8 @@ export const users = sqliteTable("users", {
   role: text("role", { enum: ["user", "admin"] }).notNull().default("user"),
   status: text("status", { enum: ["active", "suspended"] }).notNull().default("active"),
   bitcoinAddress: text("bitcoin_address"),
+  // Key of the user's profile photo in Cloudflare R2 (see lib/storage.ts), null if not set.
+  avatarKey: text("avatar_key"),
   // Notification preferences (all default to on) — see lib/email.ts for the emails they gate.
   notifyOnApproval: integer("notify_on_approval", { mode: "boolean" }).notNull().default(true),
   notifyOnRejection: integer("notify_on_rejection", { mode: "boolean" }).notNull().default(true),

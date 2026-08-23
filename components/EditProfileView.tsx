@@ -1,10 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
-export default function EditProfileView({ user }: { user: { username: string; email: string } }) {
+export default function EditProfileView({ user }: { user: { username: string; email: string; avatarUrl: string | null } }) {
   const router = useRouter();
+
+  const [avatarUrl, setAvatarUrl] = useState(user.avatarUrl);
+  const [avatarMsg, setAvatarMsg] = useState("");
+  const [savingAvatar, setSavingAvatar] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [username, setUsername] = useState(user.username);
   const [email, setEmail] = useState(user.email);
@@ -21,6 +26,44 @@ export default function EditProfileView({ user }: { user: { username: string; em
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [deleteMsg, setDeleteMsg] = useState("");
   const [deleting, setDeleting] = useState(false);
+
+  async function uploadAvatar(file: File) {
+    setAvatarMsg("");
+    if (!file.type.startsWith("image/")) {
+      setAvatarMsg("Only image files are allowed.");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setAvatarMsg("The image must be 5MB or smaller.");
+      return;
+    }
+    setSavingAvatar(true);
+    const formData = new FormData();
+    formData.append("file", file);
+    const res = await fetch("/api/profile/avatar", { method: "POST", body: formData });
+    const data = await res.json();
+    setSavingAvatar(false);
+    if (res.ok) {
+      setAvatarUrl(`${data.avatarKey ? "/api/media/" + data.avatarKey : ""}?t=${Date.now()}`);
+      router.refresh();
+    } else {
+      setAvatarMsg(data.error);
+    }
+  }
+
+  async function deleteAvatar() {
+    setSavingAvatar(true);
+    setAvatarMsg("");
+    const res = await fetch("/api/profile/avatar", { method: "DELETE" });
+    setSavingAvatar(false);
+    if (res.ok) {
+      setAvatarUrl(null);
+      router.refresh();
+    } else {
+      const data = await res.json().catch(() => ({}));
+      setAvatarMsg(data.error ?? "Something went wrong.");
+    }
+  }
 
   async function saveInfo() {
     setSavingInfo(true);
@@ -81,6 +124,48 @@ export default function EditProfileView({ user }: { user: { username: string; em
       <div>
         <h1 className="font-display text-2xl font-bold mb-1">Edit Profile</h1>
         <p className="text-[13px] text-[var(--text-muted)]">Manage your account details and security.</p>
+      </div>
+
+      <div className="border border-[var(--border)] rounded-2xl bg-[var(--surface)] p-[18px]">
+        <div className="flex items-center gap-4">
+          {avatarUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={avatarUrl} alt="Profile photo" className="w-20 h-20 rounded-full object-cover border border-[var(--border)] shrink-0" />
+          ) : (
+            <div className="w-20 h-20 rounded-full bg-[var(--accent)] text-white flex items-center justify-center text-2xl font-bold font-display shrink-0">
+              {user.username.slice(0, 2).toUpperCase()}
+            </div>
+          )}
+          <div className="flex flex-col gap-2">
+            <div className="flex gap-2">
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={savingAvatar}
+                className="px-3.5 py-2 rounded-[9px] border border-[var(--border)] text-[12.5px] font-semibold disabled:opacity-60"
+              >
+                {savingAvatar ? "Uploading…" : "Add photo"}
+              </button>
+              {avatarUrl && (
+                <button onClick={deleteAvatar} disabled={savingAvatar} className="px-3.5 py-2 rounded-[9px] border border-[var(--danger)] text-[var(--danger)] text-[12.5px] font-semibold disabled:opacity-60">
+                  Delete photo
+                </button>
+              )}
+            </div>
+            <div className="text-[11px] text-[var(--text-faint)] leading-relaxed">At least 500x500px recommended. Only image files are allowed, up to 5MB.</div>
+            {avatarMsg && <div className="text-[11.5px] text-[var(--danger)]">{avatarMsg}</div>}
+          </div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              if (f) uploadAvatar(f);
+              e.target.value = "";
+            }}
+          />
+        </div>
       </div>
 
       <div className="border border-[var(--border)] rounded-2xl bg-[var(--surface)] p-[18px]">

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { SafeUser } from "@/lib/auth";
 
-export default function ProfileMenu({ user }: { user: SafeUser }) {
+export default function ProfileMenu({ user, avatarUrl }: { user: SafeUser; avatarUrl?: string | null }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [earnings, setEarnings] = useState<string | null>(null);
@@ -42,18 +42,14 @@ export default function ProfileMenu({ user }: { user: SafeUser }) {
         onClick={() => setOpen((v) => !v)}
         className="flex items-center gap-2 pl-1.5 pr-2.5 py-1.5 rounded-full border border-transparent hover:border-[var(--border)]"
       >
-        <span className="w-[34px] h-[34px] rounded-full bg-[var(--accent)] text-white flex items-center justify-center text-[13px] font-bold font-display shrink-0">
-          {initials}
-        </span>
+        <Avatar avatarUrl={avatarUrl} initials={initials} size={34} textSize={13} />
         <span className="text-[13px] font-semibold hidden sm:inline">{user.username}</span>
       </button>
 
       {open && (
         <div className="absolute right-0 top-[calc(100%+8px)] w-72 border border-[var(--border)] rounded-2xl bg-[var(--surface)] shadow-lg overflow-hidden z-30">
           <div className="flex items-center gap-3 px-4 py-4 border-b border-[var(--border-soft)]">
-            <span className="w-11 h-11 rounded-full bg-[var(--accent)] text-white flex items-center justify-center text-[15px] font-bold font-display shrink-0">
-              {initials}
-            </span>
+            <Avatar avatarUrl={avatarUrl} initials={initials} size={44} textSize={15} />
             <div className="min-w-0">
               <div className="text-[14px] font-semibold truncate">{user.username}</div>
               <div className="text-[12px] text-[var(--text-muted)] truncate">{user.email}</div>
@@ -95,5 +91,20 @@ function MenuLink({ href, onNavigate, children }: { href: string; onNavigate: ()
     <Link href={href} onClick={onNavigate} className="flex items-center gap-2 px-4 py-2.5 text-[13px] font-medium text-[var(--text)] hover:bg-[var(--bg)]">
       {children}
     </Link>
+  );
+}
+
+function Avatar({ avatarUrl, initials, size, textSize }: { avatarUrl?: string | null; initials: string; size: number; textSize: number }) {
+  if (avatarUrl) {
+    // eslint-disable-next-line @next/next/no-img-element
+    return <img src={avatarUrl} alt="" className="rounded-full object-cover shrink-0" style={{ width: size, height: size }} />;
+  }
+  return (
+    <span
+      className="rounded-full bg-[var(--accent)] text-white flex items-center justify-center font-bold font-display shrink-0"
+      style={{ width: size, height: size, fontSize: textSize }}
+    >
+      {initials}
+    </span>
   );
 }
