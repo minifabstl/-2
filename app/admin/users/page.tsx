@@ -1,5 +1,5 @@
 import { desc } from "drizzle-orm";
-import { getDb, users, posts } from "@/db";
+import { getDb, users, posts, bonuses } from "@/db";
 import { calculateEarningsUsd, formatUsd } from "@/lib/earnings";
 import AdminUsersTable from "@/components/AdminUsersTable";
 
@@ -8,6 +8,7 @@ export default async function AdminUsersPage() {
 
   const allUsers = await db.select().from(users).orderBy(desc(users.createdAt));
   const allPosts = await db.select({ userId: posts.userId, viewCount: posts.viewCount }).from(posts);
+  const allBonuses = await db.select({ userId: bonuses.userId, amountUsd: bonuses.amountUsd }).from(bonuses);
 
   const viewsByUser = new Map<string, { posts: number; views: number }>();
   for (const p of allPosts) {
@@ -17,8 +18,14 @@ export default async function AdminUsersPage() {
     viewsByUser.set(p.userId, cur);
   }
 
+  const bonusByUser = new Map<string, number>();
+  for (const b of allBonuses) {
+    bonusByUser.set(b.userId, (bonusByUser.get(b.userId) ?? 0) + b.amountUsd);
+  }
+
   const rows = allUsers.map((u) => {
     const agg = viewsByUser.get(u.id) ?? { posts: 0, views: 0 };
+    const bonusUsd = bonusByUser.get(u.id) ?? 0;
     return {
       id: u.id,
       username: u.username,
@@ -26,7 +33,7 @@ export default async function AdminUsersPage() {
       joined: u.createdAt.toLocaleDateString("en-US"),
       posts: agg.posts,
       views: agg.views.toLocaleString("en-US"),
-      earnings: formatUsd(calculateEarningsUsd(agg.views)),
+      earnings: formatUsd(calculateEarningsUsd(agg.views) + bonusUsd),
       status: u.status,
       role: u.role,
     };

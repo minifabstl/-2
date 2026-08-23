@@ -117,7 +117,12 @@ export default function ProfileView({
       {tab === "earnings" && (
         <div className="mt-[22px]">
           <div className="border border-[var(--border)] rounded-2xl bg-[var(--surface)] overflow-hidden">
-            <div className="px-[18px] py-4 border-b border-[var(--border)] font-display text-sm font-bold">Earnings by Content</div>
+            <div className="px-[18px] py-4 border-b border-[var(--border)]">
+              <div className="font-display text-sm font-bold">Earnings by Content</div>
+              <div className="text-[11px] text-[var(--text-muted)] mt-0.5">
+                Includes a $3 bonus on your first approved upload, and $0.10 for every upload after that.
+              </div>
+            </div>
             {posts.length === 0 && <div className="px-[18px] py-4 text-sm text-[var(--text-muted)]">You don&apos;t have any posts yet.</div>}
             {posts.length > 0 && (
               <div className="grid grid-cols-[1fr_120px_110px_110px] px-[18px] py-2.5 text-[10.5px] font-semibold text-[var(--text-faint)] tracking-wide uppercase border-b border-[var(--border-soft)]">

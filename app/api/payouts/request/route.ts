@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { nanoid } from "nanoid";
 import { eq, sum } from "drizzle-orm";
-import { getDb, posts, payouts } from "@/db";
+import { getDb, posts, payouts, bonuses } from "@/db";
 import { AuthError, requireUser } from "@/lib/auth";
 import { calculateEarningsUsd } from "@/lib/earnings";
 
@@ -26,7 +26,8 @@ export async function POST() {
     .where(eq(posts.userId, user.id));
 
   const totalViews = Number(total ?? 0);
-  const totalEarned = calculateEarningsUsd(totalViews);
+  const [{ bonusTotal }] = await db.select({ bonusTotal: sum(bonuses.amountUsd) }).from(bonuses).where(eq(bonuses.userId, user.id));
+  const totalEarned = calculateEarningsUsd(totalViews) + Number(bonusTotal ?? 0);
 
   const [{ paidOut }] = await db
     .select({ paidOut: sum(payouts.amountUsd) })

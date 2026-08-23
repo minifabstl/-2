@@ -99,7 +99,22 @@ export const comments = sqliteTable("comments", {
 });
 
 // ---------------------------------------------------------------------------
-// Payouts — payout records derived from earnings of $0.20 per 1000 views.
+// Upload bonuses — a one-time cash bonus granted when a post is approved for
+// the FIRST time (not on re-approval/restore). The first approved post of a
+// user's account earns FIRST_UPLOAD_BONUS_USD, every approved post after
+// that earns REPEAT_UPLOAD_BONUS_USD (see lib/earnings.ts). One row per post.
+// ---------------------------------------------------------------------------
+export const bonuses = sqliteTable("bonuses", {
+  id: text("id").primaryKey(),
+  userId: text("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  postId: text("post_id").notNull().references(() => posts.id, { onDelete: "cascade" }).unique(),
+  amountUsd: real("amount_usd").notNull(),
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
+});
+
+// ---------------------------------------------------------------------------
+// Payouts — payout records derived from earnings of $0.20 per 1000 views,
+// plus any upload bonuses (see `bonuses` above).
 // In this MVP no real Bitcoin transfer is made; the "paid" status is marked
 // manually by an admin (see README > Bitcoin payouts).
 // ---------------------------------------------------------------------------

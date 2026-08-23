@@ -77,7 +77,9 @@ export default function AppShell({ user, children }: { user: SafeUser | null; ch
         <div className="mt-auto flex flex-col gap-2.5">
           <div className="p-2.5 rounded-xl bg-[var(--accent-soft)] flex flex-col gap-1.5">
             <div className="text-[12.5px] font-semibold">1000 views = $0.20</div>
-            <div className="text-[11.5px] text-[var(--text-muted)] leading-snug">Earn as you share, get paid out in Bitcoin.</div>
+            <div className="text-[11.5px] text-[var(--text-muted)] leading-snug">
+              Earn as you share, get paid out in Bitcoin. Get a $3 bonus on your first approved upload, plus $0.10 per upload after that.
+            </div>
           </div>
           <div className="flex flex-wrap gap-x-2.5 gap-y-1 px-1 text-[10.5px] text-[var(--text-faint)]">
             <Link href="/sss" className="hover:text-[var(--text-muted)]">FAQ</Link>

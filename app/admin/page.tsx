@@ -1,19 +1,20 @@
 import { count, desc, eq, sum } from "drizzle-orm";
-import { getDb, users, posts, payouts } from "@/db";
+import { getDb, users, posts, payouts, bonuses } from "@/db";
 import { formatUsd, calculateEarningsUsd } from "@/lib/earnings";
 
 export default async function AdminOverviewPage() {
   const db = getDb();
 
-  const [[userCount], [postCount], [viewsRow], [pendingCount]] = await Promise.all([
+  const [[userCount], [postCount], [viewsRow], [pendingCount], [bonusRow]] = await Promise.all([
     db.select({ n: count() }).from(users),
     db.select({ n: count() }).from(posts),
     db.select({ n: sum(posts.viewCount) }).from(posts),
     db.select({ n: count() }).from(posts).where(eq(posts.status, "pending")),
+    db.select({ n: sum(bonuses.amountUsd) }).from(bonuses),
   ]);
 
   const totalViews = Number(viewsRow?.n ?? 0);
-  const totalEarnedAllTime = calculateEarningsUsd(totalViews);
+  const totalEarnedAllTime = calculateEarningsUsd(totalViews) + Number(bonusRow?.n ?? 0);
 
   const recentPosts = await db
     .select({ id: posts.id, title: posts.title, status: posts.status, createdAt: posts.createdAt })

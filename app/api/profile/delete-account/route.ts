@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { eq } from "drizzle-orm";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
-import { getDb, users, posts, likes, comments, payouts, sessions, passwordResetTokens, passwordResetCodes } from "@/db";
+import { getDb, users, posts, likes, comments, payouts, sessions, passwordResetTokens, passwordResetCodes, bonuses } from "@/db";
 import { AuthError, destroySession, requireUser } from "@/lib/auth";
 import { verifyPassword } from "@/lib/password";
 
@@ -47,6 +47,7 @@ export async function POST(req: NextRequest) {
     await db.delete(likes).where(eq(likes.postId, p.id));
     await db.delete(comments).where(eq(comments.postId, p.id));
   }
+  await db.delete(bonuses).where(eq(bonuses.userId, user.id));
   await db.delete(posts).where(eq(posts.userId, user.id));
   await db.delete(likes).where(eq(likes.userId, user.id));
   await db.delete(comments).where(eq(comments.userId, user.id));
