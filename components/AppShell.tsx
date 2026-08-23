@@ -17,15 +17,6 @@ const NAV = [
   { href: "/creator-program", label: "Creator Program", locked: false, icon: "star" },
 ] as const;
 
-const CATEGORIES = [
-  { slug: "muzik", label: "Music" },
-  { slug: "oyun", label: "Gaming" },
-  { slug: "egitim", label: "Education" },
-  { slug: "spor", label: "Sports" },
-  { slug: "teknoloji", label: "Technology" },
-  { slug: "komedi", label: "Comedy" },
-];
-
 export default function AppShell({ user, avatarUrl, children }: { user: SafeUser | null; avatarUrl?: string | null; children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
@@ -68,15 +59,6 @@ export default function AppShell({ user, avatarUrl, children }: { user: SafeUser
             );
           })}
         </nav>
-
-        <div className="flex flex-col gap-0.5">
-          <div className="text-[11px] font-semibold tracking-wide text-[var(--text-faint)] px-2.5 pt-2 pb-1">CATEGORIES</div>
-          {CATEGORIES.map((c) => (
-            <Link key={c.slug} href={`/explore?kategori=${c.slug}`} className="flex items-center gap-2.5 px-2.5 py-2 rounded-[10px] text-sm text-[var(--text)] hover:bg-[var(--bg)]">
-              {c.label}
-            </Link>
-          ))}
-        </div>
 
         <div className="mt-auto flex flex-col gap-2.5">
           <div className="p-2.5 rounded-xl bg-[var(--accent-soft)] flex flex-col gap-1.5">
