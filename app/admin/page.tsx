@@ -1,20 +1,40 @@
 import { count, desc, eq, sum } from "drizzle-orm";
 import { getDb, users, posts, payouts, bonuses } from "@/db";
-import { formatUsd, calculateEarningsUsd } from "@/lib/earnings";
+import { formatUsd, calculateEarningsUsd, calculateTier } from "@/lib/earnings";
 
 export default async function AdminOverviewPage() {
   const db = getDb();
 
-  const [[userCount], [postCount], [viewsRow], [pendingCount], [bonusRow]] = await Promise.all([
+  const [[userCount], [postCount], [viewsRow], [pendingCount], allUsersForTiers, allPostsForTiers, allBonusesForTiers] = await Promise.all([
     db.select({ n: count() }).from(users),
     db.select({ n: count() }).from(posts),
     db.select({ n: sum(posts.viewCount) }).from(posts),
     db.select({ n: count() }).from(posts).where(eq(posts.status, "pending")),
-    db.select({ n: sum(bonuses.amountUsd) }).from(bonuses),
+    db.select({ id: users.id, verifiedCreator: users.verifiedCreator }).from(users),
+    db.select({ userId: posts.userId, viewCount: posts.viewCount }).from(posts),
+    db.select({ userId: bonuses.userId, amountUsd: bonuses.amountUsd }).from(bonuses),
   ]);
 
   const totalViews = Number(viewsRow?.n ?? 0);
-  const totalEarnedAllTime = calculateEarningsUsd(totalViews) + Number(bonusRow?.n ?? 0);
+
+  // Sitewide earned-to-date, computed per-user so each user's tier multiplier is honored
+  // (a global calculateEarningsUsd(totalViews) call would silently assume everyone is "new" tier).
+  const aggByUser = new Map<string, { posts: number; views: number }>();
+  for (const p of allPostsForTiers) {
+    const cur = aggByUser.get(p.userId) ?? { posts: 0, views: 0 };
+    cur.posts += 1;
+    cur.views += p.viewCount;
+    aggByUser.set(p.userId, cur);
+  }
+  const bonusByUser = new Map<string, number>();
+  for (const b of allBonusesForTiers) {
+    bonusByUser.set(b.userId, (bonusByUser.get(b.userId) ?? 0) + b.amountUsd);
+  }
+  const totalEarnedAllTime = allUsersForTiers.reduce((acc, u) => {
+    const agg = aggByUser.get(u.id) ?? { posts: 0, views: 0 };
+    const tier = calculateTier({ verifiedCreator: u.verifiedCreator, totalUploads: agg.posts, totalViews: agg.views });
+    return acc + calculateEarningsUsd(agg.views, tier) + (bonusByUser.get(u.id) ?? 0);
+  }, 0);
 
   const recentPosts = await db
     .select({ id: posts.id, title: posts.title, status: posts.status, createdAt: posts.createdAt })

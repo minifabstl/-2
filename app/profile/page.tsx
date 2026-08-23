@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { desc, eq } from "drizzle-orm";
 import { getDb, posts, payouts, bonuses } from "@/db";
 import { getCurrentUser } from "@/lib/auth";
-import { calculateEarningsUsd, formatUsd, formatViews } from "@/lib/earnings";
+import { calculateEarningsUsd, calculateTier, formatUsd, formatViews } from "@/lib/earnings";
 import { mediaUrl } from "@/lib/storage";
 import ProfileView from "@/components/ProfileView";
 
@@ -31,7 +31,8 @@ export default async function ProfilePage({ searchParams }: { searchParams: Prom
   const totalBonusUsd = myBonuses.reduce((acc, b) => acc + b.amountUsd, 0);
 
   const totalViews = myPosts.reduce((acc, p) => acc + p.viewCount, 0);
-  const totalEarned = calculateEarningsUsd(totalViews) + totalBonusUsd;
+  const tier = calculateTier({ verifiedCreator: user.verifiedCreator, totalUploads: myPosts.length, totalViews });
+  const totalEarned = calculateEarningsUsd(totalViews, tier) + totalBonusUsd;
   const alreadyRequested = myPayouts.reduce((s, p) => s + p.amountUsd, 0);
   const availableToRequest = Math.max(0, totalEarned - alreadyRequested);
 
@@ -53,7 +54,7 @@ export default async function ProfilePage({ searchParams }: { searchParams: Prom
         title: p.title,
         status: p.status,
         viewsLabel: formatViews(p.viewCount) + " views",
-        earnLabel: formatUsd(calculateEarningsUsd(p.viewCount) + (bonusByPostId.get(p.id) ?? 0)),
+        earnLabel: formatUsd(calculateEarningsUsd(p.viewCount, tier) + (bonusByPostId.get(p.id) ?? 0)),
       }))}
       payouts={myPayouts.map((p) => ({
         id: p.id,

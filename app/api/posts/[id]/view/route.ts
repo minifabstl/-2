@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { eq, sql } from "drizzle-orm";
 import { getDb, posts } from "@/db";
 import { getCurrentUser } from "@/lib/auth";
+import { currentWeekStart } from "@/lib/earnings";
 
 const SEEN_COOKIE_TTL_SECONDS = 60 * 60 * 6; // 6 hours — so the same browser isn't counted repeatedly
 
@@ -27,7 +28,7 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
 
   const [viewer, rows] = await Promise.all([
     getCurrentUser(),
-    db.select({ userId: posts.userId }).from(posts).where(eq(posts.id, postId)).limit(1),
+    db.select({ userId: posts.userId, weekStartAt: posts.weekStartAt }).from(posts).where(eq(posts.id, postId)).limit(1),
   ]);
 
   const target = rows[0];
@@ -44,9 +45,16 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
     return NextResponse.json({ ok: true, counted: false, reason: "already-seen" });
   }
 
+  const weekStart = currentWeekStart(new Date());
+  const isNewWeek = !target.weekStartAt || target.weekStartAt.getTime() !== weekStart.getTime();
+
   await db
     .update(posts)
-    .set({ viewCount: sql`${posts.viewCount} + 1` })
+    .set(
+      isNewWeek
+        ? { viewCount: sql`${posts.viewCount} + 1`, weekViewCount: 1, weekStartAt: weekStart }
+        : { viewCount: sql`${posts.viewCount} + 1`, weekViewCount: sql`${posts.weekViewCount} + 1` }
+    )
     .where(eq(posts.id, postId));
 
   cookieStore.set(seenCookieName, "1", {

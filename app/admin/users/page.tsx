@@ -1,6 +1,6 @@
 import { desc } from "drizzle-orm";
 import { getDb, users, posts, bonuses } from "@/db";
-import { calculateEarningsUsd, formatUsd } from "@/lib/earnings";
+import { calculateEarningsUsd, calculateTier, formatUsd, TIER_LABEL } from "@/lib/earnings";
 import AdminUsersTable from "@/components/AdminUsersTable";
 
 export default async function AdminUsersPage() {
@@ -26,6 +26,7 @@ export default async function AdminUsersPage() {
   const rows = allUsers.map((u) => {
     const agg = viewsByUser.get(u.id) ?? { posts: 0, views: 0 };
     const bonusUsd = bonusByUser.get(u.id) ?? 0;
+    const tier = calculateTier({ verifiedCreator: u.verifiedCreator, totalUploads: agg.posts, totalViews: agg.views });
     return {
       id: u.id,
       username: u.username,
@@ -33,9 +34,12 @@ export default async function AdminUsersPage() {
       joined: u.createdAt.toLocaleDateString("en-US"),
       posts: agg.posts,
       views: agg.views.toLocaleString("en-US"),
-      earnings: formatUsd(calculateEarningsUsd(agg.views) + bonusUsd),
+      earnings: formatUsd(calculateEarningsUsd(agg.views, tier) + bonusUsd),
       status: u.status,
       role: u.role,
+      tier,
+      tierLabel: TIER_LABEL[tier],
+      verifiedCreator: u.verifiedCreator,
     };
   });
 

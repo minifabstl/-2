@@ -16,6 +16,8 @@ export const users = sqliteTable("users", {
   bitcoinAddress: text("bitcoin_address"),
   // Key of the user's profile photo in Cloudflare R2 (see lib/storage.ts), null if not set.
   avatarKey: text("avatar_key"),
+  // Hand-granted by an admin — the top Creator Program tier (see lib/earnings.ts calculateTier).
+  verifiedCreator: integer("verified_creator", { mode: "boolean" }).notNull().default(false),
   // Notification preferences (all default to on) — see lib/email.ts for the emails they gate.
   notifyOnApproval: integer("notify_on_approval", { mode: "boolean" }).notNull().default(true),
   notifyOnRejection: integer("notify_on_rejection", { mode: "boolean" }).notNull().default(true),
@@ -76,6 +78,11 @@ export const posts = sqliteTable("posts", {
   // flagged: reported by users but still live. removed: taken down/rejected by an admin.
   status: text("status", { enum: ["pending", "live", "flagged", "removed"] }).notNull().default("pending"),
   viewCount: integer("view_count").notNull().default(0),
+  // Views within the CURRENT calendar week (Monday-anchored, UTC), for the Creator Program
+  // leaderboard. Reset lazily the next time a view lands after the week has rolled over
+  // (see app/api/posts/[id]/view/route.ts) — there is no scheduled/cron job in this project.
+  weekViewCount: integer("week_view_count").notNull().default(0),
+  weekStartAt: integer("week_start_at", { mode: "timestamp" }),
   createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
 });
 

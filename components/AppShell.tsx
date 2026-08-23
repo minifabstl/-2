@@ -14,6 +14,7 @@ const NAV = [
   { href: "/explore", label: "Explore", locked: false, icon: "compass" },
   { href: "/upload", label: "My Uploads", locked: true, icon: "upload" },
   { href: "/profile", label: "My Earnings", locked: true, icon: "wallet" },
+  { href: "/creator-program", label: "Creator Program", locked: false, icon: "star" },
 ] as const;
 
 const CATEGORIES = [
@@ -141,6 +142,8 @@ function NavIcon({ name }: { name: string }) {
       return <svg {...common}><rect x="3" y="4" width="18" height="14" rx="2" /><path d="M8 21h8M12 18v3" /></svg>;
     case "wallet":
       return <svg {...common}><circle cx="12" cy="12" r="9" /><path d="M12 7v10M9 9.5c0-1.4 1.3-2.5 3-2.5s3 1 3 2.3c0 3-6 1.5-6 4.5 0 1.4 1.3 2.4 3 2.4s3-1 3-2.4" /></svg>;
+    case "star":
+      return <svg {...common}><path d="M12 3l2.6 5.9 6.4.6-4.8 4.3 1.4 6.3L12 16.9 6.4 20.1l1.4-6.3-4.8-4.3 6.4-.6L12 3z" /></svg>;
     default:
       return null;
   }

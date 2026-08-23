@@ -12,6 +12,9 @@ type Row = {
   earnings: string;
   status: "active" | "suspended";
   role: "user" | "admin";
+  tier: "new" | "contributor" | "creator" | "verified";
+  tierLabel: string;
+  verifiedCreator: boolean;
 };
 
 export default function AdminUsersTable({ initialUsers }: { initialUsers: Row[] }) {
@@ -24,6 +27,22 @@ export default function AdminUsersTable({ initialUsers }: { initialUsers: Row[] 
   async function toggleSuspend(id: string) {
     setRows((prev) => prev.map((r) => (r.id === id ? { ...r, status: r.status === "active" ? "suspended" : "active" } : r)));
     await fetch(`/api/admin/users/${id}/suspend`, { method: "POST" });
+  }
+
+  async function toggleVerified(id: string) {
+    setRows((prev) =>
+      prev.map((r) => {
+        if (r.id !== id) return r;
+        const nextVerified = !r.verifiedCreator;
+        return {
+          ...r,
+          verifiedCreator: nextVerified,
+          tier: nextVerified ? "verified" : r.tier,
+          tierLabel: nextVerified ? "Verified Content Creator" : r.tierLabel,
+        };
+      })
+    );
+    await fetch(`/api/admin/users/${id}/verified`, { method: "POST" });
   }
 
   async function confirmReset() {
@@ -60,6 +79,7 @@ export default function AdminUsersTable({ initialUsers }: { initialUsers: Row[] 
           <div className="w-20">POSTS</div>
           <div className="w-24">VIEWS</div>
           <div className="w-24">EARNINGS</div>
+          <div className="w-36">TIER</div>
           <div className="w-24">STATUS</div>
           <div className="flex-1">ACTIONS</div>
         </div>
@@ -77,6 +97,17 @@ export default function AdminUsersTable({ initialUsers }: { initialUsers: Row[] 
             <div className="w-20">{u.posts}</div>
             <div className="w-24">{u.views}</div>
             <div className="w-24 font-semibold text-[var(--ok)]">{u.earnings}</div>
+            <div className="w-36">
+              <span
+                className="px-2.5 py-1 rounded-full text-[10.5px] font-semibold"
+                style={{
+                  background: u.tier === "new" ? "var(--border-soft)" : "var(--accent-soft)",
+                  color: u.tier === "new" ? "var(--text-muted)" : "var(--accent-dark)",
+                }}
+              >
+                {u.tierLabel}
+              </span>
+            </div>
             <div className="w-24">
               <span
                 className="px-2.5 py-1 rounded-full text-[11px] font-semibold"
@@ -101,6 +132,12 @@ export default function AdminUsersTable({ initialUsers }: { initialUsers: Row[] 
                 style={{ color: u.status === "active" ? "var(--danger)" : "var(--ok)" }}
               >
                 {u.status === "active" ? "Suspend" : "Activate"}
+              </button>
+              <button
+                onClick={() => toggleVerified(u.id)}
+                className="px-2.5 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--surface)] text-[11px] font-semibold text-[var(--accent-dark)]"
+              >
+                {u.verifiedCreator ? "Revoke Verified" : "Grant Verified"}
               </button>
             </div>
           </div>
