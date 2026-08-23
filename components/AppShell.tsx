@@ -34,7 +34,7 @@ export default function AppShell({ user, avatarUrl, children }: { user: SafeUser
       <PromoBanner />
       <div className="flex flex-1 min-h-0">
       <aside className="w-60 min-w-60 border-r border-[var(--border)] bg-[var(--surface)] flex flex-col gap-6 p-3.5 sticky top-0 h-screen">
-        <Link href="/" className="flex flex-col items-center justify-center px-2 pt-4 pb-3.5 gap-2">
+        <Link href="/" className="flex flex-col items-center justify-center px-2 pt-1 pb-3 gap-2">
           <Logo size={32} />
           <span className="w-24 h-[3px] rounded-full" style={{ background: "var(--accent)" }} />
         </Link>
@@ -92,19 +92,21 @@ export default function AppShell({ user, avatarUrl, children }: { user: SafeUser
       </aside>
 
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="h-16 min-h-16 border-b border-[var(--border)] bg-[var(--surface)] flex items-center gap-4 px-7">
+        <header className="h-16 min-h-16 flex items-center gap-4 px-7" style={{ background: "#00aff0" }}>
           <div className="flex-1" />
           {user ? (
             <div className="flex items-center gap-3">
               {user.role === "admin" && (
-                <Link href="/admin" className="text-[13px] font-semibold text-[var(--text-muted)] hover:text-[var(--text)]">
+                <Link href="/admin" className="text-[13px] font-semibold text-white/80 hover:text-white">
                   Admin Panel
                 </Link>
               )}
-              <ProfileMenu user={user} avatarUrl={avatarUrl ?? null} />
+              <div className="bg-white/90 rounded-full">
+                <ProfileMenu user={user} avatarUrl={avatarUrl ?? null} />
+              </div>
             </div>
           ) : (
-            <Link href="/login" className="px-4 py-2.5 rounded-[10px] border border-[var(--accent)] bg-[var(--accent)] text-white text-[13.5px] font-semibold">
+            <Link href="/login" className="px-4 py-2.5 rounded-[10px] bg-white text-[#00aff0] text-[13.5px] font-bold">
               Log In
             </Link>
           )}
