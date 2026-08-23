@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { nanoid } from "nanoid";
 import { desc, eq } from "drizzle-orm";
-import { getDb, comments, users } from "@/db";
+import { getDb, comments, users, posts } from "@/db";
 import { AuthError, requireUser } from "@/lib/auth";
+import { sendNewCommentEmail } from "@/lib/email";
 
 /** Lists the comments on a post — visible to everyone. */
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -41,5 +42,18 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const db = getDb();
   const id = nanoid();
   await db.insert(comments).values({ id, postId, userId: user.id, text, createdAt: new Date() });
+
+  // Notify the post's owner by email, unless they're commenting on their own post or have this notification off.
+  const ownerRows = await db
+    .select({ userId: posts.userId, title: posts.title, email: users.email, notifyOnComment: users.notifyOnComment })
+    .from(posts)
+    .innerJoin(users, eq(posts.userId, users.id))
+    .where(eq(posts.id, postId))
+    .limit(1);
+  const owner = ownerRows[0];
+  if (owner && owner.userId !== user.id && owner.notifyOnComment) {
+    await sendNewCommentEmail(owner.email, owner.title, user.username).catch(() => {});
+  }
+
   return NextResponse.json({ ok: true, id, username: user.username });
 }

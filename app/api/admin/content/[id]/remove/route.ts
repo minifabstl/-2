@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import { eq } from "drizzle-orm";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
-import { getDb, posts, likes, comments } from "@/db";
+import { getDb, posts, likes, comments, users } from "@/db";
 import { AuthError, requireAdmin } from "@/lib/auth";
+import { sendContentRejectedEmail } from "@/lib/email";
 
 /**
  * "Remove" / "Reject" action.
@@ -34,6 +35,13 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
     return NextResponse.json({ ok: true, status: "live" });
   }
 
+  const ownerRows = await db
+    .select({ email: users.email, notifyOnRejection: users.notifyOnRejection })
+    .from(users)
+    .where(eq(users.id, target.userId))
+    .limit(1);
+  const owner = ownerRows[0];
+
   // Permanent delete: remove the file in R2 and the database record (along with its likes/comments).
   const { env } = getCloudflareContext();
   await env.BUCKET.delete(target.mediaKey);
@@ -42,6 +50,10 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
   await db.delete(likes).where(eq(likes.postId, id));
   await db.delete(comments).where(eq(comments.postId, id));
   await db.delete(posts).where(eq(posts.id, id));
+
+  if (owner?.notifyOnRejection) {
+    await sendContentRejectedEmail(owner.email, target.title).catch(() => {});
+  }
 
   return NextResponse.json({ ok: true, status: "deleted" });
 }

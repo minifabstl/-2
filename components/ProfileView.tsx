@@ -18,14 +18,16 @@ export default function ProfileView({
   posts,
   payouts,
   justUploaded,
+  initialTab = "posts",
 }: {
   user: { username: string; bitcoinAddress: string | null };
   stats: { totalPosts: number; totalViews: number; totalViewsLabel: string; totalEarnedLabel: string; availableLabel: string };
   posts: Post[];
   payouts: Payout[];
   justUploaded?: boolean;
+  initialTab?: "posts" | "earnings";
 }) {
-  const [tab, setTab] = useState<"posts" | "earnings">("posts");
+  const [tab, setTab] = useState<"posts" | "earnings">(initialTab);
   const [requesting, setRequesting] = useState(false);
   const [requestMsg, setRequestMsg] = useState("");
   const [address, setAddress] = useState(user.bitcoinAddress ?? "");
@@ -113,7 +115,29 @@ export default function ProfileView({
       )}
 
       {tab === "earnings" && (
-        <div className="flex gap-5 mt-[22px] items-start">
+        <div className="mt-[22px]">
+          <div className="border border-[var(--border)] rounded-2xl bg-[var(--surface)] overflow-hidden">
+            <div className="px-[18px] py-4 border-b border-[var(--border)] font-display text-sm font-bold">Earnings by Content</div>
+            {posts.length === 0 && <div className="px-[18px] py-4 text-sm text-[var(--text-muted)]">You don&apos;t have any posts yet.</div>}
+            {posts.length > 0 && (
+              <div className="grid grid-cols-[1fr_120px_110px_110px] px-[18px] py-2.5 text-[10.5px] font-semibold text-[var(--text-faint)] tracking-wide uppercase border-b border-[var(--border-soft)]">
+                <div>Title</div>
+                <div>Type</div>
+                <div>Views</div>
+                <div>Earned</div>
+              </div>
+            )}
+            {posts.map((p) => (
+              <div key={p.id} className="grid grid-cols-[1fr_120px_110px_110px] items-center px-[18px] py-3 text-[12.5px] border-b border-[var(--border-soft)] last:border-b-0">
+                <div className="font-medium truncate pr-3">{p.title}</div>
+                <div className="text-[var(--text-muted)] capitalize">{p.type}</div>
+                <div className="text-[var(--text-muted)]">{p.status === "pending" ? "—" : p.viewsLabel}</div>
+                <div className="font-semibold text-[var(--ok)]">+{p.earnLabel}</div>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex gap-5 items-start mt-5">
           <div className="flex-1 border border-[var(--border)] rounded-2xl bg-[var(--surface)] overflow-hidden">
             <div className="px-[18px] py-4 border-b border-[var(--border)] font-display text-sm font-bold">Payout History</div>
             {payouts.length === 0 && <div className="px-[18px] py-4 text-sm text-[var(--text-muted)]">You haven&apos;t requested a payout yet.</div>}
@@ -153,6 +177,7 @@ export default function ProfileView({
               {requesting ? "Sending…" : "Get Paid in Bitcoin"}
             </button>
             {requestMsg && <div className="text-[11.5px] text-[var(--text-muted)]">{requestMsg}</div>}
+          </div>
           </div>
         </div>
       )}

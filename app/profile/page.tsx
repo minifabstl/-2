@@ -5,11 +5,11 @@ import { getCurrentUser } from "@/lib/auth";
 import { calculateEarningsUsd, formatUsd, formatViews } from "@/lib/earnings";
 import ProfileView from "@/components/ProfileView";
 
-export default async function ProfilePage({ searchParams }: { searchParams: Promise<{ uploaded?: string }> }) {
+export default async function ProfilePage({ searchParams }: { searchParams: Promise<{ uploaded?: string; tab?: string }> }) {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
 
-  const { uploaded } = await searchParams;
+  const { uploaded, tab } = await searchParams;
 
   const db = getDb();
 
@@ -33,6 +33,7 @@ export default async function ProfilePage({ searchParams }: { searchParams: Prom
   return (
     <ProfileView
       justUploaded={uploaded === "1"}
+      initialTab={tab === "earnings" ? "earnings" : "posts"}
       user={{ username: user.username, bitcoinAddress: user.bitcoinAddress }}
       stats={{
         totalPosts: myPosts.length,
@@ -46,12 +47,12 @@ export default async function ProfilePage({ searchParams }: { searchParams: Prom
         type: p.type,
         title: p.title,
         status: p.status,
-        viewsLabel: formatViews(p.viewCount) + " izlenme",
+        viewsLabel: formatViews(p.viewCount) + " views",
         earnLabel: formatUsd(calculateEarningsUsd(p.viewCount)),
       }))}
       payouts={myPayouts.map((p) => ({
         id: p.id,
-        date: p.createdAt.toLocaleDateString("tr-TR"),
+        date: p.createdAt.toLocaleDateString("en-US"),
         amountLabel: formatUsd(p.amountUsd),
         status: p.status,
       }))}

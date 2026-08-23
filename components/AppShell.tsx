@@ -6,6 +6,7 @@ import { useState } from "react";
 import type { SafeUser } from "@/lib/auth";
 import LoginPromptModal from "@/components/LoginPromptModal";
 import Logo from "@/components/Logo";
+import ProfileMenu from "@/components/ProfileMenu";
 
 const NAV = [
   { href: "/", label: "Home", locked: false, icon: "home" },
@@ -29,12 +30,6 @@ export default function AppShell({ user, children }: { user: SafeUser | null; ch
   const [promptOpen, setPromptOpen] = useState(false);
 
   const isAuthPage = pathname === "/login" || pathname === "/reset-password" || pathname.startsWith("/admin");
-
-  async function handleLogout() {
-    await fetch("/api/auth/logout", { method: "POST" });
-    router.refresh();
-    router.push("/");
-  }
 
   if (isAuthPage) {
     // The login/signup screen uses its own full-page layout (no sidebar).
@@ -102,12 +97,7 @@ export default function AppShell({ user, children }: { user: SafeUser | null; ch
                   Admin Panel
                 </Link>
               )}
-              <Link href="/profile" className="w-[34px] h-[34px] rounded-full bg-[var(--accent)] text-white flex items-center justify-center text-[13px] font-bold font-display">
-                {user.username.slice(0, 2).toUpperCase()}
-              </Link>
-              <button onClick={handleLogout} className="px-3.5 py-2 rounded-[10px] border border-[var(--border)] bg-[var(--surface)] text-[13px] font-semibold">
-                Log Out
-              </button>
+              <ProfileMenu user={user} />
             </div>
           ) : (
             <Link href="/login" className="px-4 py-2.5 rounded-[10px] border border-[var(--accent)] bg-[var(--accent)] text-white text-[13.5px] font-semibold">

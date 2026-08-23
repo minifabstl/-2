@@ -14,6 +14,10 @@ export const users = sqliteTable("users", {
   role: text("role", { enum: ["user", "admin"] }).notNull().default("user"),
   status: text("status", { enum: ["active", "suspended"] }).notNull().default("active"),
   bitcoinAddress: text("bitcoin_address"),
+  // Notification preferences (all default to on) — see lib/email.ts for the emails they gate.
+  notifyOnApproval: integer("notify_on_approval", { mode: "boolean" }).notNull().default(true),
+  notifyOnRejection: integer("notify_on_rejection", { mode: "boolean" }).notNull().default(true),
+  notifyOnComment: integer("notify_on_comment", { mode: "boolean" }).notNull().default(true),
   createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
 });
 
