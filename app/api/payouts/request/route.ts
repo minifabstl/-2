@@ -16,7 +16,7 @@ export async function POST() {
   }
 
   if (!user.bitcoinAddress) {
-    return NextResponse.json({ error: "Add a Bitcoin wallet address to your profile first." }, { status: 400 });
+    return NextResponse.json({ error: "Add a wallet address to your profile first." }, { status: 400 });
   }
 
   const db = getDb();

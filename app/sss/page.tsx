@@ -16,7 +16,7 @@ const FAQS = [
   },
   {
     q: "How do I withdraw my earnings?",
-    a: "Save your Bitcoin wallet address on your profile and create a request by clicking the \"Get Paid in Bitcoin\" button. Your request is reviewed by an admin and sent to your wallet; once it's marked as \"paid,\" it will appear in your history.",
+    a: "Save your wallet address on your profile and create a request by clicking the \"Request Payout\" button. Your request is reviewed by an admin and sent to your wallet; once it's marked as \"paid,\" it will appear in your history.",
   },
   {
     q: "I forgot my password, what should I do?",

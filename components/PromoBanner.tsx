@@ -48,7 +48,7 @@ export default function PromoBanner() {
         <span className="flex-1 min-w-0">
           <strong className="font-display font-bold">Get paid for what you post.</strong>{" "}
           <span className="opacity-90">
-            Earn $0.20 per 1,000 views, paid in Bitcoin. Get a $3 bonus on your first upload.
+            Earn $0.20 per 1,000 views, paid straight to your wallet. Get a $3 bonus on your first upload.
           </span>
         </span>
         <span className="px-3 py-1.5 rounded-full bg-white/15 hover:bg-white/25 font-semibold whitespace-nowrap shrink-0">

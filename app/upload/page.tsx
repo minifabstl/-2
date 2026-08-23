@@ -112,7 +112,7 @@ export default function UploadPage() {
 
       <div className="mb-6 px-4 py-3 rounded-[10px] flex items-center gap-2 text-[12.5px] font-semibold" style={{ background: "var(--accent-soft)", color: "var(--accent-dark)" }}>
         <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)] shrink-0" />
-        Your uploads earn money: $0.20 per 1000 views, paid in Bitcoin.
+        Your uploads earn money: $0.20 per 1000 views, paid straight to your wallet.
       </div>
 
       <form onSubmit={submit} className="flex flex-col gap-6">

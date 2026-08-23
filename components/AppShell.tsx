@@ -34,22 +34,38 @@ export default function AppShell({ user, avatarUrl, children }: { user: SafeUser
       <PromoBanner />
       <div className="flex flex-1 min-h-0">
       <aside className="w-60 min-w-60 border-r border-[var(--border)] bg-[var(--surface)] flex flex-col gap-6 p-3.5 sticky top-0 h-screen">
-        <Link href="/" className="flex items-center justify-center px-2 py-3">
-          <Logo size={26} />
+        <Link href="/" className="flex flex-col items-center justify-center px-2 pt-4 pb-3.5 gap-2">
+          <Logo size={32} />
+          <span className="w-24 h-[3px] rounded-full" style={{ background: "var(--accent)" }} />
         </Link>
 
         <nav className="flex flex-col gap-0.5">
           {NAV.map((item) => {
             const active = pathname === item.href;
             const locked = item.locked && !user;
+            const isCreatorProgram = item.href === "/creator-program";
+            const isEarnings = item.href === "/profile";
             return (
               <button
                 key={item.href}
                 onClick={() => (locked ? setPromptOpen(true) : router.push(item.href))}
-                className={`flex items-center gap-2.5 px-2.5 py-2 rounded-[10px] text-sm text-left ${active ? "bg-[var(--accent-soft)] text-[var(--accent-dark)] font-semibold" : "text-[var(--text)] font-medium hover:bg-[var(--bg)]"}`}
+                className={`flex items-center gap-2.5 px-2.5 py-2 rounded-[10px] text-sm text-left ${
+                  isCreatorProgram
+                    ? "font-semibold"
+                    : active
+                      ? "bg-[var(--accent-soft)] text-[var(--accent-dark)] font-semibold"
+                      : "text-[var(--text)] font-medium hover:bg-[var(--bg)]"
+                }`}
+                style={isCreatorProgram ? { background: "rgba(219,26,109,0.12)", color: "#db1a6d" } : undefined}
               >
                 <NavIcon name={item.icon} />
                 {item.label}
+                {isEarnings && (
+                  <svg className="shrink-0" width="14" height="14" viewBox="0 0 24 24" fill="#eab308" stroke="#ca8a04" strokeWidth="1">
+                    <circle cx="12" cy="12" r="9" />
+                    <text x="12" y="16" textAnchor="middle" fontSize="11" fontWeight="700" fill="#78350f" stroke="none">$</text>
+                  </svg>
+                )}
                 {locked && (
                   <svg className="ml-auto text-[var(--text-faint)]" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <rect x="5" y="11" width="14" height="9" rx="2" /><path d="M8 11V8a4 4 0 018 0v3" />
@@ -64,7 +80,7 @@ export default function AppShell({ user, avatarUrl, children }: { user: SafeUser
           <div className="p-2.5 rounded-xl bg-[var(--accent-soft)] flex flex-col gap-1.5">
             <div className="text-[12.5px] font-semibold">1000 views = $0.20</div>
             <div className="text-[11.5px] text-[var(--text-muted)] leading-snug">
-              Earn as you share, get paid out in Bitcoin. Get a $3 bonus on your first approved upload, plus $0.10 per upload after that.
+              Earn as you share, get paid straight to your wallet. Get a $3 bonus on your first approved upload, plus $0.10 per upload after that.
             </div>
           </div>
           <div className="flex flex-wrap gap-x-2.5 gap-y-1 px-1 text-[10.5px] text-[var(--text-faint)]">

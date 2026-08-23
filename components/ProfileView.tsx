@@ -169,14 +169,14 @@ export default function ProfileView({
           </div>
 
           <div className="w-[300px] border border-[var(--border)] rounded-2xl bg-[var(--surface)] p-[18px] flex flex-col gap-3.5">
-            <div className="font-display text-sm font-bold">Bitcoin Wallet</div>
+            <div className="font-display text-sm font-bold">Payout Wallet</div>
             <div className="text-[11.5px] text-[var(--text-muted)] leading-relaxed">
               When you request a payout, your earnings are sent to this address.
             </div>
             <input
               value={address}
               onChange={(e) => setAddress(e.target.value)}
-              placeholder="bc1q…"
+              placeholder="Your wallet address"
               className="border border-[var(--border)] rounded-[10px] px-3 py-2.5 text-[11.5px] outline-none"
             />
             <button onClick={saveAddress} disabled={savingAddress} className="py-2.5 rounded-[9px] border border-[var(--border)] text-[12.5px] font-semibold disabled:opacity-60">
@@ -184,7 +184,7 @@ export default function ProfileView({
             </button>
             <div className="h-px bg-[var(--border-soft)] my-0.5" />
             <button onClick={requestPayout} disabled={requesting} className="py-3 rounded-[10px] bg-[var(--btc)] text-white text-[13px] font-bold disabled:opacity-60">
-              {requesting ? "Sending…" : "Get Paid in Bitcoin"}
+              {requesting ? "Sending…" : "Request Payout"}
             </button>
             {requestMsg && <div className="text-[11.5px] text-[var(--text-muted)]">{requestMsg}</div>}
           </div>

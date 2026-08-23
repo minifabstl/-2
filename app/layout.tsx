@@ -9,7 +9,7 @@ const display = Space_Grotesk({ variable: "--font-display", subsets: ["latin"], 
 const body = IBM_Plex_Sans({ variable: "--font-body", subsets: ["latin"], weight: ["400", "500", "600"] });
 
 const SITE_URL = "https://leakedfap.org";
-const SITE_DESCRIPTION = "A video and photo sharing platform. Earn per view, get paid in Bitcoin.";
+const SITE_DESCRIPTION = "A video and photo sharing platform. Earn per view, get paid straight to your wallet.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

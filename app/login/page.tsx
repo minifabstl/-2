@@ -51,7 +51,7 @@ export default function LoginPage() {
         <div className="flex flex-col gap-[18px]">
           <div className="font-display text-[34px] font-bold leading-[1.25] max-w-[440px]">Share and earn.</div>
           <div className="text-[15px] text-white/85 leading-relaxed max-w-[420px]">
-            Share your photos and videos, earn $0.20 for every 1,000 views — we&apos;ll send your earnings straight to your Bitcoin wallet.
+            Share your photos and videos, earn $0.20 for every 1,000 views — we&apos;ll send your earnings straight to your wallet.
           </div>
           <div className="flex gap-7 mt-2">
             <div>
@@ -59,8 +59,8 @@ export default function LoginPage() {
               <div className="text-xs text-white/75">/ 1,000 views</div>
             </div>
             <div>
-              <div className="font-display text-[22px] font-bold">₿</div>
-              <div className="text-xs text-white/75">Paid in Bitcoin</div>
+              <div className="font-display text-[22px] font-bold">⚡</div>
+              <div className="text-xs text-white/75">Fast payouts</div>
             </div>
           </div>
         </div>
@@ -119,8 +119,8 @@ export default function LoginPage() {
           )}
 
           {isSignup && (
-            <Field label="Bitcoin wallet address" hint="for your earnings, can also be added later">
-              <input value={bitcoinAddress} onChange={(e) => setBitcoinAddress(e.target.value)} placeholder="bc1q…" className="input" />
+            <Field label="Wallet address" hint="for your earnings, can also be added later">
+              <input value={bitcoinAddress} onChange={(e) => setBitcoinAddress(e.target.value)} placeholder="Your wallet address" className="input" />
             </Field>
           )}
 

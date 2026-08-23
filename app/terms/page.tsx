@@ -27,7 +27,7 @@ export default function TermsPage() {
         </Section>
         <Section title="4. Earnings and payouts">
           Views on approved content convert into earnings ($0.20 per 1000 views). You can withdraw your earnings by
-          requesting a payout to your Bitcoin wallet address. Payments are sent manually by an admin, and processing
+          requesting a payout to your wallet address. Payments are sent manually by an admin, and processing
           time may vary. If fake/automated view generation (bots, refresh abuse, etc.) is detected, the related
           earnings may be canceled and the account may be suspended.
         </Section>

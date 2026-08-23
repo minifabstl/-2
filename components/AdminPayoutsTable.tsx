@@ -98,7 +98,7 @@ export default function AdminPayoutsTable({ initialItems }: { initialItems: Item
                   disabled={busyId === it.id}
                   className="px-2.5 py-1.5 rounded-lg bg-[var(--accent)] text-white text-[11px] font-semibold disabled:opacity-60"
                 >
-                  {busyId === it.id ? "Processing…" : "Sent BTC, Mark Paid"}
+                  {busyId === it.id ? "Processing…" : "Payment Sent, Mark Paid"}
                 </button>
               ) : (
                 <span className="text-[11px] text-[var(--text-faint)]">{it.paidAt ? `on ${it.paidAt}` : "—"}</span>
@@ -113,8 +113,8 @@ export default function AdminPayoutsTable({ initialItems }: { initialItems: Item
           <circle cx="12" cy="12" r="9" /><path d="M12 8v8M9 10c0-1.1 1.3-2 3-2s3 .8 3 1.9c0 2.4-6 1.2-6 3.6 0 1.1 1.3 1.9 3 1.9s3-.8 3-1.9" />
         </svg>
         <span className="text-[11.5px] leading-relaxed">
-          This panel does not send automatic Bitcoin transfers. After you send the payment to the address from your own
-          wallet or exchange, click the &quot;Sent BTC, Mark Paid&quot; button.
+          This panel does not send automatic transfers. After you send the payment to the address from your own
+          wallet or exchange, click the &quot;Payment Sent, Mark Paid&quot; button.
         </span>
       </div>
     </div>

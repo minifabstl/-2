@@ -39,7 +39,7 @@ export default async function AdminPayoutsPage() {
         <div>
           <div className="font-display text-xl font-bold">Payouts</div>
           <div className="text-[12.5px] text-[var(--text-muted)] mt-0.5">
-            Users&apos; Bitcoin payout requests — after sending the transfer from your own wallet, mark it as &quot;Paid&quot;
+            Users&apos; payout requests — after sending the transfer from your own wallet, mark it as &quot;Paid&quot;
           </div>
         </div>
         <div className="text-right">

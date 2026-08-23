@@ -20,7 +20,7 @@ import {
 
 export const metadata: Metadata = {
   title: "Creator Program",
-  description: "Get paid in Bitcoin for every view your content gets. Learn about tiers, rates, and this week's top creators on LeakedFap.",
+  description: "Get paid straight to your wallet for every view your content gets. Learn about tiers, rates, and this week's top creators on LeakedFap.",
 };
 
 export default async function CreatorProgramPage() {
@@ -76,7 +76,7 @@ export default async function CreatorProgramPage() {
         </span>
         <h1 className="font-display text-3xl font-bold mb-3">Post here. Get paid for every view.</h1>
         <p className="text-[14px] text-[var(--text-muted)] max-w-xl leading-relaxed mb-6">
-          Every approved upload earns real money as it gets views — paid out straight to your Bitcoin wallet, any time you have at
+          Every approved upload earns real money as it gets views — paid out straight to your wallet, any time you have at
           least $1 accrued. Upload more, get more views, and your rate goes up as you move through the creator tiers below.
         </p>
         <Link href="/upload" className="px-6 py-3 rounded-[10px] bg-[var(--accent)] text-white text-[14px] font-semibold">
@@ -165,7 +165,7 @@ export default async function CreatorProgramPage() {
           </RuleItem>
           <RuleItem>Views only count from real, unique viewers — you can&apos;t earn from watching your own content.</RuleItem>
           <RuleItem>
-            Request a payout any time you have at least $1 accrued. Add your Bitcoin address on your profile, and an admin will
+            Request a payout any time you have at least $1 accrued. Add your wallet address on your profile, and an admin will
             send your payout from there.
           </RuleItem>
           <RuleItem>All uploads are reviewed before going live — content that violates our terms won&apos;t be approved.</RuleItem>

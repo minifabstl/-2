@@ -13,7 +13,7 @@ export default function PrivacyPage() {
 
       <div className="flex flex-col gap-6 text-[13.5px] leading-relaxed text-[var(--text)]">
         <Section title="1. Data we collect">
-          When you create an account, we store your username, email address, and (if you provide one) your Bitcoin
+          When you create an account, we store your username, email address, and (if you provide one) your payout
           wallet address. Your password is never stored as plain text — it is only stored in an irreversibly hashed
           form. The videos/photos you upload, their title and category information, the likes/comments you receive,
           and the view counts of your content are also kept in our system.
