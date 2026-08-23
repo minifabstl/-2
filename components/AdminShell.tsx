@@ -9,15 +9,18 @@ const NAV = [
   { href: "/admin/users", label: "Users" },
   { href: "/admin/content", label: "Content" },
   { href: "/admin/payouts", label: "Payouts" },
+  { href: "/admin/gifts", label: "Gift Milestones" },
 ];
 
 export default function AdminShell({
   username,
   pendingContentCount = 0,
+  pendingGiftsCount = 0,
   children,
 }: {
   username: string;
   pendingContentCount?: number;
+  pendingGiftsCount?: number;
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
@@ -48,6 +51,11 @@ export default function AdminShell({
                 {item.href === "/admin/content" && pendingContentCount > 0 && (
                   <span className="ml-2 min-w-[18px] h-[18px] px-1 rounded-full bg-[var(--warn)] text-white text-[10.5px] font-bold flex items-center justify-center">
                     {pendingContentCount}
+                  </span>
+                )}
+                {item.href === "/admin/gifts" && pendingGiftsCount > 0 && (
+                  <span className="ml-2 min-w-[18px] h-[18px] px-1 rounded-full bg-[var(--warn)] text-white text-[10.5px] font-bold flex items-center justify-center">
+                    {pendingGiftsCount}
                   </span>
                 )}
               </Link>

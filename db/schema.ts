@@ -18,6 +18,13 @@ export const users = sqliteTable("users", {
   avatarKey: text("avatar_key"),
   // Hand-granted by an admin — the top Creator Program tier (see lib/earnings.ts calculateTier).
   verifiedCreator: integer("verified_creator", { mode: "boolean" }).notNull().default(false),
+  // Total time the user has spent actively on the site, in seconds (see lib/gift.ts and
+  // app/api/track-time/route.ts). Powers the "100 hours = $50 OnlyFans account" gift program.
+  activeSeconds: integer("active_seconds").notNull().default(0),
+  // Set the first time activeSeconds crosses the gift milestone threshold. Null until then.
+  giftMilestoneReachedAt: integer("gift_milestone_reached_at", { mode: "timestamp" }),
+  // Set by an admin once the gift has actually been sent to the user (see admin > Gift Milestones).
+  giftSentAt: integer("gift_sent_at", { mode: "timestamp" }),
   // Notification preferences (all default to on) — see lib/email.ts for the emails they gate.
   notifyOnApproval: integer("notify_on_approval", { mode: "boolean" }).notNull().default(true),
   notifyOnRejection: integer("notify_on_rejection", { mode: "boolean" }).notNull().default(true),

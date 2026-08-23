@@ -8,6 +8,8 @@ import LoginPromptModal from "@/components/LoginPromptModal";
 import Logo from "@/components/Logo";
 import ProfileMenu from "@/components/ProfileMenu";
 import PromoBanner from "@/components/PromoBanner";
+import TimeTracker from "@/components/TimeTracker";
+import { GIFT_MILESTONE_HOURS, GIFT_REWARD_LABEL, formatHoursOnSite } from "@/lib/gift";
 
 const NAV = [
   { href: "/", label: "Home", locked: false, icon: "home" },
@@ -17,7 +19,15 @@ const NAV = [
   { href: "/creator-program", label: "Creator Program", locked: false, icon: "star" },
 ] as const;
 
-export default function AppShell({ user, avatarUrl, children }: { user: SafeUser | null; avatarUrl?: string | null; children: React.ReactNode }) {
+export default function AppShell({
+  user,
+  avatarUrl,
+  children,
+}: {
+  user: SafeUser | null;
+  avatarUrl?: string | null;
+  children: React.ReactNode;
+}) {
   const pathname = usePathname();
   const router = useRouter();
   const [promptOpen, setPromptOpen] = useState(false);
@@ -31,6 +41,7 @@ export default function AppShell({ user, avatarUrl, children }: { user: SafeUser
 
   return (
     <div className="flex flex-col min-h-screen bg-[var(--bg)]">
+      {user && <TimeTracker />}
       <PromoBanner />
       <div className="flex flex-1 min-h-0">
       <aside className="w-60 min-w-60 border-r border-[var(--border)] bg-[var(--surface)] flex flex-col gap-6 p-3.5 sticky top-0 h-screen">
@@ -77,6 +88,7 @@ export default function AppShell({ user, avatarUrl, children }: { user: SafeUser
         </nav>
 
         <div className="mt-auto flex flex-col gap-2.5">
+          <GiftBox hoursOnSite={user ? formatHoursOnSite(user.activeSeconds) : null} claimed={!!user?.giftSentAt} />
           <div className="p-2.5 rounded-xl bg-[var(--accent-soft)] flex flex-col gap-1.5">
             <div className="text-[12.5px] font-semibold">1000 views = $0.20</div>
             <div className="text-[11.5px] text-[var(--text-muted)] leading-snug">
@@ -127,6 +139,28 @@ export default function AppShell({ user, avatarUrl, children }: { user: SafeUser
       </div>
 
       <LoginPromptModal open={promptOpen} onClose={() => setPromptOpen(false)} title="Sign up to use this feature" />
+    </div>
+  );
+}
+
+function GiftBox({ hoursOnSite, claimed }: { hoursOnSite: string | null; claimed: boolean }) {
+  const pct = hoursOnSite ? Math.min(100, (Number(hoursOnSite) / GIFT_MILESTONE_HOURS) * 100) : 0;
+  return (
+    <div className="p-2.5 rounded-xl flex flex-col gap-1.5" style={{ background: "rgba(219,26,109,0.1)" }}>
+      <div className="text-[12.5px] font-semibold">🎁 {GIFT_MILESTONE_HOURS} hours = {GIFT_REWARD_LABEL}</div>
+      <div className="text-[11.5px] text-[var(--text-muted)] leading-snug">
+        Spend {GIFT_MILESTONE_HOURS} hours on the site and we&apos;ll gift you a real, admin-funded {GIFT_REWARD_LABEL} — free.
+      </div>
+      {hoursOnSite && (
+        <>
+          <div className="h-1.5 rounded-full bg-white/60 overflow-hidden mt-0.5">
+            <div className="h-full rounded-full" style={{ width: `${pct}%`, background: "#db1a6d" }} />
+          </div>
+          <div className="text-[10.5px] font-semibold" style={{ color: "#db1a6d" }}>
+            {claimed ? "Gift sent — enjoy!" : `${hoursOnSite}h / ${GIFT_MILESTONE_HOURS}h`}
+          </div>
+        </>
+      )}
     </div>
   );
 }
