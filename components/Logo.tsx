@@ -25,7 +25,6 @@ export function LogoMark({ size = 28 }: { size?: number }) {
 export default function Logo({ size = 28, withWordmark = true, className = "" }: { size?: number; withWordmark?: boolean; className?: string }) {
   return (
     <span className={`flex items-center gap-2 ${className}`}>
-      <LogoMark size={size} />
       {withWordmark && (
         <span className="font-display text-[17px] font-bold tracking-tight">
           Leaked<span className="text-[var(--accent)]">Fap</span>
