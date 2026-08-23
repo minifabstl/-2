@@ -38,8 +38,8 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen bg-[var(--bg)]">
-      <div className="hidden md:flex w-[640px] min-h-screen flex-col justify-between p-12 text-white" style={{ background: "linear-gradient(160deg, oklch(0.64 0.19 25), oklch(0.5 0.17 20))" }}>
+    <div className="flex min-h-screen" style={{ background: "linear-gradient(90deg, #db1a6d, #f5c9dc 55%, #ffffff 85%)" }}>
+      <div className="hidden md:flex w-[640px] min-h-screen flex-col justify-between p-12 text-white" style={{ background: "linear-gradient(160deg, #e2226f, #a8125a)" }}>
         <div className="flex flex-col items-start gap-1.5">
           <span className="font-display text-[24px] font-bold tracking-tight text-white">
             Leaked<span className="text-white/70">Fap</span>

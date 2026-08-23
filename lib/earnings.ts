@@ -6,6 +6,9 @@ export const FIRST_UPLOAD_BONUS_USD = 3.0;
 /** Bonus for every approved upload after the first one. */
 export const REPEAT_UPLOAD_BONUS_USD = 0.1;
 
+/** Minimum days between payout requests for the same user (see app/api/payouts/request). */
+export const PAYOUT_COOLDOWN_DAYS = 45;
+
 /**
  * Creator Program tiers. Status is based on a user's ALL-TIME totals, so it only ever
  * goes up, never down. "verified" is hand-granted by an admin (users.verifiedCreator);

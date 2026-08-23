@@ -22,10 +22,12 @@ const NAV = [
 export default function AppShell({
   user,
   avatarUrl,
+  hasUploaded,
   children,
 }: {
   user: SafeUser | null;
   avatarUrl?: string | null;
+  hasUploaded?: boolean;
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
@@ -42,7 +44,7 @@ export default function AppShell({
   return (
     <div className="flex flex-col min-h-screen bg-[var(--bg)]">
       {user && <TimeTracker />}
-      <PromoBanner />
+      <PromoBanner canDismiss={!!hasUploaded} />
       <div className="flex flex-1 min-h-0">
       <aside className="w-60 min-w-60 border-r border-[var(--border)] bg-[var(--surface)] flex flex-col gap-6 p-3.5 sticky top-0 h-screen">
         <Link href="/" className="flex flex-col items-center justify-center px-2 pt-1 pb-3 gap-2">
@@ -107,6 +109,12 @@ export default function AppShell({
             <Link href="/privacy" className="hover:text-[var(--text-muted)]">Privacy</Link>
             <Link href="/terms" className="hover:text-[var(--text-muted)]">Terms</Link>
           </div>
+          <div className="px-1 text-[10.5px] text-[var(--text-faint)] leading-snug">
+            For advertising inquiries, contact us at{" "}
+            <a href="mailto:LeakedFap@protonmail.com" className="hover:text-[var(--text-muted)] underline">
+              LeakedFap@protonmail.com
+            </a>
+          </div>
         </div>
       </aside>
 
@@ -127,9 +135,7 @@ export default function AppShell({
                   Admin Panel
                 </Link>
               )}
-              <div className="bg-white/90 rounded-full">
-                <ProfileMenu user={user} avatarUrl={avatarUrl ?? null} />
-              </div>
+              <ProfileMenu user={user} avatarUrl={avatarUrl ?? null} />
             </div>
           ) : (
             <Link href="/login" className="px-4 py-2.5 rounded-[10px] bg-white text-[#00aff0] text-[13.5px] font-bold">

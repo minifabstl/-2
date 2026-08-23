@@ -5,6 +5,7 @@ import { mediaUrl } from "@/lib/storage";
 import {
   CONTRIBUTOR_REQUIREMENT,
   CREATOR_REQUIREMENT,
+  PAYOUT_COOLDOWN_DAYS,
   RATE_USD_PER_1000_VIEWS,
   FIRST_UPLOAD_BONUS_USD,
   REPEAT_UPLOAD_BONUS_USD,
@@ -93,7 +94,7 @@ export default async function CreatorProgramPage() {
             <div className="grid grid-cols-3 gap-3">
               <HeroStat title={`$${RATE_USD_PER_1000_VIEWS.toFixed(2)} / 1,000 views`} body="One simple, transparent rate for every creator." />
               <HeroStat title="Reviewed, not gamed" body="Every upload is checked before it can earn." />
-              <HeroStat title="$1 minimum payout" body="Request your earnings any time you qualify." />
+              <HeroStat title={`Payouts every ${PAYOUT_COOLDOWN_DAYS} days`} body="Request your accrued earnings once you're eligible." />
             </div>
           </div>
 
@@ -207,10 +208,12 @@ export default async function CreatorProgramPage() {
             <PayoutRow label="First upload bonus" value={formatUsd(FIRST_UPLOAD_BONUS_USD)} />
             <PayoutRow label="Every upload after" value={`+${formatUsd(REPEAT_UPLOAD_BONUS_USD)}`} />
             <PayoutRow label="Minimum payout" value="$1.00" />
+            <PayoutRow label="Withdrawal frequency" value={`Once every ${PAYOUT_COOLDOWN_DAYS} days`} />
             <PayoutRow label="Review" value="Manual, by an admin" />
             <p className="text-[11.5px] text-[var(--text-faint)] leading-relaxed mt-1">
-              Add your wallet address on your profile, then request a payout any time your accrued balance reaches the
-              minimum. Requests are reviewed and sent manually, so processing time can vary.
+              Add your wallet address on your profile, then request a payout once every {PAYOUT_COOLDOWN_DAYS} days, as
+              long as your accrued balance has reached the minimum. Requests are reviewed and sent manually, so
+              processing time can vary.
             </p>
           </div>
         </div>

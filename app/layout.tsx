@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { Space_Grotesk, IBM_Plex_Sans } from "next/font/google";
+import { count, eq } from "drizzle-orm";
 import "./globals.css";
 import { getCurrentUser } from "@/lib/auth";
 import { mediaUrl } from "@/lib/storage";
+import { getDb, posts } from "@/db";
 import AppShell from "@/components/AppShell";
 
 const display = Space_Grotesk({ variable: "--font-display", subsets: ["latin"], weight: ["500", "600", "700"] });
@@ -42,12 +44,19 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
   const user = await getCurrentUser();
   const avatarUrl = user?.avatarKey ? mediaUrl(user.avatarKey) : null;
 
+  let hasUploaded = false;
+  if (user) {
+    const db = getDb();
+    const [{ n }] = await db.select({ n: count() }).from(posts).where(eq(posts.userId, user.id));
+    hasUploaded = n > 0;
+  }
+
   return (
     <html lang="en" className={`${display.variable} ${body.variable} h-full antialiased`}>
       <body className="min-h-full">
         {/* eslint-disable-next-line react/no-danger */}
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(WEBSITE_JSON_LD) }} />
-        <AppShell user={user} avatarUrl={avatarUrl}>{children}</AppShell>
+        <AppShell user={user} avatarUrl={avatarUrl} hasUploaded={hasUploaded}>{children}</AppShell>
       </body>
     </html>
   );

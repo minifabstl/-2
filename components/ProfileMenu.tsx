@@ -40,10 +40,18 @@ export default function ProfileMenu({ user, avatarUrl }: { user: SafeUser; avata
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-2 pl-1.5 pr-2.5 py-1.5 rounded-full border border-transparent hover:border-[var(--border)]"
+        className="relative flex items-center gap-2 pl-1.5 pr-3 py-1.5 rounded-full border border-white/40 overflow-hidden"
+        style={
+          avatarUrl
+            ? { backgroundImage: `url(${avatarUrl})`, backgroundSize: "cover", backgroundPosition: "center" }
+            : { background: "rgba(255,255,255,0.9)" }
+        }
       >
-        <Avatar avatarUrl={avatarUrl} initials={initials} size={34} textSize={13} />
-        <span className="text-[13px] font-semibold hidden sm:inline">{user.username}</span>
+        {avatarUrl && <span className="absolute inset-0 bg-black/45" />}
+        <span className="relative flex items-center gap-2">
+          <Avatar avatarUrl={avatarUrl} initials={initials} size={34} textSize={13} />
+          <span className={`text-[13px] font-semibold hidden sm:inline ${avatarUrl ? "text-white" : ""}`}>{user.username}</span>
+        </span>
       </button>
 
       {open && (

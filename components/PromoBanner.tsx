@@ -1,35 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
-const DISMISS_KEY = "lfap_promo_banner_dismissed";
+/**
+ * The top promo banner. Cannot be dismissed until the user has made at least one upload —
+ * `canDismiss` is computed server-side in app/layout.tsx from whether they have any posts.
+ * Dismissal is intentionally in-memory only (no localStorage): it reappears on every page
+ * reload, and persists only across client-side navigation within the same page load.
+ */
+export default function PromoBanner({ canDismiss }: { canDismiss: boolean }) {
+  const [dismissed, setDismissed] = useState(false);
 
-export default function PromoBanner() {
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    // Reads a one-time client-only preference (dismissed or not) to decide whether to show the banner.
-    let dismissed = false;
-    try {
-      dismissed = localStorage.getItem(DISMISS_KEY) === "1";
-    } catch {
-      dismissed = false;
-    }
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- syncing from localStorage, a client-only external source
-    setVisible(!dismissed);
-  }, []);
-
-  function dismiss() {
-    setVisible(false);
-    try {
-      localStorage.setItem(DISMISS_KEY, "1");
-    } catch {
-      // ignore — worst case the banner reappears next visit
-    }
-  }
-
-  if (!visible) return null;
+  if (dismissed) return null;
 
   return (
     <div
@@ -55,9 +38,15 @@ export default function PromoBanner() {
           Learn more
         </span>
       </Link>
-      <button onClick={dismiss} aria-label="Dismiss" className="shrink-0 opacity-80 hover:opacity-100 text-base leading-none px-1">
-        ✕
-      </button>
+      {canDismiss && (
+        <button
+          onClick={() => setDismissed(true)}
+          aria-label="Dismiss"
+          className="shrink-0 opacity-80 hover:opacity-100 text-base leading-none px-1"
+        >
+          ✕
+        </button>
+      )}
     </div>
   );
 }

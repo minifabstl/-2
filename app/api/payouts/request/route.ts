@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 import { nanoid } from "nanoid";
-import { count, eq, sum } from "drizzle-orm";
+import { count, desc, eq, sum } from "drizzle-orm";
 import { getDb, posts, payouts, bonuses } from "@/db";
 import { AuthError, requireUser } from "@/lib/auth";
-import { calculateEarningsUsd, calculateTier } from "@/lib/earnings";
+import { PAYOUT_COOLDOWN_DAYS, calculateEarningsUsd, calculateTier } from "@/lib/earnings";
 
 /** Opens a payout request for the user's accrued (not yet requested) earnings. */
 export async function POST() {
@@ -20,6 +20,27 @@ export async function POST() {
   }
 
   const db = getDb();
+
+  // Payouts can only be requested once every PAYOUT_COOLDOWN_DAYS — see the Creator Program page.
+  const [lastPayout] = await db
+    .select({ createdAt: payouts.createdAt })
+    .from(payouts)
+    .where(eq(payouts.userId, user.id))
+    .orderBy(desc(payouts.createdAt))
+    .limit(1);
+  if (lastPayout) {
+    const cooldownMs = PAYOUT_COOLDOWN_DAYS * 24 * 60 * 60 * 1000;
+    const nextEligibleAt = lastPayout.createdAt.getTime() + cooldownMs;
+    const msRemaining = nextEligibleAt - Date.now();
+    if (msRemaining > 0) {
+      const daysRemaining = Math.ceil(msRemaining / (24 * 60 * 60 * 1000));
+      return NextResponse.json(
+        { error: `You can request a payout once every ${PAYOUT_COOLDOWN_DAYS} days. Try again in ${daysRemaining} day${daysRemaining === 1 ? "" : "s"}.` },
+        { status: 400 }
+      );
+    }
+  }
+
   const [{ total }] = await db
     .select({ total: sum(posts.viewCount) })
     .from(posts)
