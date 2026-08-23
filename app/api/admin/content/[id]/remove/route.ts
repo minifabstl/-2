@@ -5,14 +5,15 @@ import { getDb, posts, likes, comments } from "@/db";
 import { AuthError, requireAdmin } from "@/lib/auth";
 
 /**
- * "Kaldır" / "Reddet" aksiyonu.
+ * "Remove" / "Reject" action.
  *
- * - İçerik hâlâ yayında/beklemedeyse (live, flagged, pending): kalıcı olarak SİLİNİR —
- *   hem veritabanı kaydı hem de Cloudflare R2'deki dosya. Cloud'da gereksiz yer
- *   kaplamasın diye burada ara bir "removed" durumu YOK, doğrudan siliniyor.
- * - İçerik zaten "removed" durumundaysa (eskiden bu uç noktayla yumuşak kaldırılmış
- *   içerikler): bu istek onu tekrar yayına ALIR (geri yükle). Kalıcı silmek için
- *   `/api/admin/content/[id]/delete` kullanılır.
+ * - If the content is still live/pending (live, flagged, pending): it is PERMANENTLY
+ *   DELETED — both the database record and the file in Cloudflare R2. There is no
+ *   intermediate "removed" state here so we don't waste storage in the cloud; it's
+ *   deleted directly.
+ * - If the content is already in "removed" status (content that was previously
+ *   soft-removed via this endpoint): this request RESTORES it back to live.
+ *   Use `/api/admin/content/[id]/delete` for a permanent delete.
  */
 export async function POST(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -26,14 +27,14 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
   const db = getDb();
   const rows = await db.select().from(posts).where(eq(posts.id, id)).limit(1);
   const target = rows[0];
-  if (!target) return NextResponse.json({ error: "İçerik bulunamadı." }, { status: 404 });
+  if (!target) return NextResponse.json({ error: "Content not found." }, { status: 404 });
 
   if (target.status === "removed") {
     await db.update(posts).set({ status: "live" }).where(eq(posts.id, id));
     return NextResponse.json({ ok: true, status: "live" });
   }
 
-  // Kalıcı silme: R2'deki dosyayı ve veritabanı kaydını (beğeni/yorumlarıyla birlikte) sil.
+  // Permanent delete: remove the file in R2 and the database record (along with its likes/comments).
   const { env } = getCloudflareContext();
   await env.BUCKET.delete(target.mediaKey);
   if (target.thumbnailKey) await env.BUCKET.delete(target.thumbnailKey);

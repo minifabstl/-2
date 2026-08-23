@@ -3,7 +3,7 @@ import { and, eq } from "drizzle-orm";
 import { getDb, users, passwordResetCodes } from "@/db";
 import { hashPassword } from "@/lib/password";
 
-/** Kullanıcının e-postasına gönderilen 6 haneli kodu doğrulayıp yeni şifresini kendisi belirler. */
+/** Verifies the 6-digit code sent to the user's email and lets them set their new password. */
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => null);
   const email = String(body?.email ?? "").trim().toLowerCase();
@@ -11,17 +11,17 @@ export async function POST(req: NextRequest) {
   const newPassword = String(body?.newPassword ?? "");
 
   if (!email || !code) {
-    return NextResponse.json({ error: "E-posta ve kod gerekli." }, { status: 400 });
+    return NextResponse.json({ error: "Email and code are required." }, { status: 400 });
   }
   if (newPassword.length < 8) {
-    return NextResponse.json({ error: "Yeni şifre en az 8 karakter olmalı." }, { status: 400 });
+    return NextResponse.json({ error: "New password must be at least 8 characters." }, { status: 400 });
   }
 
   const db = getDb();
   const userRows = await db.select({ id: users.id, email: users.email }).from(users).where(eq(users.email, email)).limit(1);
   const user = userRows[0];
-  // Kullanıcı bulunamasa bile aynı genel hata mesajını döneriz (e-posta sızdırmamak için).
-  const genericError = () => NextResponse.json({ error: "Kod hatalı veya süresinin dolmuş olabilir." }, { status: 400 });
+  // We return the same generic error even if the user isn't found (to avoid leaking the email).
+  const genericError = () => NextResponse.json({ error: "The code is incorrect or may have expired." }, { status: 400 });
   if (!user) return genericError();
 
   const codeRows = await db

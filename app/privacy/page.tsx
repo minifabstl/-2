@@ -1,49 +1,48 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Gizlilik Politikası",
-  description: "LeakedFap gizlilik politikası — hangi verileri topluyoruz, nasıl kullanıyoruz ve saklıyoruz.",
+  title: "Privacy Policy",
+  description: "LeakedFap privacy policy — what data we collect, how we use it, and how we store it.",
 };
 
 export default function PrivacyPage() {
   return (
     <div className="max-w-2xl mx-auto p-10">
-      <h1 className="font-display text-2xl font-bold mb-1">Gizlilik Politikası</h1>
-      <p className="text-[12px] text-[var(--text-faint)] mb-8">Son güncelleme: 22 Ağustos 2026</p>
+      <h1 className="font-display text-2xl font-bold mb-1">Privacy Policy</h1>
+      <p className="text-[12px] text-[var(--text-faint)] mb-8">Last updated: August 22, 2026</p>
 
       <div className="flex flex-col gap-6 text-[13.5px] leading-relaxed text-[var(--text)]">
-        <Section title="1. Topladığımız veriler">
-          Hesap oluşturduğunda kullanıcı adını, e-posta adresini ve (girersen) Bitcoin cüzdan adresini saklarız.
-          Şifren asla düz metin olarak saklanmaz — yalnızca geri döndürülemez bir şekilde hash&apos;lenir. Yüklediğin
-          video/fotoğraflar, başlık ve kategori bilgisi, aldığın beğeni/yorumlar ve içeriklerinin izlenme sayıları da
-          sistemimizde tutulur.
+        <Section title="1. Data we collect">
+          When you create an account, we store your username, email address, and (if you provide one) your Bitcoin
+          wallet address. Your password is never stored as plain text — it is only stored in an irreversibly hashed
+          form. The videos/photos you upload, their title and category information, the likes/comments you receive,
+          and the view counts of your content are also kept in our system.
         </Section>
-        <Section title="2. Verileri nasıl kullanıyoruz">
-          Verilerini hesabını çalıştırmak, izlenmelerini kazanca çevirmek, ödeme taleplerini işlemek ve platformu
-          güvenli tutmak (kural ihlallerini tespit etmek, hesap askıya alma) için kullanırız. Verilerini üçüncü
-          taraflara satmayız.
+        <Section title="2. How we use your data">
+          We use your data to run your account, convert views into earnings, process payout requests, and keep the
+          platform safe (detecting rule violations, suspending accounts). We do not sell your data to third parties.
         </Section>
-        <Section title="3. Çerezler">
-          Oturumunu açık tutmak için gerekli (zorunlu) çerezler kullanırız. Ayrıca aynı tarayıcının kısa süre içinde
-          aynı içeriği tekrar tekrar izleyerek görüntülenme sayacını suistimal etmesini önlemek için teknik bir çerez
-          kullanılır. Reklam/izleme amaçlı üçüncü taraf çerezi kullanmıyoruz.
+        <Section title="3. Cookies">
+          We use essential (required) cookies to keep your session active. We also use a technical cookie to prevent
+          the same browser from abusing the view counter by repeatedly watching the same content within a short
+          period of time. We do not use third-party cookies for advertising or tracking purposes.
         </Section>
-        <Section title="4. Medya depolama">
-          Yüklediğin video ve fotoğraflar Cloudflare R2 üzerinde saklanır. İçeriğini kaldırdığında (veya admin
-          reddettiğinde/kaldırdığında) dosya depodan kalıcı olarak silinir.
+        <Section title="4. Media storage">
+          The videos and photos you upload are stored on Cloudflare R2. When you remove your content (or when an
+          admin rejects/removes it), the file is permanently deleted from storage.
         </Section>
-        <Section title="5. Verilerini silme">
-          Hesabının kapatılmasını ve verilerinin silinmesini istersen bizimle iletişime geç. Yasal olarak saklamamız
-          gereken kayıtlar (örn. ödeme geçmişi) hariç, verilerin makul bir süre içinde silinir.
+        <Section title="5. Deleting your data">
+          If you want your account closed and your data deleted, contact us. Except for records we are legally
+          required to retain (e.g. payment history), your data will be deleted within a reasonable period of time.
         </Section>
-        <Section title="6. İletişim">
-          Gizlilikle ilgili sorularını hesabınla ilişkili yönetici ekibine iletebilirsin.
+        <Section title="6. Contact">
+          You can direct any privacy-related questions to the admin team associated with your account.
         </Section>
       </div>
 
       <div className="mt-9 text-[11.5px] text-[var(--text-faint)] leading-relaxed border-t border-[var(--border)] pt-5">
-        Bu metin genel bir taslaktır; yürürlükteki mevzuata (KVKK/GDPR ve bulunduğun ülkenin yasaları) tam uyum için
-        bir hukuk danışmanına gözden geçirtmen önerilir.
+        This text is a general template; we recommend having it reviewed by a legal advisor to ensure full compliance
+        with applicable regulations (such as GDPR and the laws of your country).
       </div>
     </div>
   );

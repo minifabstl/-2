@@ -27,16 +27,16 @@ export default async function AdminOverviewPage() {
   return (
     <div>
       <div className="mb-6">
-        <div className="font-display text-xl font-bold">Genel Bakış</div>
-        <div className="text-[12.5px] text-[var(--text-muted)] mt-0.5">Platformun anlık durumu</div>
+        <div className="font-display text-xl font-bold">Overview</div>
+        <div className="text-[12.5px] text-[var(--text-muted)] mt-0.5">Live snapshot of the platform</div>
       </div>
 
       <div className="grid grid-cols-5 gap-3.5 mb-7">
-        <Stat label="Toplam Kullanıcı" value={String(userCount.n)} />
-        <Stat label="Toplam İçerik" value={String(postCount.n)} />
-        <Stat label="Onay Bekleyen İçerik" value={String(pendingCount.n)} tone={pendingCount.n > 0 ? "warn" : undefined} />
-        <Stat label="Toplam İzlenme" value={totalViews.toLocaleString("tr-TR")} />
-        <Stat label="Ödenecek (bekleyen talepler)" value={formatUsd(pendingSumUsd)} tone="btc" />
+        <Stat label="Total Users" value={String(userCount.n)} />
+        <Stat label="Total Content" value={String(postCount.n)} />
+        <Stat label="Pending Approval" value={String(pendingCount.n)} tone={pendingCount.n > 0 ? "warn" : undefined} />
+        <Stat label="Total Views" value={totalViews.toLocaleString("en-US")} />
+        <Stat label="Owed (pending requests)" value={formatUsd(pendingSumUsd)} tone="btc" />
       </div>
 
       {pendingCount.n > 0 && (
@@ -46,17 +46,17 @@ export default async function AdminOverviewPage() {
           style={{ color: "var(--warn)" }}
         >
           <span className="w-1.5 h-1.5 rounded-full bg-[var(--warn)]" />
-          {pendingCount.n} yeni içerik onay bekliyor — incelemek için tıkla
+          {pendingCount.n} new item{pendingCount.n === 1 ? "" : "s"} awaiting approval — click to review
         </a>
       )}
 
       <div className="text-[11.5px] text-[var(--text-faint)] mb-7 -mt-4">
-        Şimdiye kadarki toplam izlenmeye göre kazanılan: {formatUsd(totalEarnedAllTime)}
+        Earned so far based on total views: {formatUsd(totalEarnedAllTime)}
       </div>
 
       <div className="border border-[var(--border)] rounded-2xl bg-[var(--surface)] p-[18px]">
-        <div className="font-display text-sm font-bold mb-3">Son Paylaşımlar</div>
-        {recentPosts.length === 0 && <div className="text-sm text-[var(--text-muted)]">Henüz içerik yok.</div>}
+        <div className="font-display text-sm font-bold mb-3">Recent Uploads</div>
+        {recentPosts.length === 0 && <div className="text-sm text-[var(--text-muted)]">No content yet.</div>}
         <div className="flex flex-col gap-1">
           {recentPosts.map((p) => (
             <div key={p.id} className="flex items-center gap-3 py-2 border-b border-[var(--border-soft)] text-[13px]">
@@ -67,10 +67,10 @@ export default async function AdminOverviewPage() {
               <div className="flex-1">{p.title}</div>
               {p.status === "pending" && (
                 <span className="px-2 py-0.5 rounded-full text-[10.5px] font-semibold" style={{ background: "var(--warn-soft)", color: "var(--warn)" }}>
-                  Onay Bekliyor
+                  Pending Approval
                 </span>
               )}
-              <div className="text-[11.5px] text-[var(--text-faint)]">{p.createdAt.toLocaleDateString("tr-TR")}</div>
+              <div className="text-[11.5px] text-[var(--text-faint)]">{p.createdAt.toLocaleDateString("en-US")}</div>
             </div>
           ))}
         </div>

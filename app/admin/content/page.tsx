@@ -33,10 +33,10 @@ export default async function AdminContentPage() {
       status: r.status as "pending" | "live" | "flagged" | "removed",
       viewsLabel: formatViews(r.viewCount),
       username: r.username,
-      createdAt: r.createdAt.toLocaleDateString("tr-TR"),
+      createdAt: r.createdAt.toLocaleDateString("en-US"),
       mediaUrl: mediaUrl(r.mediaKey),
     }))
-    // Onay bekleyenler en üstte görünsün, admin ilk açtığında hemen fark etsin.
+    // Show pending items at the top so the admin notices them right away.
     .sort((a, b) => (a.status === "pending") === (b.status === "pending") ? 0 : a.status === "pending" ? -1 : 1);
 
   const pendingCount = items.filter((it) => it.status === "pending").length;
@@ -44,11 +44,11 @@ export default async function AdminContentPage() {
   return (
     <div>
       <div className="mb-6">
-        <div className="font-display text-xl font-bold">İçerikler</div>
+        <div className="font-display text-xl font-bold">Content</div>
         <div className="text-[12.5px] text-[var(--text-muted)] mt-0.5">
           {pendingCount > 0
-            ? `${pendingCount} içerik onayını bekliyor — yayına girmeden önce inceleyip onayla ya da reddet.`
-            : "Yüklenen tüm video ve fotoğraflar — uygunsuz içerikleri akıştan kaldırabilirsin."}
+            ? `${pendingCount} item${pendingCount === 1 ? "" : "s"} awaiting approval — review before it goes live and approve or reject.`
+            : "All uploaded videos and photos — remove any inappropriate content from the feed."}
         </div>
       </div>
       <AdminContentTable initialItems={items} />

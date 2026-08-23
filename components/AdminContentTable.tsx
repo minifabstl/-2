@@ -15,10 +15,10 @@ type Item = {
 };
 
 const STATUS_LABEL: Record<Item["status"], string> = {
-  pending: "Onay Bekliyor",
-  live: "Yayında",
-  flagged: "İşaretli",
-  removed: "Kaldırıldı",
+  pending: "Pending Review",
+  live: "Live",
+  flagged: "Flagged",
+  removed: "Removed",
 };
 
 export default function AdminContentTable({ initialItems }: { initialItems: Item[] }) {
@@ -29,7 +29,7 @@ export default function AdminContentTable({ initialItems }: { initialItems: Item
   const [previewItem, setPreviewItem] = useState<Item | null>(null);
 
   async function toggleRemove(id: string, isPermanent: boolean) {
-    if (isPermanent && !window.confirm("Bu içerik kalıcı olarak silinecek (dosya da bulut depodan silinir) ve geri alınamaz. Emin misin?")) {
+    if (isPermanent && !window.confirm("This content will be permanently deleted (the file will also be removed from cloud storage) and cannot be undone. Are you sure?")) {
       return;
     }
     setBusyId(id);
@@ -46,7 +46,7 @@ export default function AdminContentTable({ initialItems }: { initialItems: Item
   }
 
   async function deleteForever(id: string) {
-    if (!window.confirm("Bu içerik kalıcı olarak silinecek (dosya da bulut depodan silinir) ve geri alınamaz. Emin misin?")) {
+    if (!window.confirm("This content will be permanently deleted (the file will also be removed from cloud storage) and cannot be undone. Are you sure?")) {
       return;
     }
     setBusyId(id);
@@ -79,7 +79,7 @@ export default function AdminContentTable({ initialItems }: { initialItems: Item
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Başlık veya kullanıcı ara"
+          placeholder="Search by title or user"
           className="border border-[var(--border)] rounded-[10px] px-3.5 py-2.5 text-[12.5px] outline-none w-72"
         />
         <div className="flex gap-1">
@@ -91,7 +91,7 @@ export default function AdminContentTable({ initialItems }: { initialItems: Item
                 filter === f ? "bg-[var(--accent-soft)] text-[var(--accent-dark)]" : "text-[var(--text-muted)] hover:bg-[var(--bg)]"
               }`}
             >
-              {f === "all" ? "Tümü" : STATUS_LABEL[f]}
+              {f === "all" ? "All" : STATUS_LABEL[f]}
             </button>
           ))}
         </div>
@@ -99,19 +99,19 @@ export default function AdminContentTable({ initialItems }: { initialItems: Item
 
       <div className="border border-[var(--border)] rounded-2xl bg-[var(--surface)] overflow-hidden">
         <div className="flex px-[18px] py-3 text-[11px] font-bold text-[var(--text-faint)] bg-[var(--bg)] border-b border-[var(--border)]">
-          <div className="w-14">ÖNİZLEME</div>
-          <div className="flex-1">BAŞLIK</div>
-          <div className="w-32">TÜR</div>
-          <div className="w-36">YÜKLEYEN</div>
-          <div className="w-28">KATEGORİ</div>
-          <div className="w-24">İZLENME</div>
-          <div className="w-24">TARİH</div>
-          <div className="w-28">DURUM</div>
-          <div className="w-36">AKSİYON</div>
+          <div className="w-14">PREVIEW</div>
+          <div className="flex-1">TITLE</div>
+          <div className="w-32">TYPE</div>
+          <div className="w-36">UPLOADER</div>
+          <div className="w-28">CATEGORY</div>
+          <div className="w-24">VIEWS</div>
+          <div className="w-24">DATE</div>
+          <div className="w-28">STATUS</div>
+          <div className="w-36">ACTION</div>
         </div>
 
         {filtered.length === 0 && (
-          <div className="px-[18px] py-8 text-center text-[12.5px] text-[var(--text-muted)]">Gösterilecek içerik yok.</div>
+          <div className="px-[18px] py-8 text-center text-[12.5px] text-[var(--text-muted)]">No content to display.</div>
         )}
 
         {filtered.map((it) => (
@@ -121,7 +121,7 @@ export default function AdminContentTable({ initialItems }: { initialItems: Item
                 type="button"
                 onClick={() => setPreviewItem(it)}
                 className="w-9 h-9 rounded-lg overflow-hidden border border-[var(--border)] bg-[var(--bg)] flex items-center justify-center relative shrink-0"
-                title="İçeriği önizle"
+                title="Preview content"
               >
                 {it.type === "photo" ? (
                   // eslint-disable-next-line @next/next/no-img-element
@@ -137,7 +137,7 @@ export default function AdminContentTable({ initialItems }: { initialItems: Item
               </button>
             </div>
             <div className="flex-1 font-semibold truncate pr-2">{it.title}</div>
-            <div className="w-32 text-[var(--text-muted)]">{it.type === "video" ? "Video" : "Fotoğraf"}</div>
+            <div className="w-32 text-[var(--text-muted)]">{it.type === "video" ? "Video" : "Photo"}</div>
             <div className="w-36 text-[var(--text-muted)]">@{it.username}</div>
             <div className="w-28 text-[var(--text-muted)]">{it.category ?? "—"}</div>
             <div className="w-24">{it.viewsLabel}</div>
@@ -164,16 +164,16 @@ export default function AdminContentTable({ initialItems }: { initialItems: Item
                     className="px-2.5 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--surface)] text-[11px] font-semibold disabled:opacity-60"
                     style={{ color: "var(--ok)" }}
                   >
-                    {busyId === it.id ? "…" : "Onayla"}
+                    {busyId === it.id ? "…" : "Approve"}
                   </button>
                   <button
                     onClick={() => toggleRemove(it.id, true)}
                     disabled={busyId === it.id}
                     className="px-2.5 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--surface)] text-[11px] font-semibold disabled:opacity-60"
                     style={{ color: "var(--danger)" }}
-                    title="Reddedilen içerik bulut depodan da kalıcı olarak silinir"
+                    title="Rejected content is also permanently deleted from cloud storage"
                   >
-                    {busyId === it.id ? "…" : "Reddet"}
+                    {busyId === it.id ? "…" : "Reject"}
                   </button>
                 </>
               ) : it.status === "removed" ? (
@@ -184,16 +184,16 @@ export default function AdminContentTable({ initialItems }: { initialItems: Item
                     className="px-2.5 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--surface)] text-[11px] font-semibold disabled:opacity-60"
                     style={{ color: "var(--ok)" }}
                   >
-                    {busyId === it.id ? "…" : "Geri Yükle"}
+                    {busyId === it.id ? "…" : "Restore"}
                   </button>
                   <button
                     onClick={() => deleteForever(it.id)}
                     disabled={busyId === it.id}
                     className="px-2.5 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--surface)] text-[11px] font-semibold disabled:opacity-60"
                     style={{ color: "var(--danger)" }}
-                    title="Dosyayı bulut depodan da kalıcı olarak sil"
+                    title="Permanently delete the file from cloud storage as well"
                   >
-                    {busyId === it.id ? "…" : "Kalıcı Sil"}
+                    {busyId === it.id ? "…" : "Delete Forever"}
                   </button>
                 </>
               ) : (
@@ -202,9 +202,9 @@ export default function AdminContentTable({ initialItems }: { initialItems: Item
                   disabled={busyId === it.id}
                   className="px-2.5 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--surface)] text-[11px] font-semibold disabled:opacity-60"
                   style={{ color: "var(--danger)" }}
-                  title="Kaldırılan içerik bulut depodan da kalıcı olarak silinir"
+                  title="Removed content is also permanently deleted from cloud storage"
                 >
-                  {busyId === it.id ? "İşleniyor…" : "Kaldır"}
+                  {busyId === it.id ? "Processing…" : "Remove"}
                 </button>
               )}
             </div>
@@ -222,7 +222,7 @@ export default function AdminContentTable({ initialItems }: { initialItems: Item
               <div>
                 <div className="font-display text-[15px] font-bold">{previewItem.title}</div>
                 <div className="text-[11.5px] text-white/70 mt-0.5">
-                  @{previewItem.username} · {previewItem.category ?? "kategori yok"} · {STATUS_LABEL[previewItem.status]}
+                  @{previewItem.username} · {previewItem.category ?? "no category"} · {STATUS_LABEL[previewItem.status]}
                 </div>
               </div>
               <button onClick={() => setPreviewItem(null)} className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-lg">
@@ -246,7 +246,7 @@ export default function AdminContentTable({ initialItems }: { initialItems: Item
                   disabled={busyId === previewItem.id}
                   className="px-4 py-2 rounded-[10px] bg-white/10 text-white text-[13px] font-semibold disabled:opacity-60"
                 >
-                  Reddet
+                  Reject
                 </button>
                 <button
                   onClick={() => {
@@ -256,7 +256,7 @@ export default function AdminContentTable({ initialItems }: { initialItems: Item
                   disabled={busyId === previewItem.id}
                   className="px-4 py-2 rounded-[10px] bg-[var(--accent)] text-white text-[13px] font-semibold disabled:opacity-60"
                 >
-                  Onayla
+                  Approve
                 </button>
               </div>
             )}

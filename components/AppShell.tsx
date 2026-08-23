@@ -8,19 +8,19 @@ import LoginPromptModal from "@/components/LoginPromptModal";
 import Logo from "@/components/Logo";
 
 const NAV = [
-  { href: "/", label: "Ana Sayfa", locked: false, icon: "home" },
-  { href: "/explore", label: "Keşfet", locked: false, icon: "compass" },
-  { href: "/upload", label: "Yüklediklerim", locked: true, icon: "upload" },
-  { href: "/profile", label: "Kazançlarım", locked: true, icon: "wallet" },
+  { href: "/", label: "Home", locked: false, icon: "home" },
+  { href: "/explore", label: "Explore", locked: false, icon: "compass" },
+  { href: "/upload", label: "My Uploads", locked: true, icon: "upload" },
+  { href: "/profile", label: "My Earnings", locked: true, icon: "wallet" },
 ] as const;
 
 const CATEGORIES = [
-  { slug: "muzik", label: "Müzik" },
-  { slug: "oyun", label: "Oyun" },
-  { slug: "egitim", label: "Eğitim" },
-  { slug: "spor", label: "Spor" },
-  { slug: "teknoloji", label: "Teknoloji" },
-  { slug: "komedi", label: "Komedi" },
+  { slug: "muzik", label: "Music" },
+  { slug: "oyun", label: "Gaming" },
+  { slug: "egitim", label: "Education" },
+  { slug: "spor", label: "Sports" },
+  { slug: "teknoloji", label: "Technology" },
+  { slug: "komedi", label: "Comedy" },
 ];
 
 export default function AppShell({ user, children }: { user: SafeUser | null; children: React.ReactNode }) {
@@ -37,7 +37,7 @@ export default function AppShell({ user, children }: { user: SafeUser | null; ch
   }
 
   if (isAuthPage) {
-    // Giriş/kayıt ekranı kendi tam sayfa düzenini kullanır (sidebar yok).
+    // The login/signup screen uses its own full-page layout (no sidebar).
     return <>{children}</>;
   }
 
@@ -71,7 +71,7 @@ export default function AppShell({ user, children }: { user: SafeUser | null; ch
         </nav>
 
         <div className="flex flex-col gap-0.5">
-          <div className="text-[11px] font-semibold tracking-wide text-[var(--text-faint)] px-2.5 pt-2 pb-1">KATEGORİLER</div>
+          <div className="text-[11px] font-semibold tracking-wide text-[var(--text-faint)] px-2.5 pt-2 pb-1">CATEGORIES</div>
           {CATEGORIES.map((c) => (
             <Link key={c.slug} href={`/explore?kategori=${c.slug}`} className="flex items-center gap-2.5 px-2.5 py-2 rounded-[10px] text-sm text-[var(--text)] hover:bg-[var(--bg)]">
               {c.label}
@@ -81,13 +81,13 @@ export default function AppShell({ user, children }: { user: SafeUser | null; ch
 
         <div className="mt-auto flex flex-col gap-2.5">
           <div className="p-2.5 rounded-xl bg-[var(--accent-soft)] flex flex-col gap-1.5">
-            <div className="text-[12.5px] font-semibold">1000 izlenme = 0,20$</div>
-            <div className="text-[11.5px] text-[var(--text-muted)] leading-snug">Paylaştıkça kazan, kazancını Bitcoin olarak al.</div>
+            <div className="text-[12.5px] font-semibold">1000 views = $0.20</div>
+            <div className="text-[11.5px] text-[var(--text-muted)] leading-snug">Earn as you share, get paid out in Bitcoin.</div>
           </div>
           <div className="flex flex-wrap gap-x-2.5 gap-y-1 px-1 text-[10.5px] text-[var(--text-faint)]">
-            <Link href="/sss" className="hover:text-[var(--text-muted)]">SSS</Link>
-            <Link href="/privacy" className="hover:text-[var(--text-muted)]">Gizlilik</Link>
-            <Link href="/terms" className="hover:text-[var(--text-muted)]">Şartlar</Link>
+            <Link href="/sss" className="hover:text-[var(--text-muted)]">FAQ</Link>
+            <Link href="/privacy" className="hover:text-[var(--text-muted)]">Privacy</Link>
+            <Link href="/terms" className="hover:text-[var(--text-muted)]">Terms</Link>
           </div>
         </div>
       </aside>
@@ -99,19 +99,19 @@ export default function AppShell({ user, children }: { user: SafeUser | null; ch
             <div className="flex items-center gap-3">
               {user.role === "admin" && (
                 <Link href="/admin" className="text-[13px] font-semibold text-[var(--text-muted)] hover:text-[var(--text)]">
-                  Yönetim Paneli
+                  Admin Panel
                 </Link>
               )}
               <Link href="/profile" className="w-[34px] h-[34px] rounded-full bg-[var(--accent)] text-white flex items-center justify-center text-[13px] font-bold font-display">
                 {user.username.slice(0, 2).toUpperCase()}
               </Link>
               <button onClick={handleLogout} className="px-3.5 py-2 rounded-[10px] border border-[var(--border)] bg-[var(--surface)] text-[13px] font-semibold">
-                Çıkış Yap
+                Log Out
               </button>
             </div>
           ) : (
             <Link href="/login" className="px-4 py-2.5 rounded-[10px] border border-[var(--accent)] bg-[var(--accent)] text-white text-[13.5px] font-semibold">
-              Giriş Yap
+              Log In
             </Link>
           )}
         </header>
@@ -121,15 +121,15 @@ export default function AppShell({ user, children }: { user: SafeUser | null; ch
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-dark)" strokeWidth="2" className="shrink-0">
               <rect x="5" y="11" width="14" height="9" rx="2" /><path d="M8 11V8a4 4 0 018 0v3" />
             </svg>
-            <span className="text-[13px] flex-1">Video ve fotoğraflara herkes bakabilir — beğenmek ve yorum yapmak için ücretsiz üye ol.</span>
-            <Link href="/login" className="px-3.5 py-1.5 rounded-lg bg-[var(--accent)] text-white text-[12.5px] font-semibold">Üye Ol</Link>
+            <span className="text-[13px] flex-1">Anyone can watch videos and photos — sign up for free to like and comment.</span>
+            <Link href="/login" className="px-3.5 py-1.5 rounded-lg bg-[var(--accent)] text-white text-[12.5px] font-semibold">Sign Up</Link>
           </div>
         )}
 
         <main className="flex-1 min-w-0">{children}</main>
       </div>
 
-      <LoginPromptModal open={promptOpen} onClose={() => setPromptOpen(false)} title="Bu özellik için üye ol" />
+      <LoginPromptModal open={promptOpen} onClose={() => setPromptOpen(false)} title="Sign up to use this feature" />
     </div>
   );
 }

@@ -6,5 +6,5 @@ export default async function HomePage() {
   const user = await getCurrentUser();
   const posts = await listPosts({ viewerId: user?.id ?? null });
 
-  return <PostGrid posts={posts} isLoggedIn={!!user} title="Senin İçin" />;
+  return <PostGrid posts={posts} isLoggedIn={!!user} title="For You" />;
 }

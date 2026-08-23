@@ -4,19 +4,21 @@ import { eq, sql } from "drizzle-orm";
 import { getDb, posts } from "@/db";
 import { getCurrentUser } from "@/lib/auth";
 
-const SEEN_COOKIE_TTL_SECONDS = 60 * 60 * 6; // 6 saat — aynı tarayıcıdan tekrar tekrar sayılmasın
+const SEEN_COOKIE_TTL_SECONDS = 60 * 60 * 6; // 6 hours — so the same browser isn't counted repeatedly
 
 /**
- * Görüntülenme sayacını artırır. Kasıtlı olarak giriş gerektirmez —
- * içerikler üye olmadan da izlenebilir ve izlenme kazanca yansır.
+ * Increments the view counter. Intentionally does not require login —
+ * content can be watched without being a member, and views feed into earnings.
  *
- * İki koruma var:
- * 1. İçeriğin sahibi kendi içeriğini izlerken sayaç artmaz (kendi kazancını şişirmesin).
- * 2. Aynı tarayıcı aynı içeriği kısa süre içinde tekrar açtığında (sayfaya çık-gir) tekrar sayılmaz —
- *    bir çerezle işaretlenir, `SEEN_COOKIE_TTL_SECONDS` sonra tekrar sayılabilir.
+ * There are two safeguards:
+ * 1. The counter does not increment when the content's owner watches their own content
+ *    (so they can't inflate their own earnings).
+ * 2. The same browser opening the same content again shortly after (leaving and re-entering
+ *    the page) is not counted again — it's marked with a cookie, and can be counted again
+ *    after `SEEN_COOKIE_TTL_SECONDS`.
  *
- * ÜRETİM NOTU: Bu hâlâ IP bazlı sağlam bir hız sınırlama değildir; farklı tarayıcı/gizli
- * pencere ile suistimal mümkün. Ciddi ölçekte Cloudflare Rate Limiting kuralı eklenmeli.
+ * PRODUCTION NOTE: This is still not a robust IP-based rate limit; abuse via a different
+ * browser/incognito window is possible. A Cloudflare Rate Limiting rule should be added at scale.
  */
 export async function POST(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id: postId } = await params;
@@ -29,14 +31,14 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
   ]);
 
   const target = rows[0];
-  if (!target) return NextResponse.json({ error: "İçerik bulunamadı." }, { status: 404 });
+  if (!target) return NextResponse.json({ error: "Content not found." }, { status: 404 });
 
-  // 1) Sahibi kendi içeriğini izliyorsa sayma.
+  // 1) Don't count if the owner is watching their own content.
   if (viewer && viewer.id === target.userId) {
     return NextResponse.json({ ok: true, counted: false, reason: "owner" });
   }
 
-  // 2) Bu tarayıcı bu içeriği yakın zamanda zaten izlemişse sayma.
+  // 2) Don't count if this browser has already watched this content recently.
   const seenCookieName = `seen_${postId}`;
   if (cookieStore.get(seenCookieName)) {
     return NextResponse.json({ ok: true, counted: false, reason: "already-seen" });

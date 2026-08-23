@@ -5,7 +5,7 @@ import { getDb, posts, users } from "@/db";
 import { getCurrentUser, AuthError, requireUser } from "@/lib/auth";
 import { uploadMedia, mediaUrl } from "@/lib/storage";
 
-/** Herkese açık akış — giriş yapmadan da görüntülenebilir. */
+/** Public feed — viewable without logging in. */
 export async function GET() {
   const db = getDb();
   const currentUser = await getCurrentUser();
@@ -38,7 +38,7 @@ export async function GET() {
   });
 }
 
-/** Yeni gönderi oluşturma — sadece giriş yapmış kullanıcılar. multipart/form-data bekler. */
+/** Create a new post — logged-in users only. Expects multipart/form-data. */
 export async function POST(req: NextRequest) {
   let user;
   try {
@@ -55,10 +55,10 @@ export async function POST(req: NextRequest) {
   const category = (form.get("category") as string) || null;
 
   if (!(file instanceof File)) {
-    return NextResponse.json({ error: "Medya dosyası gerekli." }, { status: 400 });
+    return NextResponse.json({ error: "A media file is required." }, { status: 400 });
   }
   if (!title) {
-    return NextResponse.json({ error: "Başlık gerekli." }, { status: 400 });
+    return NextResponse.json({ error: "A title is required." }, { status: 400 });
   }
 
   const mediaKey = await uploadMedia(file);
@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
     title,
     category,
     mediaKey,
-    // Yeni yüklenen içerik doğrudan yayına girmez — admin onayından geçmesi gerekir.
+    // Newly uploaded content does not go live directly — it must pass admin approval.
     status: "pending",
     viewCount: 0,
     createdAt: new Date(),

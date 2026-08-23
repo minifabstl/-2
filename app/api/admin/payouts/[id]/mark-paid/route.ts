@@ -4,13 +4,14 @@ import { getDb, payouts } from "@/db";
 import { AuthError, requireAdmin } from "@/lib/auth";
 
 /**
- * Bir ödeme talebini "ödendi" olarak işaretler.
+ * Marks a payout request as "paid".
  *
- * ÖNEMLİ: Bu uygulama gerçek bir Bitcoin transferi GERÇEKLEŞTİRMEZ — admin,
- * transferi kendi cüzdanından/borsasından manuel yaptıktan SONRA burayı
- * işaretler. Otomatik on-chain ödeme istersen bir ödeme sağlayıcısı (ör.
- * BTCPay Server, Coinbase Commerce, OpenNode) entegre edilmeli; bu, ayrı bir
- * güvenlik/uyumluluk incelemesi gerektiren bir adımdır (bkz. README).
+ * IMPORTANT: This application does NOT perform an actual Bitcoin transfer —
+ * the admin marks this AFTER manually sending the transfer from their own
+ * wallet/exchange. If you want automated on-chain payment, a payment
+ * provider (e.g. BTCPay Server, Coinbase Commerce, OpenNode) needs to be
+ * integrated; this is a step that requires a separate security/compliance
+ * review (see README).
  */
 export async function POST(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {

@@ -4,7 +4,7 @@ import { and, eq } from "drizzle-orm";
 import { getDb, likes } from "@/db";
 import { AuthError, requireUser } from "@/lib/auth";
 
-/** Beğen/beğenmekten vazgeç — SADECE giriş yapmış kullanıcılar. */
+/** Like / unlike — logged-in users ONLY. */
 export async function POST(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id: postId } = await params;
 
@@ -13,7 +13,7 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
     user = await requireUser();
   } catch (e) {
     if (e instanceof AuthError) {
-      return NextResponse.json({ error: "Beğenmek için üye olmalısın." }, { status: 401 });
+      return NextResponse.json({ error: "You must be a member to like this." }, { status: 401 });
     }
     throw e;
   }

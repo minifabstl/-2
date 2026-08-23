@@ -1,13 +1,18 @@
+import { getCloudflareContext } from "@opennextjs/cloudflare";
+
 /**
- * E-posta gönderim stub'ı. Gerçek üretimde burayı Resend, Postmark, SendGrid
- * gibi bir sağlayıcıyla değiştir (Cloudflare Workers ile uyumlu, fetch tabanlı
- * bir API kullanan sağlayıcılar en kolayı). Şimdilik sadece konsola yazar.
+ * Email sending. Reads the RESEND_API_KEY / EMAIL_FROM values from the
+ * Cloudflare Worker environment via `getCloudflareContext().env` (this
+ * project reads DB, R2, and all other Cloudflare bindings the same way —
+ * `process.env` is not reliably populated in this environment).
+ * If the API key isn't set (e.g. local development), it just logs to the console.
  */
 export async function sendPasswordResetEmail(email: string, resetUrl: string) {
-  const apiKey = process.env.RESEND_API_KEY;
+  const { env } = getCloudflareContext();
+  const apiKey = env.RESEND_API_KEY;
 
   if (!apiKey) {
-    console.log(`[email:dev] ${email} adresine şifre sıfırlama bağlantısı: ${resetUrl}`);
+    console.log(`[email:dev] Password reset link for ${email}: ${resetUrl}`);
     return;
   }
 
@@ -18,24 +23,25 @@ export async function sendPasswordResetEmail(email: string, resetUrl: string) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: process.env.EMAIL_FROM ?? "no-reply@example.com",
+      from: env.EMAIL_FROM ?? "no-reply@example.com",
       to: email,
-      subject: "Şifre Sıfırlama Talebi",
-      html: `<p>Şifreni sıfırlamak için <a href="${resetUrl}">bu bağlantıya</a> tıkla. Bu bağlantı 1 saat içinde geçersiz olur.</p>
-             <p>Bu talebi sen yapmadıysan bu e-postayı yok sayabilirsin — şifren değişmez.</p>`,
+      subject: "Password Reset Request",
+      html: `<p>Click <a href="${resetUrl}">this link</a> to reset your password. This link expires in 1 hour.</p>
+             <p>If you didn't request this, you can ignore this email — your password won't change.</p>`,
     }),
   });
 }
 
 /**
- * Kullanıcının kendi başlattığı "Şifremi Unuttum" akışı için 6 haneli kod gönderir.
- * Aynı stub mantığı: API key yoksa konsola yazar, varsa Resend ile gerçekten gönderir.
+ * Sends a 6-digit code for the user-initiated "Forgot Password" flow.
+ * Same read logic: logs to the console if there's no API key, sends for real via Resend otherwise.
  */
 export async function sendPasswordResetCodeEmail(email: string, code: string) {
-  const apiKey = process.env.RESEND_API_KEY;
+  const { env } = getCloudflareContext();
+  const apiKey = env.RESEND_API_KEY;
 
   if (!apiKey) {
-    console.log(`[email:dev] ${email} adresine şifre sıfırlama kodu: ${code}`);
+    console.log(`[email:dev] Password reset code for ${email}: ${code}`);
     return;
   }
 
@@ -46,13 +52,13 @@ export async function sendPasswordResetCodeEmail(email: string, code: string) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: process.env.EMAIL_FROM ?? "no-reply@example.com",
+      from: env.EMAIL_FROM ?? "no-reply@example.com",
       to: email,
-      subject: "Şifre Sıfırlama Kodun",
-      html: `<p>Şifreni sıfırlamak için aşağıdaki kodu kullan:</p>
+      subject: "Your Password Reset Code",
+      html: `<p>Use the code below to reset your password:</p>
              <p style="font-size:28px;font-weight:bold;letter-spacing:4px;">${code}</p>
-             <p>Bu kod 15 dakika içinde geçersiz olur.</p>
-             <p>Bu talebi sen yapmadıysan bu e-postayı yok sayabilirsin — şifren değişmez.</p>`,
+             <p>This code expires in 15 minutes.</p>
+             <p>If you didn't request this, you can ignore this email — your password won't change.</p>`,
     }),
   });
 }

@@ -47,7 +47,7 @@ export default function PostCard({
           </div>
         )}
         <div className="absolute top-2 left-2 bg-black/45 text-white text-[10.5px] font-semibold px-1.5 py-0.5 rounded-[6px]">
-          {post.type === "video" ? "VİDEO" : "FOTO"}
+          {post.type === "video" ? "VIDEO" : "PHOTO"}
         </div>
         <div className="absolute bottom-2 right-2 bg-black/45 text-white text-[10.5px] font-semibold px-1.5 py-0.5 rounded-[6px]">
           {post.viewsLabel}

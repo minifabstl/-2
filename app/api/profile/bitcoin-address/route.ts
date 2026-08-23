@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm";
 import { getDb, users } from "@/db";
 import { AuthError, requireUser } from "@/lib/auth";
 
-/** Kullanıcının kendi Bitcoin cüzdan adresini günceller. */
+/** Updates the user's own Bitcoin wallet address. */
 export async function POST(req: NextRequest) {
   let user;
   try {

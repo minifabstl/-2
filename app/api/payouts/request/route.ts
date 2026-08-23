@@ -5,7 +5,7 @@ import { getDb, posts, payouts } from "@/db";
 import { AuthError, requireUser } from "@/lib/auth";
 import { calculateEarningsUsd } from "@/lib/earnings";
 
-/** Kullanıcının birikmiş (henüz ödeme talebi oluşturulmamış) kazancı için ödeme talebi açar. */
+/** Opens a payout request for the user's accrued (not yet requested) earnings. */
 export async function POST() {
   let user;
   try {
@@ -16,7 +16,7 @@ export async function POST() {
   }
 
   if (!user.bitcoinAddress) {
-    return NextResponse.json({ error: "Önce profilinden bir Bitcoin cüzdan adresi ekle." }, { status: 400 });
+    return NextResponse.json({ error: "Add a Bitcoin wallet address to your profile first." }, { status: 400 });
   }
 
   const db = getDb();
@@ -37,7 +37,7 @@ export async function POST() {
   const available = totalEarned - alreadyRequested;
 
   if (available < 1) {
-    return NextResponse.json({ error: "Ödeme talep etmek için en az 1$ birikmiş kazancın olmalı." }, { status: 400 });
+    return NextResponse.json({ error: "You must have at least $1 in accrued earnings to request a payout." }, { status: 400 });
   }
 
   const id = nanoid();

@@ -6,10 +6,10 @@ import { AuthError, requireAdmin } from "@/lib/auth";
 import { sendPasswordResetEmail } from "@/lib/email";
 
 /**
- * Kullanıcının şifresini SIFIRLAR — ama asla görüntülemez ya da belirlemez.
- * Tek yaptığı: kullanıcının kayıtlı e-postasına, kendi yeni şifresini
- * belirleyebileceği süreli/tek kullanımlık bir bağlantı göndermek.
- * Bu response hiçbir zaman token'ı admin'e döndürmez.
+ * RESETS the user's password — but never views or sets it directly.
+ * All it does is send a time-limited/single-use link to the user's
+ * registered email, letting them set their own new password.
+ * This response never returns the token to the admin.
  */
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -23,7 +23,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const db = getDb();
   const rows = await db.select({ email: users.email, username: users.username }).from(users).where(eq(users.id, id)).limit(1);
   const target = rows[0];
-  if (!target) return NextResponse.json({ error: "Kullanıcı bulunamadı." }, { status: 404 });
+  if (!target) return NextResponse.json({ error: "User not found." }, { status: 404 });
 
   const token = nanoid(40);
   const now = new Date();
@@ -31,7 +31,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     id: token,
     userId: id,
     createdAt: now,
-    expiresAt: new Date(now.getTime() + 60 * 60 * 1000), // 1 saat
+    expiresAt: new Date(now.getTime() + 60 * 60 * 1000), // 1 hour
     usedAt: null,
   });
 
@@ -39,5 +39,5 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const resetUrl = `${origin}/reset-password?token=${token}`;
   await sendPasswordResetEmail(target.email, resetUrl);
 
-  return NextResponse.json({ ok: true, message: `Sıfırlama bağlantısı @${target.username} kullanıcısının e-postasına gönderildi.` });
+  return NextResponse.json({ ok: true, message: `Reset link sent to @${target.username}'s email.` });
 }

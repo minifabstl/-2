@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm";
 import { getDb, users } from "@/db";
 import { AuthError, requireAdmin } from "@/lib/auth";
 
-/** Kullanıcıyı askıya alır / tekrar aktif eder. Sadece admin. */
+/** Suspends the user / reactivates them. Admin only. */
 export async function POST(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     await requireAdmin();
@@ -16,7 +16,7 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
   const db = getDb();
   const rows = await db.select({ status: users.status }).from(users).where(eq(users.id, id)).limit(1);
   const target = rows[0];
-  if (!target) return NextResponse.json({ error: "Kullanıcı bulunamadı." }, { status: 404 });
+  if (!target) return NextResponse.json({ error: "User not found." }, { status: 404 });
 
   const nextStatus = target.status === "active" ? "suspended" : "active";
   await db.update(users).set({ status: nextStatus }).where(eq(users.id, id));

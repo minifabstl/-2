@@ -8,9 +8,9 @@ directory = ".open-next/assets"
 binding = "ASSETS"
 
 # ---------------------------------------------------------------------------
-# Veritabanı (Cloudflare D1). Önce şu komutla oluştur:
+# Database (Cloudflare D1). First create it with:
 #   npx wrangler d1 create video-app-db
-# ve dönen database_id değerini aşağıya yapıştır.
+# then paste the returned database_id below.
 # ---------------------------------------------------------------------------
 [[d1_databases]]
 binding = "DB"
@@ -19,7 +19,7 @@ database_id = "f8fe2525-b279-4e33-ac91-4cff6ceddcdc"
 migrations_dir = "drizzle"
 
 # ---------------------------------------------------------------------------
-# Medya deposu (Cloudflare R2). Önce şu komutla oluştur:
+# Media storage (Cloudflare R2). First create it with:
 #   npx wrangler r2 bucket create video-app-media
 # ---------------------------------------------------------------------------
 [[r2_buckets]]
@@ -27,10 +27,10 @@ binding = "BUCKET"
 bucket_name = "video-app-media"
 
 # ---------------------------------------------------------------------------
-# E-posta gönderimi (Resend). Gönderen adresi — Resend'de leakedfap.org alan
-# adını doğruladıktan sonra buradaki adresi kullanabilirsin. API anahtarı
-# buraya YAZILMAZ (gizli kalması için) — onun yerine şu komutla eklenir:
+# Email sending (Resend). Sender address — you can use this address once
+# you've verified the leakedfap.org domain in Resend. The API key is NOT
+# written here (to keep it secret) — instead it's added with:
 #   npx wrangler secret put RESEND_API_KEY
 # ---------------------------------------------------------------------------
 [vars]
-EMAIL_FROM = "LeakedFap <bildirim@leakedfap.org>"
+EMAIL_FROM = "LeakedFap <notifications@leakedfap.org>"

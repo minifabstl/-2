@@ -13,13 +13,13 @@ export async function POST(req: NextRequest) {
   const bitcoinAddress = (body?.bitcoinAddress ?? "").trim() || null;
 
   if (!/^[a-z0-9_.]{3,24}$/.test(username)) {
-    return NextResponse.json({ error: "Kullanıcı adı 3-24 karakter olmalı (harf, rakam, . _)." }, { status: 400 });
+    return NextResponse.json({ error: "Username must be 3-24 characters (letters, numbers, . _)." }, { status: 400 });
   }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return NextResponse.json({ error: "Geçerli bir e-posta adresi gir." }, { status: 400 });
+    return NextResponse.json({ error: "Enter a valid email address." }, { status: 400 });
   }
   if (typeof password !== "string" || password.length < 8) {
-    return NextResponse.json({ error: "Şifre en az 8 karakter olmalı." }, { status: 400 });
+    return NextResponse.json({ error: "Password must be at least 8 characters." }, { status: 400 });
   }
 
   const db = getDb();
@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
     .where(or(eq(users.username, username), eq(users.email, email)))
     .limit(1);
   if (existing.length > 0) {
-    return NextResponse.json({ error: "Bu kullanıcı adı veya e-posta zaten kayıtlı." }, { status: 409 });
+    return NextResponse.json({ error: "This username or email is already registered." }, { status: 409 });
   }
 
   const { hash, salt } = await hashPassword(password);

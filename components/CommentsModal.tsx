@@ -50,13 +50,13 @@ export default function CommentsModal({
     <div className="fixed inset-0 z-50 bg-black/35 flex items-center justify-center" onClick={onClose}>
       <div className="w-[400px] max-h-[520px] bg-[var(--surface)] rounded-2xl flex flex-col overflow-hidden shadow-2xl" onClick={(e) => e.stopPropagation()}>
         <div className="px-[18px] py-4 border-b border-[var(--border)] flex items-center justify-between">
-          <div className="font-display text-[14.5px] font-bold">Yorumlar · {post.commentCount}</div>
+          <div className="font-display text-[14.5px] font-bold">Comments · {post.commentCount}</div>
           <button onClick={onClose} className="text-[var(--text-faint)] text-lg leading-none p-1">&#10005;</button>
         </div>
         <div className="flex-1 overflow-y-auto px-[18px] py-3.5 flex flex-col gap-3.5">
-          {loading && <div className="text-xs text-[var(--text-faint)]">Yükleniyor…</div>}
+          {loading && <div className="text-xs text-[var(--text-faint)]">Loading…</div>}
           {!loading && comments.length === 0 && (
-            <div className="text-xs text-[var(--text-faint)]">Henüz yorum yok — ilk yorumu sen yaz.</div>
+            <div className="text-xs text-[var(--text-faint)]">No comments yet — be the first to write one.</div>
           )}
           {comments.map((c) => (
             <div key={c.id} className="flex gap-2.5">
@@ -77,7 +77,7 @@ export default function CommentsModal({
                 value={draft}
                 onChange={(e) => setDraft(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && submit()}
-                placeholder="Bir yorum yaz…"
+                placeholder="Write a comment…"
                 className="flex-1 border border-[var(--border)] rounded-[10px] px-3 py-2 text-[12.5px] outline-none"
               />
               <button
@@ -85,7 +85,7 @@ export default function CommentsModal({
                 disabled={sending}
                 className="px-3.5 py-2 rounded-[10px] bg-[var(--accent)] text-white text-[12.5px] font-semibold disabled:opacity-60"
               >
-                Gönder
+                Send
               </button>
             </div>
           ) : (
@@ -93,7 +93,7 @@ export default function CommentsModal({
               onClick={onNeedLogin}
               className="w-full py-2.5 rounded-[10px] border border-dashed border-[var(--border)] bg-[var(--bg)] text-[var(--text-muted)] text-[12.5px] font-semibold"
             >
-              Yorum yapmak için üye ol
+              Sign up to comment
             </button>
           )}
         </div>

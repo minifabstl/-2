@@ -6,8 +6,8 @@ export default defineConfig({
   dialect: "sqlite",
   driver: "d1-http",
   dbCredentials: {
-    // `wrangler d1 migrations apply` kullanıyorsan bu alanlara gerek yok;
-    // sadece `drizzle-kit push` ile uzaktan D1'e doğrudan bağlanmak istersen doldur.
+    // Not needed if you're using `wrangler d1 migrations apply`;
+    // only fill these in if you want to connect directly to remote D1 via `drizzle-kit push`.
     accountId: process.env.CLOUDFLARE_ACCOUNT_ID ?? "",
     databaseId: process.env.CLOUDFLARE_DATABASE_ID ?? "",
     token: process.env.CLOUDFLARE_D1_TOKEN ?? "",

@@ -1,12 +1,12 @@
 /**
- * Şifre hash'leme — Web Crypto API (PBKDF2-SHA256) kullanır.
+ * Password hashing — uses the Web Crypto API (PBKDF2-SHA256).
  *
- * ÖNEMLİ GÜVENLİK NOTU: Şifreler hiçbir zaman düz metin olarak saklanmaz,
- * loglanmaz veya API üzerinden geri döndürülmez. Sadece bu dosyadaki
- * fonksiyonlar üzerinden hash'lenir/karşılaştırılır. Yönetici paneli dahil
- * hiçbir yer, hiçbir kullanıcının gerçek şifresini gösteremez — bkz.
- * app/api/admin/users/[id]/reset-password/route.ts (sadece sıfırlama linki
- * üretir, şifreyi asla göstermez).
+ * IMPORTANT SECURITY NOTE: Passwords are never stored as plain text, logged,
+ * or returned via the API. They are only hashed/compared through the
+ * functions in this file. No location, including the admin panel, can ever
+ * display a user's actual password — see
+ * app/api/admin/users/[id]/reset-password/route.ts (it only generates a
+ * reset link, never shows the password).
  */
 
 const ITERATIONS = 100_000;
@@ -51,7 +51,7 @@ export async function verifyPassword(password: string, hash: string, salt: strin
   const saltBytes = hexToBuffer(salt);
   const derived = await deriveBits(password, saltBytes);
   const candidateHex = bufferToHex(derived);
-  // Zamanlama saldırılarına karşı sabit-zamanlı karşılaştırma
+  // Constant-time comparison to guard against timing attacks
   if (candidateHex.length !== hash.length) return false;
   let diff = 0;
   for (let i = 0; i < candidateHex.length; i++) {

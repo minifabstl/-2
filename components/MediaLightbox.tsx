@@ -20,7 +20,7 @@ export default function MediaLightbox({ post, onClose }: { post: FeedPost; onClo
       <button
         onClick={onClose}
         className="absolute top-5 right-5 w-9 h-9 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center text-lg"
-        aria-label="Kapat"
+        aria-label="Close"
       >
         ✕
       </button>

@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
   const password = body?.password ?? "";
 
   if (!identifier || !password) {
-    return NextResponse.json({ error: "Kullanıcı adı/e-posta ve şifre gerekli." }, { status: 400 });
+    return NextResponse.json({ error: "Username/email and password are required." }, { status: 400 });
   }
 
   const db = getDb();
@@ -21,8 +21,8 @@ export async function POST(req: NextRequest) {
     .limit(1);
   const user = rows[0];
 
-  // Kullanıcı bulunamasa da bulunsa da aynı hatayı döndür (kullanıcı adı sızdırmayı önler)
-  const genericError = () => NextResponse.json({ error: "Kullanıcı adı/e-posta veya şifre hatalı." }, { status: 401 });
+  // Return the same error whether or not the user is found (prevents username enumeration)
+  const genericError = () => NextResponse.json({ error: "Incorrect username/email or password." }, { status: 401 });
 
   if (!user) return genericError();
 
@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
   if (!valid) return genericError();
 
   if (user.status === "suspended") {
-    return NextResponse.json({ error: "Hesabın askıya alınmış. Destek ile iletişime geç." }, { status: 403 });
+    return NextResponse.json({ error: "Your account has been suspended. Please contact support." }, { status: 403 });
   }
 
   await createSession(user.id);

@@ -37,7 +37,7 @@ export default function OpengraphImage() {
         </div>
         <div style={{ display: "flex", color: "white", fontSize: 64, fontWeight: 800 }}>LeakedFap</div>
         <div style={{ display: "flex", color: "rgba(255,255,255,0.85)", fontSize: 28, fontWeight: 500 }}>
-          Paylaştıkça kazan — izlenme başına ödeme, Bitcoin ile
+          Share and earn — paid per view, in Bitcoin
         </div>
       </div>
     ),

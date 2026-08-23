@@ -1,4 +1,4 @@
-/** 1000 izlenme başına kazanç (USD). İstenirse .env üzerinden değiştirilebilir. */
+/** Earnings per 1000 views (USD). Can be changed via .env if desired. */
 export const RATE_USD_PER_1000_VIEWS = 0.2;
 
 export function calculateEarningsUsd(viewCount: number): number {

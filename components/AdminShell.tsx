@@ -5,10 +5,10 @@ import { usePathname } from "next/navigation";
 import { LogoMark } from "@/components/Logo";
 
 const NAV = [
-  { href: "/admin", label: "Genel Bakış" },
-  { href: "/admin/users", label: "Kullanıcılar" },
-  { href: "/admin/content", label: "İçerikler" },
-  { href: "/admin/payouts", label: "Ödemeler" },
+  { href: "/admin", label: "Overview" },
+  { href: "/admin/users", label: "Users" },
+  { href: "/admin/content", label: "Content" },
+  { href: "/admin/payouts", label: "Payouts" },
 ];
 
 export default function AdminShell({
@@ -31,7 +31,7 @@ export default function AdminShell({
             <div className="font-display text-[15px] font-bold">
               Leaked<span className="text-[var(--accent)]">Fap</span>
             </div>
-            <div className="text-[10.5px] text-[var(--text-faint)] tracking-wide">YÖNETİM PANELİ</div>
+            <div className="text-[10.5px] text-[var(--text-faint)] tracking-wide">ADMIN PANEL</div>
           </div>
         </Link>
 
@@ -61,9 +61,9 @@ export default function AdminShell({
           </div>
           <div className="text-xs font-semibold">
             @{username}
-            <div className="text-[10.5px] text-[var(--text-faint)] font-normal">Sahip</div>
+            <div className="text-[10.5px] text-[var(--text-faint)] font-normal">Owner</div>
           </div>
-          <Link href="/" className="ml-auto text-[11px] text-[var(--text-muted)] font-semibold">Siteye Dön</Link>
+          <Link href="/" className="ml-auto text-[11px] text-[var(--text-muted)] font-semibold">Back to Site</Link>
         </div>
       </aside>
 

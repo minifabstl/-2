@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
 
 export default nextConfig;
 
-// Cloudflare Pages ile yerel `next dev` sunucusunu entegre eder (D1/R2 binding'lerine
-// yerelde de erişebilmek için). Prod build'ini etkilemez.
+// Integrates the local `next dev` server with Cloudflare Pages (so D1/R2 bindings
+// are also reachable locally). Does not affect the prod build.
 import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
 initOpenNextCloudflareForDev();

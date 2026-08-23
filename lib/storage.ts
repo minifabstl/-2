@@ -1,7 +1,7 @@
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { nanoid } from "nanoid";
 
-/** Video/fotoğraf dosyasını Cloudflare R2'ye yükler, benzersiz anahtarı döndürür. */
+/** Uploads a video/photo file to Cloudflare R2, returns its unique key. */
 export async function uploadMedia(file: File): Promise<string> {
   const { env } = getCloudflareContext();
   const ext = file.name.split(".").pop() || "bin";
@@ -12,7 +12,7 @@ export async function uploadMedia(file: File): Promise<string> {
   return key;
 }
 
-/** Medyayı R2'den okuyan API route'unun (app/api/media/[key]/route.ts) ürettiği URL. */
+/** URL produced by the API route (app/api/media/[key]/route.ts) that reads the media from R2. */
 export function mediaUrl(key: string): string {
   return `/api/media/${key}`;
 }

@@ -5,12 +5,12 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 const CATEGORIES = [
-  { slug: "muzik", label: "Müzik" },
-  { slug: "oyun", label: "Oyun" },
-  { slug: "egitim", label: "Eğitim" },
-  { slug: "spor", label: "Spor" },
-  { slug: "teknoloji", label: "Teknoloji" },
-  { slug: "komedi", label: "Komedi" },
+  { slug: "muzik", label: "Music" },
+  { slug: "oyun", label: "Gaming" },
+  { slug: "egitim", label: "Education" },
+  { slug: "spor", label: "Sports" },
+  { slug: "teknoloji", label: "Technology" },
+  { slug: "komedi", label: "Comedy" },
 ];
 
 const MAX_MB = { photo: 5, video: 95 };
@@ -41,11 +41,11 @@ export default function UploadPage() {
     const isVideo = f.type.startsWith("video/");
     const expectedType = isVideo ? "video" : "photo";
     if (expectedType !== type) {
-      setError(`Seçtiğin dosya bir ${isVideo ? "video" : "fotoğraf"} — önce yukarıdan doğru türü seç.`);
+      setError(`The file you selected is a ${isVideo ? "video" : "photo"} — first select the correct type above.`);
       return;
     }
     if (f.size / (1024 * 1024) > MAX_MB[expectedType]) {
-      setError(`Dosya çok büyük — en fazla ${MAX_MB[expectedType]} MB olabilir.`);
+      setError(`File is too large — the maximum is ${MAX_MB[expectedType]} MB.`);
       return;
     }
     setFile(f);
@@ -61,9 +61,9 @@ export default function UploadPage() {
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (!file) return setError("Bir video veya fotoğraf seç.");
-    if (!readGuide) return setError("Devam etmeden önce yükleme koşullarını okuduğunu onaylamalısın.");
-    if (!acceptedTerms) return setError("Devam etmeden önce içerik haklarını ve Kullanım Şartları'nı kabul etmelisin.");
+    if (!file) return setError("Select a video or photo.");
+    if (!readGuide) return setError("You must confirm that you've read the upload guidelines before continuing.");
+    if (!acceptedTerms) return setError("You must accept the content rights and Terms of Service before continuing.");
     setError("");
     setLoading(true);
 
@@ -78,7 +78,7 @@ export default function UploadPage() {
     setLoading(false);
 
     if (!res.ok) {
-      setError(data.error ?? "Yükleme başarısız.");
+      setError(data.error ?? "Upload failed.");
       return;
     }
     router.push("/profile?uploaded=1");
@@ -87,12 +87,12 @@ export default function UploadPage() {
 
   return (
     <div className="max-w-3xl mx-auto p-10">
-      {/* Üst adım göstergesi (görsel) */}
+      {/* Top step indicator (visual) */}
       <div className="flex items-center justify-center gap-3 mb-7">
         {[
-          { label: "Yükle", active: true },
-          { label: "Gönder", active: !!file },
-          { label: "Bitti", active: false },
+          { label: "Upload", active: true },
+          { label: "Submit", active: !!file },
+          { label: "Done", active: false },
         ].map((step, i, arr) => (
           <div key={step.label} className="flex items-center gap-3">
             <div className="flex flex-col items-center gap-1.5">
@@ -112,7 +112,7 @@ export default function UploadPage() {
 
       <div className="mb-6 px-4 py-3 rounded-[10px] flex items-center gap-2 text-[12.5px] font-semibold" style={{ background: "var(--accent-soft)", color: "var(--accent-dark)" }}>
         <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)] shrink-0" />
-        Paylaşımların kazanç sağlar: her 1000 izlenme için 0,20$, Bitcoin ile ödeme.
+        Your uploads earn money: $0.20 per 1000 views, paid in Bitcoin.
       </div>
 
       <form onSubmit={submit} className="flex flex-col gap-6">
@@ -123,30 +123,31 @@ export default function UploadPage() {
             Video
           </button>
           <button type="button" onClick={() => { setType("photo"); removeFile(); }} className={`flex-1 py-2.5 rounded-[10px] border text-sm font-semibold ${type === "photo" ? "border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--accent-dark)]" : "border-[var(--border)] text-[var(--text-muted)]"}`}>
-            Fotoğraf
+            Photo
           </button>
         </div>
 
         <div>
-          <div className="font-display text-[15px] font-bold mb-3">Detaylar</div>
+          <div className="font-display text-[15px] font-bold mb-3">Details</div>
 
           <div className="flex items-start gap-2.5 px-4 py-3 rounded-[10px] bg-[var(--bg)] border border-[var(--border)] mb-3.5">
             <span className="w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0" style={{ background: "var(--accent-soft)", color: "var(--accent-dark)" }}>
               i
             </span>
             <div className="text-[12px] text-[var(--text-muted)] leading-relaxed">
-              Yüklemeden önce: net görüntülü, telifi sana ait, kurallara uygun içerikler daha hızlı onaylanır. Uygunsuz veya izinsiz içerikler reddedilir.
+              Before uploading: clear, well-lit content that you own the rights to and that follows the rules gets
+              approved faster. Inappropriate or unauthorized content will be rejected.
             </div>
           </div>
 
           <label className="flex items-start gap-2.5 text-[12px] text-[var(--text-muted)] cursor-pointer">
             <input type="checkbox" checked={readGuide} onChange={(e) => setReadGuide(e.target.checked)} className="mt-0.5" />
-            Yükleme koşullarını okudum ve anladım.
+            I have read and understood the upload guidelines.
           </label>
         </div>
 
         <div className="grid grid-cols-2 gap-5">
-          {/* Sol: dosya seçim / sürükle-bırak alanı */}
+          {/* Left: file picker / drag-and-drop zone */}
           <div
             onDragOver={(e) => { e.preventDefault(); if (readGuide) setDragOver(true); }}
             onDragLeave={() => setDragOver(false)}
@@ -171,11 +172,11 @@ export default function UploadPage() {
                     <path d="M4 16v3a2 2 0 002 2h12a2 2 0 002-2v-3" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 </div>
-                <div className="text-sm font-semibold">Dosya seç</div>
+                <div className="text-sm font-semibold">Select file</div>
                 <div className="text-[11px] text-[var(--text-faint)] leading-relaxed">
-                  Desteklenen {type === "photo" ? "fotoğraf" : "video"} formatı:
+                  Supported {type === "photo" ? "photo" : "video"} formats:
                   <br />
-                  {FORMAT_HINT[type]} (en fazla {maxMb}MB)
+                  {FORMAT_HINT[type]} (max {maxMb}MB)
                 </div>
                 <button
                   type="button"
@@ -183,7 +184,7 @@ export default function UploadPage() {
                   onClick={() => fileInputRef.current?.click()}
                   className="mt-1 px-5 py-2.5 rounded-full bg-[var(--accent)] text-white text-[13px] font-semibold disabled:opacity-50"
                 >
-                  Ekle
+                  Add
                 </button>
               </>
             ) : (
@@ -215,15 +216,15 @@ export default function UploadPage() {
             />
           </div>
 
-          {/* Sağ: başlık, kategori, boyut göstergesi */}
+          {/* Right: title, category, size indicator */}
           <div className="flex flex-col gap-4">
             <label className="flex flex-col gap-1.5">
-              <span className="text-[12.5px] font-semibold">Başlık <span className="text-[var(--text-faint)] font-normal">(gerekli)</span></span>
-              <input required value={title} onChange={(e) => setTitle(e.target.value)} placeholder="İçeriğine bir başlık ver" className="border border-[var(--border)] rounded-[10px] px-3.5 py-2.5 text-sm outline-none" />
+              <span className="text-[12.5px] font-semibold">Title <span className="text-[var(--text-faint)] font-normal">(required)</span></span>
+              <input required value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Give your content a title" className="border border-[var(--border)] rounded-[10px] px-3.5 py-2.5 text-sm outline-none" />
             </label>
 
             <label className="flex flex-col gap-1.5">
-              <span className="text-[12.5px] font-semibold">Kategori</span>
+              <span className="text-[12.5px] font-semibold">Category</span>
               <select value={category} onChange={(e) => setCategory(e.target.value)} className="border border-[var(--border)] rounded-[10px] px-3.5 py-2.5 text-sm outline-none">
                 {CATEGORIES.map((c) => (
                   <option key={c.slug} value={c.slug}>{c.label}</option>
@@ -233,7 +234,7 @@ export default function UploadPage() {
 
             <div>
               <div className="text-[12.5px] font-semibold mb-1.5">
-                Eklenen medya ({fileSizeMb.toFixed(1)}MB / {maxMb}MB)
+                Added media ({fileSizeMb.toFixed(1)}MB / {maxMb}MB)
               </div>
               <div className="h-1.5 rounded-full bg-[var(--bg)] overflow-hidden">
                 <div
@@ -244,19 +245,19 @@ export default function UploadPage() {
             </div>
 
             <div className="text-[11.5px] text-[var(--text-muted)] leading-relaxed">
-              Medyan yalnızca yönetici ekibimizin incelemesinden sonra herkese açık akışta görünür olur.
+              Your media will only become visible in the public feed after review by our admin team.
             </div>
           </div>
         </div>
 
         <label className="flex items-start gap-2.5 text-[12px] text-[var(--text-muted)] cursor-pointer">
           <input type="checkbox" checked={acceptedTerms} onChange={(e) => setAcceptedTerms(e.target.checked)} className="mt-0.5" />
-          Bu içeriğin haklarına sahip olduğumu veya paylaşma yetkim olduğunu, içerikte görünen herkesin 18 yaşından büyük olduğunu ve
-          paylaşıma onay verdiğini onaylıyorum.{" "}
+          I confirm that I own the rights to this content or have authorization to share it, that everyone appearing
+          in it is over 18 years old, and that they have consented to it being shared.{" "}
           <Link href="/terms" target="_blank" className="text-[var(--accent)] underline" onClick={(e) => e.stopPropagation()}>
-            Kullanım Şartları
+            Terms of Service
           </Link>
-          &apos;nı kabul ediyorum.
+          .
         </label>
 
         <button
@@ -264,7 +265,7 @@ export default function UploadPage() {
           type="submit"
           className="py-3 rounded-[10px] bg-[var(--accent)] text-white text-sm font-semibold disabled:opacity-50"
         >
-          {loading ? "Yükleniyor…" : "Paylaş"}
+          {loading ? "Uploading…" : "Share"}
         </button>
       </form>
     </div>

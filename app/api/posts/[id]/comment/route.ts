@@ -4,7 +4,7 @@ import { desc, eq } from "drizzle-orm";
 import { getDb, comments, users } from "@/db";
 import { AuthError, requireUser } from "@/lib/auth";
 
-/** Bir gönderinin yorumlarını listeler — herkes görebilir. */
+/** Lists the comments on a post — visible to everyone. */
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id: postId } = await params;
   const db = getDb();
@@ -18,7 +18,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
   return NextResponse.json({ comments: rows });
 }
 
-/** Yorum ekle — SADECE giriş yapmış kullanıcılar. */
+/** Add a comment — logged-in users ONLY. */
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id: postId } = await params;
 
@@ -27,7 +27,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     user = await requireUser();
   } catch (e) {
     if (e instanceof AuthError) {
-      return NextResponse.json({ error: "Yorum yapmak için üye olmalısın." }, { status: 401 });
+      return NextResponse.json({ error: "You must be a member to comment." }, { status: 401 });
     }
     throw e;
   }
@@ -35,7 +35,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const body = await req.json().catch(() => null);
   const text = (body?.text ?? "").trim();
   if (!text || text.length > 500) {
-    return NextResponse.json({ error: "Yorum 1-500 karakter olmalı." }, { status: 400 });
+    return NextResponse.json({ error: "Comment must be 1-500 characters." }, { status: 400 });
   }
 
   const db = getDb();

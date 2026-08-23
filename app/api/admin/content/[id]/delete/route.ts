@@ -4,7 +4,7 @@ import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { getDb, posts, likes, comments } from "@/db";
 import { AuthError, requireAdmin } from "@/lib/auth";
 
-/** Kalıcı silme — "Kaldırıldı" durumundaki eski içerikler için. R2'deki dosyayı ve veritabanı kaydını tamamen siler, geri alınamaz. */
+/** Permanent delete — for old content already in "Removed" status. Fully deletes the file in R2 and the database record; cannot be undone. */
 export async function POST(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     await requireAdmin();
@@ -17,7 +17,7 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
   const db = getDb();
   const rows = await db.select().from(posts).where(eq(posts.id, id)).limit(1);
   const target = rows[0];
-  if (!target) return NextResponse.json({ error: "İçerik bulunamadı." }, { status: 404 });
+  if (!target) return NextResponse.json({ error: "Content not found." }, { status: 404 });
 
   const { env } = getCloudflareContext();
   await env.BUCKET.delete(target.mediaKey);

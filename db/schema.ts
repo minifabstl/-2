@@ -1,14 +1,14 @@
 import { sqliteTable, text, integer, real } from "drizzle-orm/sqlite-core";
 
 // ---------------------------------------------------------------------------
-// Kullanıcılar
+// Users
 // ---------------------------------------------------------------------------
 export const users = sqliteTable("users", {
   id: text("id").primaryKey(), // nanoid
   username: text("username").notNull().unique(),
   email: text("email").notNull().unique(),
-  // Şifre ASLA düz metin olarak tutulmaz. passwordHash = PBKDF2 türetilmiş hash,
-  // passwordSalt = her kullanıcıya özel rastgele tuz. Görüntülenemez / geri döndürülemez.
+  // Passwords are NEVER stored as plain text. passwordHash = PBKDF2-derived hash,
+  // passwordSalt = a random salt unique to each user. Cannot be displayed / retrieved.
   passwordHash: text("password_hash").notNull(),
   passwordSalt: text("password_salt").notNull(),
   role: text("role", { enum: ["user", "admin"] }).notNull().default("user"),
@@ -18,18 +18,18 @@ export const users = sqliteTable("users", {
 });
 
 // ---------------------------------------------------------------------------
-// Oturumlar (cookie tabanlı session)
+// Sessions (cookie-based session)
 // ---------------------------------------------------------------------------
 export const sessions = sqliteTable("sessions", {
-  id: text("id").primaryKey(), // session token (nanoid, cookie'de saklanır)
+  id: text("id").primaryKey(), // session token (nanoid, stored in the cookie)
   userId: text("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
   expiresAt: integer("expires_at", { mode: "timestamp" }).notNull(),
   createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
 });
 
 // ---------------------------------------------------------------------------
-// Şifre sıfırlama talepleri — admin veya kullanıcı tetikleyebilir.
-// Token tek kullanımlık ve süreli; şifrenin kendisi hiçbir yerde tutulmaz.
+// Password reset requests — can be triggered by an admin or by the user.
+// The token is single-use and time-limited; the password itself is never stored anywhere.
 // ---------------------------------------------------------------------------
 export const passwordResetTokens = sqliteTable("password_reset_tokens", {
   id: text("id").primaryKey(), // nanoid token
@@ -40,41 +40,41 @@ export const passwordResetTokens = sqliteTable("password_reset_tokens", {
 });
 
 // ---------------------------------------------------------------------------
-// Şifre sıfırlama kodları — kullanıcının KENDİSİ "Şifremi Unuttum" akışıyla
-// tetikler. Admin'in yukarıdaki link tabanlı `passwordResetTokens` akışından
-// farklı olarak burada kullanıcının e-postasına 6 haneli bir kod gider,
-// kullanıcı bu kodu girip yeni şifresini kendisi belirler.
+// Password reset codes — triggered by the USER THEMSELVES via the "Forgot
+// Password" flow. Unlike the admin's link-based `passwordResetTokens` flow
+// above, here a 6-digit code is sent to the user's email, and the user enters
+// that code to set their own new password.
 // ---------------------------------------------------------------------------
 export const passwordResetCodes = sqliteTable("password_reset_codes", {
   id: text("id").primaryKey(), // nanoid
   userId: text("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
-  code: text("code").notNull(), // 6 haneli sayısal kod
+  code: text("code").notNull(), // 6-digit numeric code
   expiresAt: integer("expires_at", { mode: "timestamp" }).notNull(),
   usedAt: integer("used_at", { mode: "timestamp" }),
   createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
 });
 
 // ---------------------------------------------------------------------------
-// Gönderiler (video / fotoğraf)
+// Posts (video / photo)
 // ---------------------------------------------------------------------------
 export const posts = sqliteTable("posts", {
   id: text("id").primaryKey(),
   userId: text("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
   type: text("type", { enum: ["video", "photo"] }).notNull(),
   title: text("title").notNull(),
-  category: text("category"), // muzik | oyun | egitim | spor | teknoloji | komedi
-  // Cloudflare R2'de saklanan medya dosyasının anahtarı (bkz. lib/storage.ts)
+  category: text("category"), // muzik | oyun | egitim | spor | teknoloji | komedi (category slugs, do not translate)
+  // Key of the media file stored in Cloudflare R2 (see lib/storage.ts)
   mediaKey: text("media_key").notNull(),
   thumbnailKey: text("thumbnail_key"),
-  // pending: admin onayı bekliyor, akışta görünmez. live: onaylandı, herkese açık akışta görünür.
-  // flagged: kullanıcılar tarafından şikayet edilmiş ama hâlâ yayında. removed: admin tarafından kaldırılmış/reddedilmiş.
+  // pending: awaiting admin approval, not visible in the feed. live: approved, visible in the public feed.
+  // flagged: reported by users but still live. removed: taken down/rejected by an admin.
   status: text("status", { enum: ["pending", "live", "flagged", "removed"] }).notNull().default("pending"),
   viewCount: integer("view_count").notNull().default(0),
   createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
 });
 
 // ---------------------------------------------------------------------------
-// Beğeniler — sadece giriş yapmış kullanıcılar oluşturabilir (API katmanında kontrol edilir)
+// Likes — can only be created by logged-in users (enforced at the API layer)
 // ---------------------------------------------------------------------------
 export const likes = sqliteTable("likes", {
   id: text("id").primaryKey(),
@@ -84,7 +84,7 @@ export const likes = sqliteTable("likes", {
 });
 
 // ---------------------------------------------------------------------------
-// Yorumlar — sadece giriş yapmış kullanıcılar oluşturabilir
+// Comments — can only be created by logged-in users
 // ---------------------------------------------------------------------------
 export const comments = sqliteTable("comments", {
   id: text("id").primaryKey(),
@@ -95,9 +95,9 @@ export const comments = sqliteTable("comments", {
 });
 
 // ---------------------------------------------------------------------------
-// Ödemeler — 1000 izlenme başına 0.20$ kazanç hesabından doğan ödeme kayıtları.
-// Bu MVP'de gerçek Bitcoin transferi YAPILMAZ; "paid" durumu admin tarafından
-// manuel işaretlenir (bkz. README > Bitcoin ödemeleri).
+// Payouts — payout records derived from earnings of $0.20 per 1000 views.
+// In this MVP no real Bitcoin transfer is made; the "paid" status is marked
+// manually by an admin (see README > Bitcoin payouts).
 // ---------------------------------------------------------------------------
 export const payouts = sqliteTable("payouts", {
   id: text("id").primaryKey(),

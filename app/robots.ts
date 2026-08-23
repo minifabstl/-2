@@ -6,7 +6,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        // Özel/gizli sayfalar arama motorlarında indekslenmesin.
+        // Private/hidden pages should not be indexed by search engines.
         disallow: ["/admin", "/api", "/profile", "/upload", "/login", "/reset-password", "/forgot-password"],
       },
     ],

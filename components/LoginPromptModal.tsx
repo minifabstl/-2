@@ -5,8 +5,8 @@ import Link from "next/link";
 export default function LoginPromptModal({
   open,
   onClose,
-  title = "Üye ol",
-  description = "Hesabın yoksa 30 saniyede oluşturabilirsin, tamamen ücretsiz.",
+  title = "Sign up",
+  description = "If you don't have an account, you can create one in 30 seconds, completely free.",
 }: {
   open: boolean;
   onClose: () => void;
@@ -34,7 +34,7 @@ export default function LoginPromptModal({
           href="/login"
           className="text-center py-2.5 rounded-[10px] bg-[var(--accent)] text-white text-[13.5px] font-semibold"
         >
-          Üye Ol / Giriş Yap
+          Sign Up / Log In
         </Link>
       </div>
     </div>

@@ -23,9 +23,9 @@ export default async function AdminUsersPage() {
       id: u.id,
       username: u.username,
       email: u.email,
-      joined: u.createdAt.toLocaleDateString("tr-TR"),
+      joined: u.createdAt.toLocaleDateString("en-US"),
       posts: agg.posts,
-      views: agg.views.toLocaleString("tr-TR"),
+      views: agg.views.toLocaleString("en-US"),
       earnings: formatUsd(calculateEarningsUsd(agg.views)),
       status: u.status,
       role: u.role,
@@ -35,8 +35,8 @@ export default async function AdminUsersPage() {
   return (
     <div>
       <div className="mb-6">
-        <div className="font-display text-xl font-bold">Kullanıcılar</div>
-        <div className="text-[12.5px] text-[var(--text-muted)] mt-0.5">Tüm kayıtlı hesaplar ve paylaşım geçmişleri</div>
+        <div className="font-display text-xl font-bold">Users</div>
+        <div className="text-[12.5px] text-[var(--text-muted)] mt-0.5">All registered accounts and their upload history</div>
       </div>
       <AdminUsersTable initialUsers={rows} />
     </div>

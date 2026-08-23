@@ -5,10 +5,10 @@ import { useState } from "react";
 type Post = { id: string; type: string; title: string; status: "pending" | "live" | "flagged" | "removed"; viewsLabel: string; earnLabel: string };
 
 const POST_STATUS_LABEL: Record<Post["status"], string> = {
-  pending: "Onay Bekliyor",
-  live: "Yayında",
-  flagged: "İşaretli",
-  removed: "Kaldırıldı",
+  pending: "Pending Approval",
+  live: "Live",
+  flagged: "Flagged",
+  removed: "Removed",
 };
 type Payout = { id: string; date: string; amountLabel: string; status: string };
 
@@ -37,7 +37,7 @@ export default function ProfileView({
     const res = await fetch("/api/payouts/request", { method: "POST" });
     const data = await res.json();
     setRequesting(false);
-    setRequestMsg(res.ok ? `Ödeme talebin alındı: ${data.amountUsd?.toFixed(2)}$` : data.error);
+    setRequestMsg(res.ok ? `Your payout request has been received: $${data.amountUsd?.toFixed(2)}` : data.error);
   }
 
   async function saveAddress() {
@@ -56,7 +56,7 @@ export default function ProfileView({
         <div className="flex items-center gap-2.5 mb-6 px-4 py-3 rounded-[10px]" style={{ background: "var(--warn-soft)", color: "var(--warn)" }}>
           <span className="w-1.5 h-1.5 rounded-full bg-[var(--warn)] shrink-0" />
           <span className="text-[12.5px] font-semibold">
-            Paylaşımın alındı! Yönetici onayından geçtikten sonra herkese açık akışta görünecek — aşağıdan durumunu takip edebilirsin.
+            Your post has been received! It will appear in the public feed once approved by an admin — you can track its status below.
           </span>
         </div>
       )}
@@ -70,24 +70,24 @@ export default function ProfileView({
       </div>
 
       <div className="grid grid-cols-4 gap-3.5 mt-[26px]">
-        <StatCard label="Toplam Gönderi" value={String(stats.totalPosts)} />
-        <StatCard label="Toplam İzlenme" value={stats.totalViewsLabel} />
-        <StatCard label="Toplam Kazanç" value={stats.totalEarnedLabel} tone="ok" />
-        <StatCard label="Talep Edilebilir" value={stats.availableLabel} tone="btc" />
+        <StatCard label="Total Posts" value={String(stats.totalPosts)} />
+        <StatCard label="Total Views" value={stats.totalViewsLabel} />
+        <StatCard label="Total Earnings" value={stats.totalEarnedLabel} tone="ok" />
+        <StatCard label="Available to Request" value={stats.availableLabel} tone="btc" />
       </div>
 
       <div className="flex bg-[var(--surface)] border border-[var(--border)] rounded-xl p-1 w-80 mt-7">
         <button onClick={() => setTab("posts")} className={`flex-1 py-2.5 rounded-[9px] text-[13.5px] font-semibold ${tab === "posts" ? "bg-white text-[var(--text)] shadow-sm" : "text-[var(--text-muted)]"}`}>
-          Gönderilerim
+          My Posts
         </button>
         <button onClick={() => setTab("earnings")} className={`flex-1 py-2.5 rounded-[9px] text-[13.5px] font-semibold ${tab === "earnings" ? "bg-white text-[var(--text)] shadow-sm" : "text-[var(--text-muted)]"}`}>
-          Kazanç &amp; Ödeme
+          Earnings &amp; Payout
         </button>
       </div>
 
       {tab === "posts" && (
         <div className="grid grid-cols-5 gap-3.5 mt-5">
-          {posts.length === 0 && <div className="text-sm text-[var(--text-muted)] col-span-5">Henüz bir paylaşımın yok.</div>}
+          {posts.length === 0 && <div className="text-sm text-[var(--text-muted)] col-span-5">You don&apos;t have any posts yet.</div>}
           {posts.map((p) => (
             <div key={p.id} className="border border-[var(--border)] rounded-xl overflow-hidden bg-[var(--surface)]">
               <div className="h-[110px] relative" style={{ background: "linear-gradient(135deg, oklch(0.86 0.06 25), oklch(0.94 0.03 25))" }}>
@@ -104,7 +104,7 @@ export default function ProfileView({
                 )}
               </div>
               <div className="px-2.5 py-2.5">
-                <div className="text-[11px] text-[var(--text-muted)]">{p.status === "pending" ? "Onaylanınca sayılmaya başlar" : p.viewsLabel}</div>
+                <div className="text-[11px] text-[var(--text-muted)]">{p.status === "pending" ? "Will start counting once approved" : p.viewsLabel}</div>
                 <div className="text-xs font-semibold text-[var(--ok)] mt-0.5">+{p.earnLabel}</div>
               </div>
             </div>
@@ -115,8 +115,8 @@ export default function ProfileView({
       {tab === "earnings" && (
         <div className="flex gap-5 mt-[22px] items-start">
           <div className="flex-1 border border-[var(--border)] rounded-2xl bg-[var(--surface)] overflow-hidden">
-            <div className="px-[18px] py-4 border-b border-[var(--border)] font-display text-sm font-bold">Ödeme Geçmişi</div>
-            {payouts.length === 0 && <div className="px-[18px] py-4 text-sm text-[var(--text-muted)]">Henüz ödeme talebin olmadı.</div>}
+            <div className="px-[18px] py-4 border-b border-[var(--border)] font-display text-sm font-bold">Payout History</div>
+            {payouts.length === 0 && <div className="px-[18px] py-4 text-sm text-[var(--text-muted)]">You haven&apos;t requested a payout yet.</div>}
             {payouts.map((p) => (
               <div key={p.id} className="flex items-center px-[18px] py-3 text-[12.5px] border-b border-[var(--border-soft)]">
                 <div className="w-28 text-[var(--text-muted)]">{p.date}</div>
@@ -128,16 +128,16 @@ export default function ProfileView({
                     color: p.status === "paid" ? "var(--ok)" : "var(--warn)",
                   }}
                 >
-                  {p.status === "paid" ? "Ödendi" : "Beklemede"}
+                  {p.status === "paid" ? "Paid" : "Pending"}
                 </span>
               </div>
             ))}
           </div>
 
           <div className="w-[300px] border border-[var(--border)] rounded-2xl bg-[var(--surface)] p-[18px] flex flex-col gap-3.5">
-            <div className="font-display text-sm font-bold">Bitcoin Cüzdanı</div>
+            <div className="font-display text-sm font-bold">Bitcoin Wallet</div>
             <div className="text-[11.5px] text-[var(--text-muted)] leading-relaxed">
-              Ödeme talep ettiğinde kazancın bu adrese gönderilir.
+              When you request a payout, your earnings are sent to this address.
             </div>
             <input
               value={address}
@@ -146,11 +146,11 @@ export default function ProfileView({
               className="border border-[var(--border)] rounded-[10px] px-3 py-2.5 text-[11.5px] outline-none"
             />
             <button onClick={saveAddress} disabled={savingAddress} className="py-2.5 rounded-[9px] border border-[var(--border)] text-[12.5px] font-semibold disabled:opacity-60">
-              {savingAddress ? "Kaydediliyor…" : "Adresi Kaydet"}
+              {savingAddress ? "Saving…" : "Save Address"}
             </button>
             <div className="h-px bg-[var(--border-soft)] my-0.5" />
             <button onClick={requestPayout} disabled={requesting} className="py-3 rounded-[10px] bg-[var(--btc)] text-white text-[13px] font-bold disabled:opacity-60">
-              {requesting ? "Gönderiliyor…" : "Bitcoin ile Ödeme Al"}
+              {requesting ? "Sending…" : "Get Paid in Bitcoin"}
             </button>
             {requestMsg && <div className="text-[11.5px] text-[var(--text-muted)]">{requestMsg}</div>}
           </div>

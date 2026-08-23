@@ -27,8 +27,8 @@ export default async function AdminPayoutsPage() {
     bitcoinAddress: r.bitcoinAddress,
     status: r.status as "pending" | "paid",
     username: r.username,
-    createdAt: r.createdAt.toLocaleDateString("tr-TR"),
-    paidAt: r.paidAt ? r.paidAt.toLocaleDateString("tr-TR") : null,
+    createdAt: r.createdAt.toLocaleDateString("en-US"),
+    paidAt: r.paidAt ? r.paidAt.toLocaleDateString("en-US") : null,
   }));
 
   const pendingTotal = rows.filter((r) => r.status === "pending").reduce((sum, r) => sum + r.amountUsd, 0);
@@ -37,13 +37,13 @@ export default async function AdminPayoutsPage() {
     <div>
       <div className="mb-6 flex items-end justify-between">
         <div>
-          <div className="font-display text-xl font-bold">Ödemeler</div>
+          <div className="font-display text-xl font-bold">Payouts</div>
           <div className="text-[12.5px] text-[var(--text-muted)] mt-0.5">
-            Kullanıcıların Bitcoin ödeme talepleri — transferi kendi cüzdanından yaptıktan sonra &quot;Ödendi&quot; olarak işaretle
+            Users&apos; Bitcoin payout requests — after sending the transfer from your own wallet, mark it as &quot;Paid&quot;
           </div>
         </div>
         <div className="text-right">
-          <div className="text-[11px] font-semibold text-[var(--text-faint)] tracking-wide">BEKLEYEN TOPLAM</div>
+          <div className="text-[11px] font-semibold text-[var(--text-faint)] tracking-wide">PENDING TOTAL</div>
           <div className="font-display text-lg font-bold text-[var(--accent-dark)]">{formatUsd(pendingTotal)}</div>
         </div>
       </div>

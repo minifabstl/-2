@@ -7,14 +7,14 @@ export default function NotFound() {
       <LogoMark size={44} />
       <div>
         <div className="font-display text-3xl font-bold">404</div>
-        <div className="text-[15px] text-[var(--text-muted)] mt-2">Aradığın sayfa bulunamadı — kaldırılmış ya da hiç var olmamış olabilir.</div>
+        <div className="text-[15px] text-[var(--text-muted)] mt-2">The page you&apos;re looking for couldn&apos;t be found — it may have been removed or never existed.</div>
       </div>
       <div className="flex gap-3 mt-2">
         <Link href="/" className="px-5 py-2.5 rounded-[10px] bg-[var(--accent)] text-white text-sm font-semibold">
-          Ana Sayfaya Dön
+          Back to Home
         </Link>
         <Link href="/explore" className="px-5 py-2.5 rounded-[10px] border border-[var(--border)] text-sm font-semibold">
-          Keşfet
+          Explore
         </Link>
       </div>
     </div>

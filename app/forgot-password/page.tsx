@@ -27,10 +27,10 @@ export default function ForgotPasswordPage() {
     const data = await res.json();
     setLoading(false);
     if (!res.ok) {
-      setError(data.error ?? "Bir şeyler ters gitti.");
+      setError(data.error ?? "Something went wrong.");
       return;
     }
-    setInfo("Bu e-posta sistemde kayıtlıysa, 6 haneli sıfırlama kodu gönderildi. Gelen kutunu (ve spam klasörünü) kontrol et.");
+    setInfo("If this email is registered, a 6-digit reset code has been sent. Check your inbox (and spam folder).");
     setStep("code");
   }
 
@@ -46,7 +46,7 @@ export default function ForgotPasswordPage() {
     const data = await res.json();
     setLoading(false);
     if (!res.ok) {
-      setError(data.error ?? "Bir şeyler ters gitti.");
+      setError(data.error ?? "Something went wrong.");
       return;
     }
     setDone(true);
@@ -57,14 +57,14 @@ export default function ForgotPasswordPage() {
     <div className="min-h-screen flex items-center justify-center bg-[var(--bg)] px-6">
       <form onSubmit={step === "email" ? requestCode : submitCode} className="w-[380px] flex flex-col gap-[18px] bg-[var(--surface)] border border-[var(--border)] rounded-2xl p-7">
         <div>
-          <div className="font-display text-[18px] font-bold">Şifremi Unuttum</div>
+          <div className="font-display text-[18px] font-bold">Forgot Password</div>
           <div className="text-[12.5px] text-[var(--text-muted)] mt-1">
-            {step === "email" ? "Hesabına kayıtlı e-postayı gir, sana sıfırlama kodu gönderelim." : "E-postana gelen 6 haneli kodu ve yeni şifreni gir."}
+            {step === "email" ? "Enter the email registered to your account and we'll send you a reset code." : "Enter the 6-digit code sent to your email and your new password."}
           </div>
         </div>
 
         {done ? (
-          <div className="text-[13px] text-[var(--ok)]">Şifren güncellendi, giriş sayfasına yönlendiriliyorsun…</div>
+          <div className="text-[13px] text-[var(--ok)]">Your password has been updated, redirecting you to the login page…</div>
         ) : (
           <>
             {error && <div className="text-[12.5px] text-[var(--danger)] bg-[var(--danger-soft)] rounded-[10px] px-3.5 py-2.5">{error}</div>}
@@ -77,11 +77,11 @@ export default function ForgotPasswordPage() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="ornek@eposta.com"
+                  placeholder="example@email.com"
                   className="border border-[var(--border)] rounded-[10px] px-3.5 py-2.5 text-sm outline-none"
                 />
                 <button disabled={loading} type="submit" className="py-2.5 rounded-[10px] bg-[var(--accent)] text-white text-sm font-semibold disabled:opacity-60">
-                  {loading ? "Gönderiliyor…" : "Kod Gönder"}
+                  {loading ? "Sending…" : "Send Code"}
                 </button>
               </>
             ) : (
@@ -92,7 +92,7 @@ export default function ForgotPasswordPage() {
                   maxLength={6}
                   value={code}
                   onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
-                  placeholder="6 haneli kod"
+                  placeholder="6-digit code"
                   className="border border-[var(--border)] rounded-[10px] px-3.5 py-2.5 text-sm outline-none tracking-[6px] text-center font-semibold"
                 />
                 <input
@@ -101,18 +101,18 @@ export default function ForgotPasswordPage() {
                   minLength={8}
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="Yeni şifre (en az 8 karakter)"
+                  placeholder="New password (at least 8 characters)"
                   className="border border-[var(--border)] rounded-[10px] px-3.5 py-2.5 text-sm outline-none"
                 />
                 <button disabled={loading} type="submit" className="py-2.5 rounded-[10px] bg-[var(--accent)] text-white text-sm font-semibold disabled:opacity-60">
-                  {loading ? "Bekleyin…" : "Şifreyi Güncelle"}
+                  {loading ? "Please wait…" : "Update Password"}
                 </button>
                 <button
                   type="button"
                   onClick={() => setStep("email")}
                   className="text-[12px] text-[var(--text-muted)] font-semibold"
                 >
-                  Farklı bir e-posta dene / kodu tekrar gönder
+                  Try a different email / resend code
                 </button>
               </>
             )}
@@ -121,7 +121,7 @@ export default function ForgotPasswordPage() {
 
         {!done && (
           <Link href="/login" className="text-[12px] text-[var(--text-muted)] text-center font-semibold mt-1">
-            Girişe dön
+            Back to login
           </Link>
         )}
       </form>

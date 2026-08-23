@@ -12,7 +12,7 @@ const GRADIENTS = [25, 230, 90, 300, 160, 15, 260, 45];
 export default function PostGrid({ posts, isLoggedIn, title }: { posts: FeedPost[]; isLoggedIn: boolean; title: string }) {
   const [items, setItems] = useState(posts);
   const [promptOpen, setPromptOpen] = useState(false);
-  const [promptText, setPromptText] = useState("Beğenmek için üye ol");
+  const [promptText, setPromptText] = useState("Sign up to like");
   const [openComments, setOpenComments] = useState<string | null>(null);
   const [openMedia, setOpenMedia] = useState<string | null>(null);
 
@@ -22,13 +22,13 @@ export default function PostGrid({ posts, isLoggedIn, title }: { posts: FeedPost
   }
 
   async function toggleLike(postId: string) {
-    if (!isLoggedIn) return requireLogin("Beğenmek için üye ol");
+    if (!isLoggedIn) return requireLogin("Sign up to like");
     setItems((prev) =>
       prev.map((p) => (p.id === postId ? { ...p, liked: !p.liked, likeCount: p.liked ? p.likeCount - 1 : p.likeCount + 1 } : p))
     );
     const res = await fetch(`/api/posts/${postId}/like`, { method: "POST" });
     if (!res.ok) {
-      // geri al
+      // revert
       setItems((prev) =>
         prev.map((p) => (p.id === postId ? { ...p, liked: !p.liked, likeCount: p.liked ? p.likeCount - 1 : p.likeCount + 1 } : p))
       );
@@ -42,7 +42,7 @@ export default function PostGrid({ posts, isLoggedIn, title }: { posts: FeedPost
   if (items.length === 0) {
     return (
       <div className="p-10 text-center text-[var(--text-muted)] text-sm">
-        Henüz burada bir içerik yok.
+        There&apos;s no content here yet.
       </div>
     );
   }
@@ -73,7 +73,7 @@ export default function PostGrid({ posts, isLoggedIn, title }: { posts: FeedPost
           onClose={() => setOpenComments(null)}
           onNeedLogin={() => {
             setOpenComments(null);
-            requireLogin("Yorum yapmak için üye ol");
+            requireLogin("Sign up to comment");
           }}
         />
       )}

@@ -17,7 +17,7 @@ export type FeedPost = {
   liked: boolean;
 };
 
-/** Herkese açık akış — üye olmayan ziyaretçiler de görebilir. `viewerId` varsa beğeni durumu eklenir. */
+/** Public feed — visible to non-member visitors too. If `viewerId` is provided, like status is included. */
 export async function listPosts(opts: { category?: string; viewerId?: string | null } = {}): Promise<FeedPost[]> {
   const db = getDb();
 
@@ -64,7 +64,7 @@ export async function listPosts(opts: { category?: string; viewerId?: string | n
     username: r.username,
     mediaUrl: mediaUrl(r.mediaKey),
     viewCount: r.viewCount,
-    viewsLabel: formatViews(r.viewCount) + " izlenme",
+    viewsLabel: formatViews(r.viewCount) + " views",
     likeCount: likeCounts.get(r.id) ?? 0,
     commentCount: commentCounts.get(r.id) ?? 0,
     liked: likedByViewer.has(r.id),
