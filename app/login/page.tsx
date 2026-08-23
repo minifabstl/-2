@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { GIFT_MILESTONE_HOURS, GIFT_REWARD_LABEL } from "@/lib/gift";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -39,14 +40,11 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-screen bg-[var(--bg)]">
       <div className="hidden md:flex w-[640px] min-h-screen flex-col justify-between p-12 text-white" style={{ background: "linear-gradient(160deg, oklch(0.64 0.19 25), oklch(0.5 0.17 20))" }}>
-        <div className="flex items-center gap-2">
-          <span className="w-7 h-7 rounded-lg bg-white/20 flex items-center justify-center">
-            <svg width="18" height="18" viewBox="0 0 28 28" fill="none">
-              <path d="M8.2 6.2h2.7v12.1h6.3v2.4H8.2V6.2z" fill="white" />
-              <path d="M17.4 6.2h6.1v2.35h-3.4v3.1h3.05v2.3h-3.05v3.9h-2.7V6.2z" fill="white" fillOpacity="0.92" />
-            </svg>
+        <div className="flex flex-col items-start gap-1.5">
+          <span className="font-display text-[24px] font-bold tracking-tight text-white">
+            Leaked<span className="text-white/70">Fap</span>
           </span>
-          <span className="font-display text-[17px] font-bold">LeakedFap</span>
+          <span className="w-16 h-[3px] rounded-full bg-white/70" />
         </div>
         <div className="flex flex-col gap-[18px]">
           <div className="font-display text-[34px] font-bold leading-[1.25] max-w-[440px]">Share and earn.</div>
@@ -62,6 +60,12 @@ export default function LoginPage() {
               <div className="font-display text-[22px] font-bold">⚡</div>
               <div className="text-xs text-white/75">Fast payouts</div>
             </div>
+          </div>
+          <div className="inline-flex items-center gap-2 mt-1 px-3.5 py-2 rounded-[10px] bg-white/12 w-fit">
+            <span className="text-[16px]">🎁</span>
+            <span className="text-[12.5px] font-semibold">
+              {GIFT_MILESTONE_HOURS} hours on the site = {GIFT_REWARD_LABEL}, free
+            </span>
           </div>
         </div>
         <div className="text-xs text-white/60">

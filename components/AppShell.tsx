@@ -88,6 +88,13 @@ export default function AppShell({
         </nav>
 
         <div className="mt-auto flex flex-col gap-2.5">
+          {user && (
+            <GiftCounter
+              hoursOnSite={formatHoursOnSite(user.activeSeconds)}
+              claimed={!!user.giftSentAt}
+              reached={user.activeSeconds >= GIFT_MILESTONE_HOURS * 3600}
+            />
+          )}
           <GiftBox hoursOnSite={user ? formatHoursOnSite(user.activeSeconds) : null} claimed={!!user?.giftSentAt} />
           <div className="p-2.5 rounded-xl bg-[var(--accent-soft)] flex flex-col gap-1.5">
             <div className="text-[12.5px] font-semibold">1000 views = $0.20</div>
@@ -105,6 +112,13 @@ export default function AppShell({
 
       <div className="flex-1 flex flex-col min-w-0">
         <header className="h-16 min-h-16 flex items-center gap-4 px-7" style={{ background: "#00aff0" }}>
+          <Link href="/creator-program" className="flex items-center gap-2.5 group">
+            <span className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-[16px] shrink-0 group-hover:bg-white/30">🎁</span>
+            <span className="hidden md:flex flex-col leading-tight">
+              <span className="text-white font-display font-bold text-[13.5px]">{GIFT_MILESTONE_HOURS} hours = {GIFT_REWARD_LABEL}</span>
+              <span className="text-white/80 text-[11px]">Spend {GIFT_MILESTONE_HOURS} hours on the site and we&apos;ll gift it to you — free.</span>
+            </span>
+          </Link>
           <div className="flex-1" />
           {user ? (
             <div className="flex items-center gap-3">
@@ -143,24 +157,35 @@ export default function AppShell({
   );
 }
 
+function GiftCounter({ hoursOnSite, claimed, reached }: { hoursOnSite: string; claimed: boolean; reached: boolean }) {
+  const pct = Math.min(100, (Number(hoursOnSite) / GIFT_MILESTONE_HOURS) * 100);
+  const statusLabel = claimed ? "Gift sent — enjoy! 🎉" : reached ? "Milestone reached! 🎉" : `${hoursOnSite}h / ${GIFT_MILESTONE_HOURS}h`;
+  return (
+    <div
+      className="p-2.5 rounded-xl flex items-center gap-2.5"
+      style={{ background: reached || claimed ? "rgba(219,26,109,0.16)" : "var(--bg)", border: "1px solid var(--border)" }}
+    >
+      <span className="text-[16px] shrink-0">⏱️</span>
+      <div className="flex-1 min-w-0">
+        <div className="h-1.5 rounded-full bg-white/70 overflow-hidden">
+          <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, background: "#db1a6d" }} />
+        </div>
+        <div className="text-[11px] font-bold mt-1" style={{ color: "#db1a6d" }}>
+          {statusLabel}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function GiftBox({ hoursOnSite, claimed }: { hoursOnSite: string | null; claimed: boolean }) {
-  const pct = hoursOnSite ? Math.min(100, (Number(hoursOnSite) / GIFT_MILESTONE_HOURS) * 100) : 0;
   return (
     <div className="p-2.5 rounded-xl flex flex-col gap-1.5" style={{ background: "rgba(219,26,109,0.1)" }}>
       <div className="text-[12.5px] font-semibold">🎁 {GIFT_MILESTONE_HOURS} hours = {GIFT_REWARD_LABEL}</div>
       <div className="text-[11.5px] text-[var(--text-muted)] leading-snug">
         Spend {GIFT_MILESTONE_HOURS} hours on the site and we&apos;ll gift you a real, admin-funded {GIFT_REWARD_LABEL} — free.
+        {hoursOnSite && !claimed && ` You're at ${hoursOnSite}h so far.`}
       </div>
-      {hoursOnSite && (
-        <>
-          <div className="h-1.5 rounded-full bg-white/60 overflow-hidden mt-0.5">
-            <div className="h-full rounded-full" style={{ width: `${pct}%`, background: "#db1a6d" }} />
-          </div>
-          <div className="text-[10.5px] font-semibold" style={{ color: "#db1a6d" }}>
-            {claimed ? "Gift sent — enjoy!" : `${hoursOnSite}h / ${GIFT_MILESTONE_HOURS}h`}
-          </div>
-        </>
-      )}
     </div>
   );
 }
