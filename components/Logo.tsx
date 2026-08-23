@@ -22,11 +22,11 @@ export function LogoMark({ size = 28 }: { size?: number }) {
   );
 }
 
-export default function Logo({ size = 28, withWordmark = true, className = "" }: { size?: number; withWordmark?: boolean; className?: string }) {
+export default function Logo({ size = 26, withWordmark = true, className = "" }: { size?: number; withWordmark?: boolean; className?: string }) {
   return (
-    <span className={`flex items-center gap-2 ${className}`}>
+    <span className={`flex items-center justify-center gap-2 ${className}`}>
       {withWordmark && (
-        <span className="font-display text-[17px] font-bold tracking-tight">
+        <span className="font-display font-bold tracking-tight" style={{ fontSize: size }}>
           Leaked<span className="text-[var(--accent)]">Fap</span>
         </span>
       )}

@@ -44,8 +44,8 @@ export default function AppShell({ user, children }: { user: SafeUser | null; ch
   return (
     <div className="flex min-h-screen bg-[var(--bg)]">
       <aside className="w-60 min-w-60 border-r border-[var(--border)] bg-[var(--surface)] flex flex-col gap-6 p-3.5 sticky top-0 h-screen">
-        <Link href="/" className="flex items-center px-2 py-1">
-          <Logo />
+        <Link href="/" className="flex items-center justify-center px-2 py-3">
+          <Logo size={26} />
         </Link>
 
         <nav className="flex flex-col gap-0.5">
