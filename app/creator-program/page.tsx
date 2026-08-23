@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { desc, eq } from "drizzle-orm";
 import { getDb, posts, users } from "@/db";
 import { mediaUrl } from "@/lib/storage";
 import {
@@ -66,111 +65,299 @@ export default async function CreatorProgramPage() {
     .slice(0, 10);
 
   return (
-    <div className="max-w-3xl mx-auto p-10">
-      <div className="flex flex-col items-center text-center mb-10">
-        <span
-          className="px-3 py-1 rounded-full text-[11px] font-bold mb-4"
-          style={{ background: "linear-gradient(90deg, #db1a6d, #a8125a)", color: "white" }}
-        >
-          Creator Program
-        </span>
-        <h1 className="font-display text-3xl font-bold mb-3">Post here. Get paid for every view.</h1>
-        <p className="text-[14px] text-[var(--text-muted)] max-w-xl leading-relaxed mb-6">
-          Every approved upload earns real money as it gets views — paid out straight to your wallet, any time you have at
-          least $1 accrued. Upload more, get more views, and your rate goes up as you move through the creator tiers below.
-        </p>
-        <Link href="/upload" className="px-6 py-3 rounded-[10px] bg-[var(--accent)] text-white text-[14px] font-semibold">
-          Upload now
-        </Link>
-      </div>
+    <div id="top" className="min-w-0">
+      {/* ---------------------------------------------------------------- Hero */}
+      <div
+        className="px-10 pt-14 pb-16"
+        style={{ background: "radial-gradient(1100px 480px at 8% -15%, rgba(219,26,109,0.14), transparent 60%), var(--bg)" }}
+      >
+        <div className="max-w-5xl mx-auto grid grid-cols-[1fr_360px] gap-10 items-start">
+          <div>
+            <Pill>Professional Creator Program</Pill>
+            <h1 className="font-display text-[40px] leading-[1.12] font-bold mt-4 mb-4 max-w-lg">
+              Turn your uploads into real, ongoing earnings.
+            </h1>
+            <p className="text-[14px] text-[var(--text-muted)] leading-relaxed max-w-md mb-6">
+              Join a creator program where the rules are clear, the rate is transparent, and every upload has a fair
+              chance to earn from real views — no invite required.
+            </p>
+            <div className="flex gap-2.5 mb-8">
+              <Link href="/upload" className="px-5 py-3 rounded-[10px] bg-[var(--accent)] text-white text-[13.5px] font-semibold">
+                Join as a creator
+              </Link>
+              <a href="#rules" className="px-5 py-3 rounded-[10px] border border-[var(--border)] bg-[var(--surface)] text-[13.5px] font-semibold">
+                Review the rules
+              </a>
+            </div>
 
-      <div className="grid grid-cols-3 gap-3.5 mb-12">
-        <StepCard
-          n={1}
-          title="Upload"
-          body="Share a video or photo. It takes a minute, and there's no limit on how much you can post."
-        />
-        <StepCard
-          n={2}
-          title="Get approved"
-          body="Our team reviews every upload before it goes live in the public feed — usually quick."
-        />
-        <StepCard
-          n={3}
-          title="Earn per view"
-          body={`Once live, you earn $${RATE_USD_PER_1000_VIEWS.toFixed(2)} per 1000 views, scaled up by your creator tier.`}
-        />
-      </div>
-
-      <Section title="This week's top creators" subtitle="Ranked by views this week (Monday–Sunday, UTC). Resets every week.">
-        {leaderboard.length === 0 ? (
-          <div className="text-[13px] text-[var(--text-muted)] py-6 text-center">
-            No views yet this week — be the first on the board.
+            <div className="grid grid-cols-3 gap-3">
+              <HeroStat title={`$${RATE_USD_PER_1000_VIEWS.toFixed(2)} / 1,000 views`} body="One simple, transparent rate for every creator." />
+              <HeroStat title="Reviewed, not gamed" body="Every upload is checked before it can earn." />
+              <HeroStat title="$1 minimum payout" body="Request your earnings any time you qualify." />
+            </div>
           </div>
-        ) : (
-          <div className="flex flex-col">
-            {leaderboard.map((u, i) => (
-              <div key={u.id} className="flex items-center gap-3.5 py-2.5 border-b border-[var(--border-soft)] last:border-b-0">
-                <div className="w-6 text-[13px] font-bold text-[var(--text-faint)] text-center">{i + 1}</div>
-                <Avatar avatarUrl={u.avatarUrl} initials={u.username.slice(0, 2).toUpperCase()} />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-1.5">
-                    <span className="font-semibold text-[13.5px] truncate">@{u.username}</span>
-                    <TierBadge tier={u.tier} />
-                  </div>
-                  <div className="text-[11.5px] text-[var(--text-faint)]">{formatViews(u.weekViews)} views this week</div>
-                </div>
-                <div className="font-semibold text-[13px] text-[var(--ok)]">{u.weekEarnedLabel}</div>
-              </div>
-            ))}
-          </div>
-        )}
-      </Section>
 
-      <Section title="Creator tiers" subtitle="Your tier is based on your all-time uploads and views — it never drops.">
-        <div className="flex flex-col gap-2.5">
-          <TierRow
-            label={TIER_LABEL.new}
-            boost={TIER_BOOST_LABEL.new}
-            requirement="Everyone starts here"
-          />
-          <TierRow
-            label={TIER_LABEL.contributor}
-            boost={TIER_BOOST_LABEL.contributor}
-            requirement={`${CONTRIBUTOR_REQUIREMENT.uploads}+ approved uploads and ${formatViews(CONTRIBUTOR_REQUIREMENT.views)}+ total views`}
-          />
-          <TierRow
-            label={TIER_LABEL.creator}
-            boost={TIER_BOOST_LABEL.creator}
-            requirement={`${CREATOR_REQUIREMENT.uploads}+ approved uploads and ${formatViews(CREATOR_REQUIREMENT.views)}+ total views`}
-          />
-          <TierRow
-            label={TIER_LABEL.verified}
-            boost={TIER_BOOST_LABEL.verified}
-            requirement="Hand-picked by the admin team for consistently high-quality content"
-          />
+          <ChecklistCard />
         </div>
-      </Section>
+      </div>
 
-      <Section title="How it works">
-        <ul className="flex flex-col gap-2.5 text-[13px] text-[var(--text-muted)] leading-relaxed">
-          <RuleItem>
-            You earn <strong className="text-[var(--text)]">{formatUsd(RATE_USD_PER_1000_VIEWS)} per 1,000 views</strong>{" "}
-            on every approved upload, multiplied by your creator tier&apos;s rate boost.
-          </RuleItem>
-          <RuleItem>
-            Your very first approved upload earns an extra{" "}
-            <strong className="text-[var(--text)]">{formatUsd(FIRST_UPLOAD_BONUS_USD)} bonus</strong>, and every approved upload
-            after that earns a <strong className="text-[var(--text)]">{formatUsd(REPEAT_UPLOAD_BONUS_USD)} bonus</strong>.
-          </RuleItem>
-          <RuleItem>Views only count from real, unique viewers — you can&apos;t earn from watching your own content.</RuleItem>
-          <RuleItem>
-            Request a payout any time you have at least $1 accrued. Add your wallet address on your profile, and an admin will
-            send your payout from there.
-          </RuleItem>
-          <RuleItem>All uploads are reviewed before going live — content that violates our terms won&apos;t be approved.</RuleItem>
-        </ul>
-      </Section>
+      <div className="max-w-5xl mx-auto px-10">
+        {/* --------------------------------------------------------- Why join */}
+        <div className="py-12">
+          <div className="font-display text-2xl font-bold mb-2">Why creators join</div>
+          <p className="text-[13.5px] text-[var(--text-muted)] leading-relaxed max-w-xl mb-6">
+            Creators come here for a clear, fair, performance-based way to earn from content they&apos;re already making —
+            and to grow their audience while they do it.
+          </p>
+          <div className="grid grid-cols-3 gap-3.5">
+            <WhyCard
+              tag="Earnings"
+              title="Earn from real views"
+              body={`Every 1,000 real views on your live content earns ${formatUsd(RATE_USD_PER_1000_VIEWS)} — plus a ${formatUsd(FIRST_UPLOAD_BONUS_USD)} bonus on your first upload.`}
+            />
+            <WhyCard
+              tag="Growth"
+              title="Build a real audience"
+              body="Get exposure on a platform built around discovery, and grow your following through genuine engagement."
+            />
+            <WhyCard
+              tag="Fair rate boosts"
+              title="Earn more as you grow"
+              body="Reach the Contributor, Creator, or Verified tier and your rate goes up — automatically, and it never drops."
+            />
+          </div>
+        </div>
+
+        {/* ---------------------------------------------------- Leaderboard */}
+        <div className="pb-12">
+          <div className="font-display text-2xl font-bold mb-1">This week&apos;s top creators</div>
+          <p className="text-[12.5px] text-[var(--text-faint)] mb-4">Ranked by real views this week (Monday–Sunday, UTC) — resets every week.</p>
+          <div className="border border-[var(--border)] rounded-2xl bg-[var(--surface)] p-[18px]">
+            {leaderboard.length === 0 ? (
+              <div className="text-[13px] text-[var(--text-muted)] py-6 text-center">
+                No views yet this week — be the first on the board.
+              </div>
+            ) : (
+              <div className="flex flex-col">
+                {leaderboard.map((u, i) => (
+                  <div key={u.id} className="flex items-center gap-3.5 py-2.5 border-b border-[var(--border-soft)] last:border-b-0">
+                    <div className="w-6 text-[13px] font-bold text-[var(--text-faint)] text-center">{i + 1}</div>
+                    <Avatar avatarUrl={u.avatarUrl} initials={u.username.slice(0, 2).toUpperCase()} />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-semibold text-[13.5px] truncate">@{u.username}</span>
+                        <TierBadge tier={u.tier} />
+                      </div>
+                      <div className="text-[11.5px] text-[var(--text-faint)]">{formatViews(u.weekViews)} views this week</div>
+                    </div>
+                    <div className="font-semibold text-[13px] text-[var(--ok)]">{u.weekEarnedLabel}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* -------------------------------------------------- Creator tiers */}
+        <div className="pb-12">
+          <div className="font-display text-2xl font-bold mb-1">Creator tiers</div>
+          <p className="text-[12.5px] text-[var(--text-faint)] mb-4">Your tier is based on your all-time uploads and views — it only ever goes up.</p>
+          <div className="border border-[var(--border)] rounded-2xl bg-[var(--surface)] p-[18px] flex flex-col gap-2.5">
+            <TierRow label={TIER_LABEL.new} boost={TIER_BOOST_LABEL.new} requirement="Everyone starts here" />
+            <TierRow
+              label={TIER_LABEL.contributor}
+              boost={TIER_BOOST_LABEL.contributor}
+              requirement={`${CONTRIBUTOR_REQUIREMENT.uploads}+ approved uploads and ${formatViews(CONTRIBUTOR_REQUIREMENT.views)}+ total views`}
+            />
+            <TierRow
+              label={TIER_LABEL.creator}
+              boost={TIER_BOOST_LABEL.creator}
+              requirement={`${CREATOR_REQUIREMENT.uploads}+ approved uploads and ${formatViews(CREATOR_REQUIREMENT.views)}+ total views`}
+            />
+            <TierRow
+              label={TIER_LABEL.verified}
+              boost={TIER_BOOST_LABEL.verified}
+              requirement="Hand-picked by the admin team for consistently high-quality content"
+            />
+          </div>
+        </div>
+
+        {/* ------------------------------------------ Requirements + Payout */}
+        <div id="rules" className="pb-12 grid grid-cols-[1fr_340px] gap-6 items-start scroll-mt-6">
+          <div>
+            <div className="font-display text-2xl font-bold mb-2">Creator requirements</div>
+            <p className="text-[13.5px] text-[var(--text-muted)] leading-relaxed mb-5">
+              To join the program, creators follow a few clear guidelines. This keeps the feed high quality and keeps
+              the program fair and trustworthy for everyone.
+            </p>
+            <div className="flex flex-col gap-2.5">
+              <ReqRow n="01" title="Content compliance" body="Only upload content you have the right to share, and that follows our Terms of Service." />
+              <ReqRow n="02" title="Accurate title & category" body="Give your upload a clear title and the right category so it can be discovered and reviewed quickly." />
+              <ReqRow n="03" title="Real, unique views only" body="Earnings are based on genuine viewer activity. Automated or self-generated views don't count, and abuse can lead to suspension." />
+              <ReqRow n="04" title="Review before it's live" body="Every upload is checked by our team before it appears in the public feed and starts earning." />
+            </div>
+          </div>
+
+          <div className="border border-[var(--border)] rounded-2xl bg-[var(--surface)] p-[22px] flex flex-col gap-3">
+            <div className="font-display text-[17px] font-bold mb-1">Payout rules</div>
+            <p className="text-[12px] text-[var(--text-muted)] leading-relaxed mb-1">
+              Payment terms, kept simple and visible.
+            </p>
+            <PayoutRow label="Rate" value={`${formatUsd(RATE_USD_PER_1000_VIEWS)} / 1,000 views`} />
+            <PayoutRow label="First upload bonus" value={formatUsd(FIRST_UPLOAD_BONUS_USD)} />
+            <PayoutRow label="Every upload after" value={`+${formatUsd(REPEAT_UPLOAD_BONUS_USD)}`} />
+            <PayoutRow label="Minimum payout" value="$1.00" />
+            <PayoutRow label="Review" value="Manual, by an admin" />
+            <p className="text-[11.5px] text-[var(--text-faint)] leading-relaxed mt-1">
+              Add your wallet address on your profile, then request a payout any time your accrued balance reaches the
+              minimum. Requests are reviewed and sent manually, so processing time can vary.
+            </p>
+          </div>
+        </div>
+
+        {/* ------------------------------------------------- How to start */}
+        <div className="pb-14">
+          <div className="font-display text-2xl font-bold mb-1">How creators get started</div>
+          <p className="text-[13.5px] text-[var(--text-muted)] leading-relaxed max-w-xl mb-5">
+            There&apos;s no application — create an account and start uploading right away. Every upload goes through a
+            quick review before it goes live and starts earning.
+          </p>
+          <div className="grid grid-cols-3 gap-3.5">
+            <StepCard n={1} title="Create your account" body="Sign up and you can start uploading immediately — no application required." />
+            <StepCard n={2} title="Upload content that follows the rules" body="Add a clear title, the right category, and content that follows our guidelines." />
+            <StepCard n={3} title="Earn per view, request payouts" body="Track your views and earnings on your profile, and request a payout once you qualify." />
+          </div>
+        </div>
+
+        {/* ------------------------------------------------------- Final CTA */}
+        <div className="pb-14">
+          <div
+            className="rounded-3xl p-[26px] flex items-center justify-between gap-6"
+            style={{ background: "linear-gradient(115deg, rgba(219,26,109,0.14), var(--surface) 55%)" }}
+          >
+            <div className="max-w-md">
+              <Pill>Ready to start earning?</Pill>
+              <div className="font-display text-[22px] font-bold leading-tight mt-3 mb-2">
+                Join creators already earning on LeakedFap.
+              </div>
+              <p className="text-[12.5px] text-[var(--text-muted)] leading-relaxed">
+                Clear rules, a transparent rate, and real payouts based on real views.
+              </p>
+            </div>
+            <div className="flex gap-2.5 shrink-0">
+              <Link href="/upload" className="px-5 py-3 rounded-[10px] bg-[var(--accent)] text-white text-[13.5px] font-semibold whitespace-nowrap">
+                Create your account
+              </Link>
+              <a href="#top" className="px-5 py-3 rounded-[10px] border border-[var(--border)] bg-[var(--surface)] text-[13.5px] font-semibold whitespace-nowrap">
+                Back to top
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Pill({ children }: { children: React.ReactNode }) {
+  return (
+    <span
+      className="inline-flex px-3 py-1 rounded-full text-[11px] font-bold"
+      style={{ background: "rgba(219,26,109,0.12)", color: "#db1a6d" }}
+    >
+      {children}
+    </span>
+  );
+}
+
+function HeroStat({ title, body }: { title: string; body: string }) {
+  return (
+    <div className="border border-[var(--border)] rounded-2xl bg-[var(--surface)] p-3.5 flex flex-col gap-1">
+      <div className="font-display text-[14px] font-bold leading-tight">{title}</div>
+      <div className="text-[11px] text-[var(--text-muted)] leading-snug">{body}</div>
+    </div>
+  );
+}
+
+function ChecklistCard() {
+  return (
+    <div className="border border-[var(--border)] rounded-3xl bg-[var(--surface)] p-6 shadow-sm">
+      <Pill>Creator requirements</Pill>
+      <div className="font-display text-[17px] font-bold mt-3 mb-4">Creator review checklist</div>
+      <div className="flex flex-col gap-2.5 mb-4">
+        <ChecklistItem label="CONTENT QUALITY" body="Uploads should be clear and represent what they claim to be." />
+        <ChecklistItem label="UPLOAD SETUP" body="Add an accurate title and the right category before submitting." />
+        <ChecklistItem label="CONTENT COMPLIANCE" body="Only publish content you have the right to share, following our Terms." />
+      </div>
+      <div className="flex flex-col gap-2">
+        <CheckLine>Clear rules keep the feed high quality.</CheckLine>
+        <CheckLine>Every upload is reviewed before it goes live.</CheckLine>
+        <CheckLine>Better content tends to earn more views — and more.</CheckLine>
+      </div>
+    </div>
+  );
+}
+
+function ChecklistItem({ label, body }: { label: string; body: string }) {
+  return (
+    <div className="rounded-xl border border-[var(--border-soft)] bg-[var(--bg)] px-3.5 py-3">
+      <div className="text-[10px] font-bold tracking-wide text-[var(--text-faint)] mb-1">{label}</div>
+      <div className="text-[12px] text-[var(--text)] leading-relaxed">{body}</div>
+    </div>
+  );
+}
+
+function CheckLine({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex items-start gap-2 text-[12px] text-[var(--text-muted)] leading-relaxed">
+      <span
+        className="w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-bold shrink-0 mt-0.5"
+        style={{ background: "rgba(219,26,109,0.12)", color: "#db1a6d" }}
+      >
+        ✓
+      </span>
+      <span>{children}</span>
+    </div>
+  );
+}
+
+function WhyCard({ tag, title, body }: { tag: string; title: string; body: string }) {
+  return (
+    <div className="border border-[var(--border)] rounded-2xl bg-[var(--surface)] p-4 flex flex-col gap-2">
+      <span
+        className="self-start px-2 py-0.5 rounded-full text-[10px] font-bold"
+        style={{ background: "rgba(219,26,109,0.12)", color: "#db1a6d" }}
+      >
+        {tag}
+      </span>
+      <div className="font-display text-[14.5px] font-bold leading-snug">{title}</div>
+      <div className="text-[12px] text-[var(--text-muted)] leading-relaxed">{body}</div>
+    </div>
+  );
+}
+
+function ReqRow({ n, title, body }: { n: string; title: string; body: string }) {
+  return (
+    <div className="flex gap-3.5 border border-[var(--border)] rounded-2xl bg-[var(--surface)] px-4 py-3.5">
+      <span
+        className="w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0"
+        style={{ background: "rgba(219,26,109,0.12)", color: "#db1a6d" }}
+      >
+        {n}
+      </span>
+      <div>
+        <div className="font-semibold text-[13.5px] mb-0.5">{title}</div>
+        <div className="text-[12px] text-[var(--text-muted)] leading-relaxed">{body}</div>
+      </div>
+    </div>
+  );
+}
+
+function PayoutRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-center justify-between border border-[var(--border)] rounded-[10px] px-3 py-2.5">
+      <span className="text-[12.5px] text-[var(--text-muted)]">{label}</span>
+      <span className="text-[12.5px] font-semibold">{value}</span>
     </div>
   );
 }
@@ -186,18 +373,6 @@ function StepCard({ n, title, body }: { n: number; title: string; body: string }
       </div>
       <div className="font-display text-[14px] font-bold">{title}</div>
       <div className="text-[12px] text-[var(--text-muted)] leading-relaxed">{body}</div>
-    </div>
-  );
-}
-
-function Section({ title, subtitle, children }: { title: string; subtitle?: string; children: React.ReactNode }) {
-  return (
-    <div className="mb-9">
-      <div className="mb-3.5">
-        <div className="font-display text-[16px] font-bold">{title}</div>
-        {subtitle && <div className="text-[12px] text-[var(--text-faint)] mt-0.5">{subtitle}</div>}
-      </div>
-      <div className="border border-[var(--border)] rounded-2xl bg-[var(--surface)] p-[18px]">{children}</div>
     </div>
   );
 }
@@ -228,15 +403,6 @@ function TierBadge({ tier }: { tier: Tier }) {
     >
       {TIER_LABEL[tier]}
     </span>
-  );
-}
-
-function RuleItem({ children }: { children: React.ReactNode }) {
-  return (
-    <li className="flex gap-2.5">
-      <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)] shrink-0 mt-1.5" />
-      <span>{children}</span>
-    </li>
   );
 }
 
