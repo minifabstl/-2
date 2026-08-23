@@ -42,11 +42,11 @@ export default function AppShell({
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-[var(--bg)]">
+    <div className="flex flex-col min-h-screen" style={{ background: "linear-gradient(120deg, #fce4ee, #fdf3f7 45%, #ffffff 80%)" }}>
       {user && <TimeTracker />}
       <PromoBanner canDismiss={!!hasUploaded} />
       <div className="flex flex-1 min-h-0">
-      <aside className="w-60 min-w-60 border-r border-[var(--border)] bg-[var(--surface)] flex flex-col gap-6 p-3.5 sticky top-0 h-screen">
+      <aside className="w-60 min-w-60 border-r border-[var(--border)] flex flex-col gap-6 p-3.5 sticky top-0 h-screen">
         <Link href="/" className="flex flex-col items-center justify-center px-2 pt-1 pb-3 gap-2">
           <Logo size={32} />
           <span className="w-24 h-[3px] rounded-full" style={{ background: "var(--accent)" }} />
