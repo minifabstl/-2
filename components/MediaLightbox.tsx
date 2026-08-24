@@ -32,7 +32,14 @@ export default function MediaLightbox({ post, onClose }: { post: FeedPost; onClo
           // eslint-disable-next-line @next/next/no-img-element
           <img src={post.mediaUrl} alt={post.title} className="max-w-full max-h-[75vh] object-contain rounded-[10px]" />
         ) : (
-          <video src={post.mediaUrl} controls autoPlay className="max-w-full max-h-[75vh] object-contain rounded-[10px]" />
+          <video
+            src={post.mediaUrl}
+            controls
+            autoPlay
+            muted
+            playsInline
+            className="max-w-full max-h-[75vh] object-contain rounded-[10px]"
+          />
         )}
         <div className="text-white text-sm text-center">
           <span className="font-semibold">{post.title}</span>
