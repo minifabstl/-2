@@ -6,11 +6,12 @@ import Link from "next/link";
 
 const MAX_TAGS = 5;
 
-// Kept well under Cloudflare Workers' fixed 128MB per-request memory ceiling — the upload
-// route buffers the incoming file in memory (via formData()/arrayBuffer()), so a limit close
-// to 128MB crashes the Worker with "Error 1102: exceeded resource limits" instead of returning
-// a clean validation error. 20MB leaves generous headroom for that overhead.
-const MAX_MB = { photo: 5, video: 20 };
+// Photo still goes straight through the Worker (buffered via formData()/arrayBuffer()), so it
+// has to stay well under Workers' fixed 128MB per-request memory ceiling — 5MB leaves generous
+// headroom. Video is uploaded directly from the browser to R2 over a presigned URL (see
+// uploadVideoDirectly() below) and never touches the Worker's memory, so its limit here just
+// mirrors the product-level cap enforced server-side in app/api/posts/presign/route.ts.
+const MAX_MB = { photo: 5, video: 300 };
 const ACCEPT = { photo: "image/png,image/jpeg,image/webp,image/jpg", video: "video/mp4,video/quicktime,video/webm,video/x-m4v" };
 const FORMAT_HINT = { photo: "PNG, JPEG, WEBP, JPG", video: "MP4, MOV, WEBM, M4V" };
 
@@ -29,6 +30,7 @@ export default function UploadPage() {
   const [dragOver, setDragOver] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [uploadPct, setUploadPct] = useState(0);
 
   const maxMb = MAX_MB[type];
   const fileSizeMb = file ? file.size / (1024 * 1024) : 0;
@@ -113,6 +115,29 @@ export default function UploadPage() {
     if (fileInputRef.current) fileInputRef.current.value = "";
   }
 
+  /**
+   * PUTs the raw file bytes straight to R2 over a short-lived presigned URL (minted by
+   * POST /api/posts/presign), tracking progress via XHR since fetch() has no upload-progress
+   * event. The Worker never sees these bytes — that's what lets video be far bigger than the
+   * ~20MB a normal formData()-through-the-Worker upload could safely handle.
+   */
+  function uploadVideoDirectly(uploadUrl: string, f: File): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open("PUT", uploadUrl);
+      xhr.setRequestHeader("Content-Type", f.type);
+      xhr.upload.onprogress = (e) => {
+        if (e.lengthComputable) setUploadPct(Math.round((e.loaded / e.total) * 100));
+      };
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 300) resolve();
+        else reject(new Error("The upload to storage failed — please try again."));
+      };
+      xhr.onerror = () => reject(new Error("The upload to storage failed — please try again."));
+      xhr.send(f);
+    });
+  }
+
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (!file) return setError("Select a video or photo.");
@@ -120,24 +145,44 @@ export default function UploadPage() {
     if (!acceptedTerms) return setError("You must accept the content rights and Terms of Service before continuing.");
     setError("");
     setLoading(true);
+    setUploadPct(0);
 
-    const form = new FormData();
-    form.set("title", title);
-    form.set("type", type);
-    form.set("tags", JSON.stringify(tags.map((t) => t.trim()).filter(Boolean)));
-    form.set("file", file);
-    if (thumbnailBlob) form.set("thumbnail", thumbnailBlob, "thumbnail.jpg");
+    try {
+      let mediaKey: string | null = null;
+      if (type === "video") {
+        const presignRes = await fetch("/api/posts/presign", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ filename: file.name, contentType: file.type, size: file.size }),
+        });
+        const presignData = await presignRes.json();
+        if (!presignRes.ok) throw new Error(presignData.error ?? "Couldn't start the upload.");
+        await uploadVideoDirectly(presignData.uploadUrl, file);
+        mediaKey = presignData.key;
+        setUploadPct(100);
+      }
 
-    const res = await fetch("/api/posts", { method: "POST", body: form });
-    const data = await res.json();
-    setLoading(false);
+      const form = new FormData();
+      form.set("title", title);
+      form.set("type", type);
+      form.set("tags", JSON.stringify(tags.map((t) => t.trim()).filter(Boolean)));
+      if (type === "photo") {
+        form.set("file", file);
+      } else if (mediaKey) {
+        form.set("mediaKey", mediaKey);
+      }
+      if (thumbnailBlob) form.set("thumbnail", thumbnailBlob, "thumbnail.jpg");
 
-    if (!res.ok) {
-      setError(data.error ?? "Upload failed.");
-      return;
+      const res = await fetch("/api/posts", { method: "POST", body: form });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Upload failed.");
+
+      router.push("/profile?uploaded=1");
+      router.refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Upload failed.");
+      setLoading(false);
     }
-    router.push("/profile?uploaded=1");
-    router.refresh();
   }
 
   return (
@@ -336,7 +381,7 @@ export default function UploadPage() {
           type="submit"
           className="py-3 rounded-[10px] bg-[var(--accent)] text-white text-sm font-semibold disabled:opacity-50"
         >
-          {loading ? "Uploading…" : "Share"}
+          {loading ? (type === "video" && uploadPct > 0 && uploadPct < 100 ? `Uploading… ${uploadPct}%` : "Uploading…") : "Share"}
         </button>
       </form>
     </div>

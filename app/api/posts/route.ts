@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { nanoid } from "nanoid";
 import { and, desc, eq, gt } from "drizzle-orm";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { getDb, posts, users } from "@/db";
 import { getCurrentUser, AuthError, requireUser } from "@/lib/auth";
 import { uploadMedia, mediaUrl } from "@/lib/storage";
@@ -8,17 +9,13 @@ import { cleanTags, parseTags } from "@/lib/posts";
 
 const MAX_TITLE_LENGTH = 200;
 
-// Mirrors the limits shown in app/upload/page.tsx — but the client-side check there is only a
-// UX convenience. It's trivial to bypass by calling this endpoint directly (e.g. with curl), so
-// the real enforcement has to happen here, server-side, on the file the server actually receives.
-//
-// video maxBytes must stay well under Cloudflare Workers' fixed 128MB per-request memory
-// ceiling — this route buffers the incoming file in memory (formData() + arrayBuffer()), so a
-// limit close to 128MB crashes the Worker with "Error 1102: exceeded resource limits" instead
-// of returning this clean 400 response. Keep this in sync with MAX_MB in app/upload/page.tsx.
-const MEDIA_LIMITS: Record<"photo" | "video", { maxBytes: number; types: string[] }> = {
+// Photo limit only — video's server-side size/type limit lives in app/api/posts/presign/route.ts
+// (MAX_VIDEO_BYTES) since that's where video enforcement actually happens now: videos are
+// PUT directly to R2 via a presigned URL and never pass through this route as raw bytes (see
+// the mediaKey handling below). Photos are small enough to still be buffered through the
+// Worker safely, well under its fixed 128MB per-request memory ceiling.
+const MEDIA_LIMITS: Record<"photo", { maxBytes: number; types: string[] }> = {
   photo: { maxBytes: 5 * 1024 * 1024, types: ["image/png", "image/jpeg", "image/webp"] },
-  video: { maxBytes: 20 * 1024 * 1024, types: ["video/mp4", "video/quicktime", "video/webm", "video/x-m4v"] },
 };
 const MAX_THUMBNAIL_BYTES = 3 * 1024 * 1024;
 
@@ -75,6 +72,11 @@ export async function POST(req: NextRequest) {
 
   const form = await req.formData();
   const file = form.get("file");
+  // For videos, the file itself was already PUT directly to R2 via a presigned URL (see
+  // POST /api/posts/presign and app/upload/page.tsx) — the Worker never buffers it, which is
+  // what lets videos be far bigger than the old 20MB Worker-memory-safe cap. This request only
+  // carries the resulting object key, plus the small thumbnail image, as normal form fields.
+  const preUploadedMediaKey = form.get("mediaKey");
   const thumbnail = form.get("thumbnail");
   const title = String(form.get("title") ?? "").trim();
   const type = form.get("type") === "photo" ? "photo" : "video";
@@ -92,25 +94,11 @@ export async function POST(req: NextRequest) {
   }
   const tags = cleanTags(rawTags);
 
-  if (!(file instanceof File)) {
-    return NextResponse.json({ error: "A media file is required." }, { status: 400 });
-  }
   if (!title) {
     return NextResponse.json({ error: "A title is required." }, { status: 400 });
   }
   if (title.length > MAX_TITLE_LENGTH) {
     return NextResponse.json({ error: `Title must be ${MAX_TITLE_LENGTH} characters or fewer.` }, { status: 400 });
-  }
-
-  const limits = MEDIA_LIMITS[type];
-  if (!limits.types.includes(file.type)) {
-    return NextResponse.json(
-      { error: `That file type isn't supported for a ${type}. Allowed: ${limits.types.join(", ")}.` },
-      { status: 400 }
-    );
-  }
-  if (file.size > limits.maxBytes) {
-    return NextResponse.json({ error: `File is too large — the maximum is ${Math.round(limits.maxBytes / (1024 * 1024))}MB.` }, { status: 400 });
   }
   if (thumbnail instanceof File) {
     if (!thumbnail.type.startsWith("image/")) {
@@ -134,7 +122,39 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "You're uploading too quickly — please wait a few minutes and try again." }, { status: 429 });
   }
 
-  const mediaKey = await uploadMedia(file);
+  let mediaKey: string;
+  if (type === "video") {
+    // Videos must have been uploaded straight to R2 already via POST /api/posts/presign.
+    // Verify the object actually exists (and grab its real size for the log) rather than
+    // trusting the client's word for it — the key alone doesn't prove anything was uploaded.
+    if (typeof preUploadedMediaKey !== "string" || !preUploadedMediaKey) {
+      return NextResponse.json({ error: "A media file is required." }, { status: 400 });
+    }
+    const { env } = getCloudflareContext();
+    const head = await env.BUCKET.head(preUploadedMediaKey);
+    if (!head) {
+      return NextResponse.json({ error: "Upload didn't complete — please try again." }, { status: 400 });
+    }
+    mediaKey = preUploadedMediaKey;
+  } else {
+    // Photos are small (5MB cap) — buffering them through the Worker is fine, so this keeps
+    // the simpler classic path instead of needing a presign round-trip for every image too.
+    if (!(file instanceof File)) {
+      return NextResponse.json({ error: "A media file is required." }, { status: 400 });
+    }
+    const limits = MEDIA_LIMITS.photo;
+    if (!limits.types.includes(file.type)) {
+      return NextResponse.json(
+        { error: `That file type isn't supported for a photo. Allowed: ${limits.types.join(", ")}.` },
+        { status: 400 }
+      );
+    }
+    if (file.size > limits.maxBytes) {
+      return NextResponse.json({ error: `File is too large — the maximum is ${Math.round(limits.maxBytes / (1024 * 1024))}MB.` }, { status: 400 });
+    }
+    mediaKey = await uploadMedia(file);
+  }
+
   // The thumbnail (a still frame captured client-side, see app/upload/page.tsx) is what
   // powers the <video poster> on post cards — without it, mobile browsers often show a
   // blank/black tile since they won't reliably decode a frame from the video file itself.
