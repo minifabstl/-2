@@ -19,6 +19,7 @@ export default function UploadPage() {
   const [tags, setTags] = useState<string[]>(Array(MAX_TAGS).fill(""));
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [thumbnailBlob, setThumbnailBlob] = useState<Blob | null>(null);
   const [readGuide, setReadGuide] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [dragOver, setDragOver] = useState(false);
@@ -28,7 +29,57 @@ export default function UploadPage() {
   const maxMb = MAX_MB[type];
   const fileSizeMb = file ? file.size / (1024 * 1024) : 0;
 
-  function pickFile(f: File | null) {
+  // Captures a still frame from a video file so we have a real thumbnail image to serve as the
+  // <video poster>, instead of relying on the browser to decode a frame on its own — mobile
+  // browsers (Safari on iOS especially) often refuse to paint any frame without one.
+  function captureVideoThumbnail(f: File): Promise<Blob | null> {
+    return new Promise((resolve) => {
+      const url = URL.createObjectURL(f);
+      const video = document.createElement("video");
+      video.muted = true;
+      video.playsInline = true;
+      video.preload = "metadata";
+      video.src = url;
+
+      const cleanup = () => URL.revokeObjectURL(url);
+
+      video.onloadeddata = () => {
+        // Seek a moment in so we don't capture an all-black first frame.
+        video.currentTime = Math.min(0.3, video.duration / 4 || 0);
+      };
+      video.onseeked = () => {
+        try {
+          const canvas = document.createElement("canvas");
+          canvas.width = video.videoWidth;
+          canvas.height = video.videoHeight;
+          const ctx = canvas.getContext("2d");
+          if (!ctx || !canvas.width || !canvas.height) {
+            cleanup();
+            resolve(null);
+            return;
+          }
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          canvas.toBlob(
+            (blob) => {
+              cleanup();
+              resolve(blob);
+            },
+            "image/jpeg",
+            0.85
+          );
+        } catch {
+          cleanup();
+          resolve(null);
+        }
+      };
+      video.onerror = () => {
+        cleanup();
+        resolve(null);
+      };
+    });
+  }
+
+  async function pickFile(f: File | null) {
     setError("");
     if (!f) return;
     const isVideo = f.type.startsWith("video/");
@@ -43,12 +94,18 @@ export default function UploadPage() {
     }
     setFile(f);
     setPreviewUrl(URL.createObjectURL(f));
+    setThumbnailBlob(null);
+    if (isVideo) {
+      const thumb = await captureVideoThumbnail(f);
+      setThumbnailBlob(thumb);
+    }
   }
 
   function removeFile() {
     setFile(null);
     if (previewUrl) URL.revokeObjectURL(previewUrl);
     setPreviewUrl(null);
+    setThumbnailBlob(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
   }
 
@@ -65,6 +122,7 @@ export default function UploadPage() {
     form.set("type", type);
     form.set("tags", JSON.stringify(tags.map((t) => t.trim()).filter(Boolean)));
     form.set("file", file);
+    if (thumbnailBlob) form.set("thumbnail", thumbnailBlob, "thumbnail.jpg");
 
     const res = await fetch("/api/posts", { method: "POST", body: form });
     const data = await res.json();

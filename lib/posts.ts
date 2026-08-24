@@ -24,6 +24,7 @@ export type FeedPost = {
   tags: string[];
   username: string;
   mediaUrl: string;
+  thumbnailUrl: string | null;
   viewCount: number;
   viewsLabel: string;
   likeCount: number;
@@ -65,12 +66,22 @@ const SELECT_FIELDS = {
   title: posts.title,
   tags: posts.tags,
   mediaKey: posts.mediaKey,
+  thumbnailKey: posts.thumbnailKey,
   viewCount: posts.viewCount,
   username: users.username,
 };
 
 async function attachEngagement(
-  rows: { id: string; type: string; title: string; tags: string | null; mediaKey: string; viewCount: number; username: string }[],
+  rows: {
+    id: string;
+    type: string;
+    title: string;
+    tags: string | null;
+    mediaKey: string;
+    thumbnailKey: string | null;
+    viewCount: number;
+    username: string;
+  }[],
   viewerId?: string | null
 ): Promise<FeedPost[]> {
   const db = getDb();
@@ -96,6 +107,7 @@ async function attachEngagement(
     tags: parseTags(r.tags),
     username: r.username,
     mediaUrl: mediaUrl(r.mediaKey),
+    thumbnailUrl: r.thumbnailKey ? mediaUrl(r.thumbnailKey) : null,
     viewCount: r.viewCount,
     viewsLabel: formatViews(r.viewCount) + " views",
     likeCount: likeCounts.get(r.id) ?? 0,

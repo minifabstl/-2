@@ -52,6 +52,7 @@ export async function POST(req: NextRequest) {
 
   const form = await req.formData();
   const file = form.get("file");
+  const thumbnail = form.get("thumbnail");
   const title = String(form.get("title") ?? "").trim();
   const type = form.get("type") === "photo" ? "photo" : "video";
 
@@ -76,6 +77,10 @@ export async function POST(req: NextRequest) {
   }
 
   const mediaKey = await uploadMedia(file);
+  // The thumbnail (a still frame captured client-side, see app/upload/page.tsx) is what
+  // powers the <video poster> on post cards — without it, mobile browsers often show a
+  // blank/black tile since they won't reliably decode a frame from the video file itself.
+  const thumbnailKey = thumbnail instanceof File ? await uploadMedia(thumbnail) : null;
   const db = getDb();
   const id = nanoid();
   await db.insert(posts).values({
@@ -85,6 +90,7 @@ export async function POST(req: NextRequest) {
     title,
     tags: tags.length > 0 ? JSON.stringify(tags) : null,
     mediaKey,
+    thumbnailKey,
     // Newly uploaded content does not go live directly — it must pass admin approval.
     status: "pending",
     viewCount: 0,
