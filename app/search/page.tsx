@@ -38,7 +38,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
   if (query) await recordSearch(query, user?.id ?? null);
 
   const breadcrumb = (
-    <nav aria-label="breadcrumb" className="px-6 pt-5 text-[11.5px] text-[var(--text-faint)] flex items-center gap-1.5">
+    <nav aria-label="breadcrumb" className="px-4 sm:px-6 pt-5 text-[11.5px] text-[var(--text-faint)] flex items-center gap-1.5">
       <Link href="/" className="hover:text-[var(--text-muted)]">Home</Link>
       <span>/</span>
       <span className="text-[var(--text-muted)] font-semibold">Search</span>
@@ -68,7 +68,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
     return (
       <>
         {breadcrumb}
-        <div className="px-7 pt-2">
+        <div className="px-4 sm:px-7 pt-2">
           <div className="flex items-center gap-3.5 mb-5">
             <div
               className="w-14 h-14 rounded-2xl flex items-center justify-center text-white font-display font-bold text-xl shrink-0"

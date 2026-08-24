@@ -2,7 +2,7 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { SafeUser } from "@/lib/auth";
 import LoginPromptModal from "@/components/LoginPromptModal";
 import Logo from "@/components/Logo";
@@ -37,6 +37,13 @@ export default function AppShell({
   const router = useRouter();
   const [promptOpen, setPromptOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Close the mobile drawer whenever the route changes (link click, back/forward, etc.).
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setSidebarOpen(false);
+  }, [pathname]);
 
   function submitSearch(e: React.FormEvent) {
     e.preventDefault();
@@ -61,9 +68,20 @@ export default function AppShell({
       {user && <TimeTracker />}
       <AdPopup key={pathname} />
       <PromoBanner canDismiss={!!hasUploaded} />
-      <div className="flex flex-1 min-h-0">
-      <aside className="w-60 min-w-60 border-r border-[var(--border)] flex flex-col gap-6 p-3.5 sticky top-0 h-screen overflow-y-auto">
-        <Link href="/" className="flex flex-col items-center justify-center px-2 pt-1 pb-3 gap-2">
+      <div className="flex flex-1 min-h-0 relative">
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/40 z-30 md:hidden"
+          onClick={() => setSidebarOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+      <aside
+        className={`w-64 md:w-60 min-w-60 border-r border-[var(--border)] bg-white md:bg-transparent flex flex-col gap-6 p-3.5 fixed md:sticky inset-y-0 left-0 md:top-0 h-screen overflow-y-auto z-40 md:z-auto transition-transform duration-300 ease-in-out ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        } md:translate-x-0`}
+      >
+        <Link href="/" onClick={() => setSidebarOpen(false)} className="flex flex-col items-center justify-center px-2 pt-1 pb-3 gap-2">
           <Logo size={32} />
           <span className="w-24 h-[3px] rounded-full" style={{ background: "var(--accent)" }} />
         </Link>
@@ -79,7 +97,13 @@ export default function AppShell({
             return (
               <button
                 key={item.href}
-                onClick={() => (locked ? setPromptOpen(true) : router.push(item.href))}
+                onClick={() => {
+                  if (locked) setPromptOpen(true);
+                  else {
+                    router.push(item.href);
+                    setSidebarOpen(false);
+                  }
+                }}
                 className={`flex items-center gap-2.5 px-2.5 py-2 rounded-[10px] text-sm text-left ${
                   isCreatorProgram
                     ? "font-semibold"
@@ -149,7 +173,17 @@ export default function AppShell({
       </aside>
 
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="h-16 min-h-16 flex items-center gap-4 px-7" style={{ background: "#00aff0" }}>
+        <header className="h-16 min-h-16 flex items-center gap-2 sm:gap-4 px-3 sm:px-7" style={{ background: "#00aff0" }}>
+          <button
+            onClick={() => setSidebarOpen((v) => !v)}
+            className="md:hidden w-9 h-9 rounded-full bg-white/20 flex items-center justify-center shrink-0"
+            aria-label="Toggle menu"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.3">
+              <path d="M4 7h16M4 12h16M4 17h16" />
+            </svg>
+          </button>
+
           <Link href="/creator-program" className="flex items-center gap-2.5 group">
             <span className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-[16px] shrink-0 group-hover:bg-white/30">🎁</span>
             <span className="hidden md:flex flex-col leading-tight">
@@ -177,11 +211,11 @@ export default function AppShell({
 
           <button
             onClick={goToUpload}
-            className="flex items-center gap-1.5 px-4 py-2.5 rounded-full font-bold text-[13px] text-white shrink-0"
+            className="flex items-center gap-1.5 px-3 sm:px-4 py-2.5 rounded-full font-bold text-[13px] text-white shrink-0"
             style={{ background: "#db1a6d" }}
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><path d="M12 5v14M5 12h14" /></svg>
-            Add
+            <span className="hidden sm:inline">Add</span>
           </button>
 
           <LanguageSwitcher />
@@ -203,12 +237,12 @@ export default function AppShell({
         </header>
 
         {!user && (
-          <div className="flex items-center gap-3 px-7 py-2.5 bg-[var(--accent-soft)] border-b border-[var(--border)]">
+          <div className="flex items-center gap-3 px-3 sm:px-7 py-2.5 bg-[var(--accent-soft)] border-b border-[var(--border)]">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-dark)" strokeWidth="2" className="shrink-0">
               <rect x="5" y="11" width="14" height="9" rx="2" /><path d="M8 11V8a4 4 0 018 0v3" />
             </svg>
             <span className="text-[13px] flex-1">Anyone can watch videos and photos — sign up for free to like and comment.</span>
-            <Link href="/login" className="px-3.5 py-1.5 rounded-lg bg-[var(--accent)] text-white text-[12.5px] font-semibold">Sign Up</Link>
+            <Link href="/login" className="px-3.5 py-1.5 rounded-lg bg-[var(--accent)] text-white text-[12.5px] font-semibold shrink-0">Sign Up</Link>
           </div>
         )}
 

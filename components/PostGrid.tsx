@@ -51,9 +51,9 @@ export default function PostGrid({ posts, isLoggedIn, title }: { posts: FeedPost
   const activeMediaPost = items.find((p) => p.id === openMedia) ?? null;
 
   return (
-    <div className="p-7 pb-16">
+    <div className="p-3 sm:p-7 pb-16">
       {title && <h2 className="font-display text-[19px] font-bold mb-4">{title}</h2>}
-      <div className="grid grid-cols-4 gap-3 max-w-[1360px] mx-auto">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3 max-w-[1360px] mx-auto">
         {items.map((post, i) => (
           <PostCard
             key={post.id}
