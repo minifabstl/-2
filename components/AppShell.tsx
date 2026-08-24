@@ -11,6 +11,7 @@ import PromoBanner from "@/components/PromoBanner";
 import AdPopup from "@/components/AdPopup";
 import TimeTracker from "@/components/TimeTracker";
 import SidebarSearch from "@/components/SidebarSearch";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { GIFT_MILESTONE_HOURS, GIFT_REWARD_LABEL, formatHoursOnSite } from "@/lib/gift";
 
 const NAV = [
@@ -184,6 +185,8 @@ export default function AppShell({
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><path d="M12 5v14M5 12h14" /></svg>
             Add
           </button>
+
+          <LanguageSwitcher />
 
           {user ? (
             <div className="flex items-center gap-3">

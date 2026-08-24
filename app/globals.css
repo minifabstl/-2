@@ -52,3 +52,16 @@ body {
   background: var(--border);
   border-radius: 8px;
 }
+
+/* Google Website Translator (see components/LanguageSwitcher.tsx) — we drive it entirely
+   through our own flag dropdown, so hide its default top banner iframe and undo the top
+   offset it injects on <body> when a translation is active. */
+.goog-te-banner-frame {
+  display: none !important;
+}
+body {
+  top: 0 !important;
+}
+.skiptranslate {
+  display: none !important;
+}

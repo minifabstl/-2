@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Space_Grotesk, IBM_Plex_Sans } from "next/font/google";
+import Script from "next/script";
 import { count, eq } from "drizzle-orm";
 import "./globals.css";
 import { getCurrentUser } from "@/lib/auth";
@@ -59,6 +60,19 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full">
         {/* eslint-disable-next-line react/no-danger */}
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(WEBSITE_JSON_LD) }} />
+
+        {/* Google Website Translator — powers the flag language switcher in the header (see
+            components/LanguageSwitcher.tsx). It reads the `googtrans` cookie on load and
+            translates whatever text it finds in the page, including content added afterward
+            by client-side navigation. */}
+        <div id="google_translate_element" style={{ display: "none" }} />
+        <Script id="google-translate-init" strategy="afterInteractive">
+          {`function googleTranslateElementInit() {
+            new window.google.translate.TranslateElement({ pageLanguage: "en", autoDisplay: false }, "google_translate_element");
+          }`}
+        </Script>
+        <Script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" strategy="afterInteractive" />
+
         <AppShell user={user} avatarUrl={avatarUrl} hasUploaded={hasUploaded} trending={trending}>{children}</AppShell>
       </body>
     </html>
