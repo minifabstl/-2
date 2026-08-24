@@ -159,3 +159,17 @@ export const searchLogs = sqliteTable("search_logs", {
   userId: text("user_id").references(() => users.id, { onDelete: "set null" }),
   createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
 });
+
+// ---------------------------------------------------------------------------
+// Login attempts — one row per FAILED login, and per registration, keyed by
+// something the caller can't cheaply throw away (the username/email being
+// attempted, or the request's IP). See lib/rateLimit.ts. This is a basic,
+// self-contained brute-force/spam guard; it is not a substitute for an
+// edge-level rate limit (a Cloudflare Rate Limiting rule in front of
+// /api/auth/* is the right place to stop distributed/scripted abuse).
+// ---------------------------------------------------------------------------
+export const loginAttempts = sqliteTable("login_attempts", {
+  id: text("id").primaryKey(),
+  key: text("key").notNull(),
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
+});

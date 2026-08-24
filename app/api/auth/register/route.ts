@@ -4,6 +4,11 @@ import { eq, or } from "drizzle-orm";
 import { getDb, users } from "@/db";
 import { hashPassword } from "@/lib/password";
 import { createSession } from "@/lib/auth";
+import { clientIp, isRateLimited, recordAttempt } from "@/lib/rateLimit";
+
+// Slows down scripted mass account creation from one source — see lib/rateLimit.ts.
+const SIGNUP_WINDOW_MS = 60 * 60 * 1000;
+const MAX_SIGNUPS_PER_WINDOW = 6;
 
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => null);
@@ -11,6 +16,11 @@ export async function POST(req: NextRequest) {
   const email = (body?.email ?? "").trim().toLowerCase();
   const password = body?.password ?? "";
   const bitcoinAddress = (body?.bitcoinAddress ?? "").trim() || null;
+
+  const signupKey = `register:${clientIp(req)}`;
+  if (await isRateLimited(signupKey, SIGNUP_WINDOW_MS, MAX_SIGNUPS_PER_WINDOW)) {
+    return NextResponse.json({ error: "Too many accounts created from this connection recently. Please try again later." }, { status: 429 });
+  }
 
   if (!/^[a-z0-9_.]{3,24}$/.test(username)) {
     return NextResponse.json({ error: "Username must be 3-24 characters (letters, numbers, . _)." }, { status: 400 });
@@ -31,6 +41,8 @@ export async function POST(req: NextRequest) {
   if (existing.length > 0) {
     return NextResponse.json({ error: "This username or email is already registered." }, { status: 409 });
   }
+
+  await recordAttempt(signupKey);
 
   const { hash, salt } = await hashPassword(password);
   const id = nanoid();

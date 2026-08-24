@@ -7,6 +7,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { mediaUrl } from "@/lib/storage";
 import { getDb, posts } from "@/db";
 import AppShell from "@/components/AppShell";
+import AgeGate from "@/components/AgeGate";
 
 const display = Space_Grotesk({ variable: "--font-display", subsets: ["latin"], weight: ["500", "600", "700"] });
 const body = IBM_Plex_Sans({ variable: "--font-body", subsets: ["latin"], weight: ["400", "500", "600"] });
@@ -72,6 +73,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
         </Script>
         <Script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" strategy="afterInteractive" />
 
+        <AgeGate />
         <AppShell user={user} avatarUrl={avatarUrl} hasUploaded={hasUploaded}>{children}</AppShell>
       </body>
     </html>

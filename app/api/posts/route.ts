@@ -1,10 +1,28 @@
 import { NextRequest, NextResponse } from "next/server";
 import { nanoid } from "nanoid";
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq, gt } from "drizzle-orm";
 import { getDb, posts, users } from "@/db";
 import { getCurrentUser, AuthError, requireUser } from "@/lib/auth";
 import { uploadMedia, mediaUrl } from "@/lib/storage";
 import { cleanTags, parseTags } from "@/lib/posts";
+
+const MAX_TITLE_LENGTH = 200;
+
+// Mirrors the limits shown in app/upload/page.tsx — but the client-side check there is only a
+// UX convenience. It's trivial to bypass by calling this endpoint directly (e.g. with curl), so
+// the real enforcement has to happen here, server-side, on the file the server actually receives.
+const MEDIA_LIMITS: Record<"photo" | "video", { maxBytes: number; types: string[] }> = {
+  photo: { maxBytes: 5 * 1024 * 1024, types: ["image/png", "image/jpeg", "image/webp"] },
+  video: { maxBytes: 95 * 1024 * 1024, types: ["video/mp4", "video/quicktime", "video/webm", "video/x-m4v"] },
+};
+const MAX_THUMBNAIL_BYTES = 3 * 1024 * 1024;
+
+// Very small, self-contained upload throttle: a member can't post more than this many times
+// in the window below. This isn't a substitute for edge-level rate limiting (a Cloudflare Rate
+// Limiting rule in front of this route is the right place to stop distributed/scripted abuse) —
+// it just stops a single logged-in account from hammering storage with scripted uploads.
+const UPLOAD_WINDOW_MS = 10 * 60 * 1000;
+const MAX_UPLOADS_PER_WINDOW = 8;
 
 /** Public feed — viewable without logging in. */
 export async function GET() {
@@ -75,13 +93,47 @@ export async function POST(req: NextRequest) {
   if (!title) {
     return NextResponse.json({ error: "A title is required." }, { status: 400 });
   }
+  if (title.length > MAX_TITLE_LENGTH) {
+    return NextResponse.json({ error: `Title must be ${MAX_TITLE_LENGTH} characters or fewer.` }, { status: 400 });
+  }
+
+  const limits = MEDIA_LIMITS[type];
+  if (!limits.types.includes(file.type)) {
+    return NextResponse.json(
+      { error: `That file type isn't supported for a ${type}. Allowed: ${limits.types.join(", ")}.` },
+      { status: 400 }
+    );
+  }
+  if (file.size > limits.maxBytes) {
+    return NextResponse.json({ error: `File is too large — the maximum is ${Math.round(limits.maxBytes / (1024 * 1024))}MB.` }, { status: 400 });
+  }
+  if (thumbnail instanceof File) {
+    if (!thumbnail.type.startsWith("image/")) {
+      return NextResponse.json({ error: "Thumbnail must be an image." }, { status: 400 });
+    }
+    if (thumbnail.size > MAX_THUMBNAIL_BYTES) {
+      return NextResponse.json({ error: "Thumbnail is too large." }, { status: 400 });
+    }
+  }
+
+  const db = getDb();
+
+  // Upload throttle — see the constant comment above.
+  const windowStart = new Date(Date.now() - UPLOAD_WINDOW_MS);
+  const recentUploads = await db
+    .select({ id: posts.id })
+    .from(posts)
+    .where(and(eq(posts.userId, user.id), gt(posts.createdAt, windowStart)))
+    .limit(MAX_UPLOADS_PER_WINDOW);
+  if (recentUploads.length >= MAX_UPLOADS_PER_WINDOW) {
+    return NextResponse.json({ error: "You're uploading too quickly — please wait a few minutes and try again." }, { status: 429 });
+  }
 
   const mediaKey = await uploadMedia(file);
   // The thumbnail (a still frame captured client-side, see app/upload/page.tsx) is what
   // powers the <video poster> on post cards — without it, mobile browsers often show a
   // blank/black tile since they won't reliably decode a frame from the video file itself.
   const thumbnailKey = thumbnail instanceof File ? await uploadMedia(thumbnail) : null;
-  const db = getDb();
   const id = nanoid();
   await db.insert(posts).values({
     id,
