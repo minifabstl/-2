@@ -26,13 +26,11 @@ export default function AppShell({
   user,
   avatarUrl,
   hasUploaded,
-  trending,
   children,
 }: {
   user: SafeUser | null;
   avatarUrl?: string | null;
   hasUploaded?: boolean;
-  trending?: string[];
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
@@ -70,7 +68,7 @@ export default function AppShell({
           <span className="w-24 h-[3px] rounded-full" style={{ background: "var(--accent)" }} />
         </Link>
 
-        <SidebarSearch trending={trending ?? []} />
+        <SidebarSearch />
 
         <nav className="flex flex-col gap-0.5">
           {NAV.map((item) => {

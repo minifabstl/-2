@@ -6,7 +6,6 @@ import "./globals.css";
 import { getCurrentUser } from "@/lib/auth";
 import { mediaUrl } from "@/lib/storage";
 import { getDb, posts } from "@/db";
-import { getTrendingSearches } from "@/lib/search";
 import AppShell from "@/components/AppShell";
 
 const display = Space_Grotesk({ variable: "--font-display", subsets: ["latin"], weight: ["500", "600", "700"] });
@@ -53,8 +52,6 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
     hasUploaded = n > 0;
   }
 
-  const trending = await getTrendingSearches();
-
   return (
     <html lang="en" className={`${display.variable} ${body.variable} h-full antialiased`}>
       <body className="min-h-full">
@@ -75,7 +72,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
         </Script>
         <Script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" strategy="afterInteractive" />
 
-        <AppShell user={user} avatarUrl={avatarUrl} hasUploaded={hasUploaded} trending={trending}>{children}</AppShell>
+        <AppShell user={user} avatarUrl={avatarUrl} hasUploaded={hasUploaded}>{children}</AppShell>
       </body>
     </html>
   );

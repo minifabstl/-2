@@ -1,10 +1,21 @@
-import { and, desc, eq, inArray, like, or } from "drizzle-orm";
+import { and, asc, count, desc, eq, inArray, like, or, sql, sum } from "drizzle-orm";
 import { getDb, posts, users, likes, comments } from "@/db";
 import { mediaUrl } from "@/lib/storage";
 import { formatViews } from "@/lib/earnings";
 
 export const MAX_TAGS = 5;
 export const MAX_TAG_LENGTH = 24;
+
+export type TagSort = "newest" | "oldest" | "views" | "likes";
+
+/**
+ * True (case-insensitive, exact) membership test against the JSON-array tags column, using
+ * SQLite's built-in JSON1 extension (`json_each`) — so tagging a video "ronaldo" matches a
+ * search for "Ronaldo" but NOT a search for "cristiano-ronaldo" (which a plain LIKE would).
+ */
+function hasExactTag(tag: string) {
+  return sql`EXISTS (SELECT 1 FROM json_each(${posts.tags}) WHERE lower(json_each.value) = lower(${tag}))`;
+}
 
 export type FeedPost = {
   id: string;
@@ -94,14 +105,16 @@ async function attachEngagement(
 }
 
 /** Public feed — visible to non-member visitors too. If `viewerId` is provided, like status is included. */
-export async function listPosts(opts: { viewerId?: string | null } = {}): Promise<FeedPost[]> {
+export async function listPosts(opts: { viewerId?: string | null; type?: "video" | "photo" } = {}): Promise<FeedPost[]> {
   const db = getDb();
+
+  const where = opts.type ? and(eq(posts.status, "live"), eq(posts.type, opts.type)) : eq(posts.status, "live");
 
   const rows = await db
     .select(SELECT_FIELDS)
     .from(posts)
     .innerJoin(users, eq(posts.userId, users.id))
-    .where(eq(posts.status, "live"))
+    .where(where)
     .orderBy(desc(posts.createdAt))
     .limit(60);
 
@@ -133,4 +146,50 @@ export async function searchPosts(query: string, viewerId?: string | null): Prom
     .limit(60);
 
   return attachEngagement(rows, viewerId);
+}
+
+/**
+ * Aggregate stats for a "topic profile" — every live post any user has tagged with `tag`
+ * (e.g. every video tagged "ronaldo", uploaded by any number of different users). Returns
+ * null when nothing has ever been tagged with it, so callers can tell "an empty topic" apart
+ * from "not a topic at all — fall back to a regular search".
+ */
+export async function getTagAggregate(tag: string): Promise<{ count: number; totalViews: number } | null> {
+  const t = tag.trim();
+  if (!t) return null;
+  const db = getDb();
+  const [row] = await db
+    .select({ count: count(), totalViews: sum(posts.viewCount) })
+    .from(posts)
+    .where(and(eq(posts.status, "live"), hasExactTag(t)));
+
+  const n = row?.count ?? 0;
+  if (n === 0) return null;
+  return { count: n, totalViews: Number(row.totalViews ?? 0) };
+}
+
+/**
+ * Every live post (from any user) tagged with `tag`, sorted the way the topic profile page's
+ * filter tabs ask for. "likes" sort is applied in JS after fetching engagement counts, same as
+ * everywhere else in this file — fine at this MVP's scale (capped at 100 posts per topic).
+ */
+export async function getPostsByTag(tag: string, opts: { sort?: TagSort; viewerId?: string | null } = {}): Promise<FeedPost[]> {
+  const t = tag.trim();
+  if (!t) return [];
+  const db = getDb();
+
+  const orderBy =
+    opts.sort === "oldest" ? asc(posts.createdAt) : opts.sort === "views" ? desc(posts.viewCount) : desc(posts.createdAt);
+
+  const rows = await db
+    .select(SELECT_FIELDS)
+    .from(posts)
+    .innerJoin(users, eq(posts.userId, users.id))
+    .where(and(eq(posts.status, "live"), hasExactTag(t)))
+    .orderBy(orderBy)
+    .limit(100);
+
+  const attached = await attachEngagement(rows, opts.viewerId);
+  if (opts.sort === "likes") attached.sort((a, b) => b.likeCount - a.likeCount);
+  return attached;
 }
