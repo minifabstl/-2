@@ -53,7 +53,7 @@ export default function PostGrid({ posts, isLoggedIn, title }: { posts: FeedPost
   return (
     <div className="p-7 pb-16">
       <h2 className="font-display text-[19px] font-bold mb-4">{title}</h2>
-      <div className="grid grid-cols-4 gap-3 max-w-[1360px] ml-auto">
+      <div className="grid grid-cols-4 gap-3 max-w-[1360px] mx-auto">
         {items.map((post, i) => (
           <PostCard
             key={post.id}
