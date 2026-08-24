@@ -36,7 +36,7 @@ export default function PostCard({
     const video = videoRef.current;
     if (!video) return;
 
-    function capture() {
+    function draw() {
       if (thumbnailCaptured.current || !video) return;
       thumbnailCaptured.current = true;
       try {
@@ -59,8 +59,24 @@ export default function PostCard({
       }
     }
 
-    video.addEventListener("loadeddata", capture);
-    return () => video.removeEventListener("loadeddata", capture);
+    // Seeking a moment in (like the upload-time capture does) rather than grabbing whatever
+    // frame happens to be current gives browsers a real decode to react to via `seeked`, which
+    // is more reliable than trusting the frame already painted right after `loadeddata`.
+    function onLoadedData() {
+      if (!video) return;
+      try {
+        video.currentTime = Math.min(0.3, (video.duration || 0) / 4 || 0);
+      } catch {
+        draw();
+      }
+    }
+
+    video.addEventListener("loadeddata", onLoadedData);
+    video.addEventListener("seeked", draw);
+    return () => {
+      video.removeEventListener("loadeddata", onLoadedData);
+      video.removeEventListener("seeked", draw);
+    };
   }, [post.id, post.type, post.thumbnailUrl]);
 
   return (
@@ -86,7 +102,7 @@ export default function PostCard({
             src={post.mediaUrl}
             poster={post.thumbnailUrl ?? undefined}
             className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.04]"
-            preload="metadata"
+            preload={post.thumbnailUrl ? "metadata" : "auto"}
             muted
             playsInline
           />

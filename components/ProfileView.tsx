@@ -53,7 +53,7 @@ export default function ProfileView({
   }
 
   return (
-    <div className="p-9 pb-16 max-w-[1100px]">
+    <div className="p-4 sm:p-9 pb-16 max-w-[1100px]">
       {justUploaded && (
         <div className="flex items-center gap-2.5 mb-6 px-4 py-3 rounded-[10px]" style={{ background: "var(--warn-soft)", color: "var(--warn)" }}>
           <span className="w-1.5 h-1.5 rounded-full bg-[var(--warn)] shrink-0" />
@@ -76,14 +76,14 @@ export default function ProfileView({
         </div>
       </div>
 
-      <div className="grid grid-cols-4 gap-3.5 mt-[26px]">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5 mt-[26px]">
         <StatCard label="Total Posts" value={String(stats.totalPosts)} />
         <StatCard label="Total Views" value={stats.totalViewsLabel} />
         <StatCard label="Total Earnings" value={stats.totalEarnedLabel} tone="ok" />
         <StatCard label="Available to Request" value={stats.availableLabel} tone="btc" />
       </div>
 
-      <div className="flex bg-[var(--surface)] border border-[var(--border)] rounded-xl p-1 w-80 mt-7">
+      <div className="flex bg-[var(--surface)] border border-[var(--border)] rounded-xl p-1 w-full sm:w-80 mt-7">
         <button onClick={() => setTab("posts")} className={`flex-1 py-2.5 rounded-[9px] text-[13.5px] font-semibold ${tab === "posts" ? "bg-white text-[var(--text)] shadow-sm" : "text-[var(--text-muted)]"}`}>
           My Posts
         </button>
@@ -93,8 +93,8 @@ export default function ProfileView({
       </div>
 
       {tab === "posts" && (
-        <div className="grid grid-cols-5 gap-3.5 mt-5">
-          {posts.length === 0 && <div className="text-sm text-[var(--text-muted)] col-span-5">You don&apos;t have any posts yet.</div>}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5 mt-5">
+          {posts.length === 0 && <div className="text-sm text-[var(--text-muted)] col-span-2 sm:col-span-3 lg:col-span-5">You don&apos;t have any posts yet.</div>}
           {posts.map((p) => (
             <div key={p.id} className="border border-[var(--border)] rounded-xl overflow-hidden bg-[var(--surface)]">
               <div className="h-[110px] relative" style={{ background: "linear-gradient(135deg, oklch(0.86 0.06 25), oklch(0.94 0.03 25))" }}>
@@ -130,33 +130,36 @@ export default function ProfileView({
             </div>
             {posts.length === 0 && <div className="px-[18px] py-4 text-sm text-[var(--text-muted)]">You don&apos;t have any posts yet.</div>}
             {posts.length > 0 && (
-              <div className="grid grid-cols-[1fr_120px_110px_110px] px-[18px] py-2.5 text-[10.5px] font-semibold text-[var(--text-faint)] tracking-wide uppercase border-b border-[var(--border-soft)]">
+              <div className="grid grid-cols-[1fr_70px_70px] sm:grid-cols-[1fr_120px_110px_110px] px-3 sm:px-[18px] py-2.5 text-[10.5px] font-semibold text-[var(--text-faint)] tracking-wide uppercase border-b border-[var(--border-soft)]">
                 <div>Title</div>
-                <div>Type</div>
+                <div className="hidden sm:block">Type</div>
                 <div>Views</div>
                 <div>Earned</div>
               </div>
             )}
             {posts.map((p) => (
-              <div key={p.id} className="grid grid-cols-[1fr_120px_110px_110px] items-center px-[18px] py-3 text-[12.5px] border-b border-[var(--border-soft)] last:border-b-0">
+              <div
+                key={p.id}
+                className="grid grid-cols-[1fr_70px_70px] sm:grid-cols-[1fr_120px_110px_110px] items-center px-3 sm:px-[18px] py-3 text-[12.5px] border-b border-[var(--border-soft)] last:border-b-0"
+              >
                 <div className="font-medium truncate pr-3">{p.title}</div>
-                <div className="text-[var(--text-muted)] capitalize">{p.type}</div>
-                <div className="text-[var(--text-muted)]">{p.status === "pending" ? "—" : p.viewsLabel}</div>
-                <div className="font-semibold text-[var(--ok)]">+{p.earnLabel}</div>
+                <div className="hidden sm:block text-[var(--text-muted)] capitalize">{p.type}</div>
+                <div className="text-[var(--text-muted)] truncate">{p.status === "pending" ? "—" : p.viewsLabel}</div>
+                <div className="font-semibold text-[var(--ok)] truncate">+{p.earnLabel}</div>
               </div>
             ))}
           </div>
 
-          <div className="flex gap-5 items-start mt-5">
-          <div className="flex-1 border border-[var(--border)] rounded-2xl bg-[var(--surface)] overflow-hidden">
-            <div className="px-[18px] py-4 border-b border-[var(--border)] font-display text-sm font-bold">Payout History</div>
-            {payouts.length === 0 && <div className="px-[18px] py-4 text-sm text-[var(--text-muted)]">You haven&apos;t requested a payout yet.</div>}
+          <div className="flex flex-col lg:flex-row gap-5 items-start mt-5">
+          <div className="w-full lg:flex-1 border border-[var(--border)] rounded-2xl bg-[var(--surface)] overflow-hidden">
+            <div className="px-3 sm:px-[18px] py-4 border-b border-[var(--border)] font-display text-sm font-bold">Payout History</div>
+            {payouts.length === 0 && <div className="px-3 sm:px-[18px] py-4 text-sm text-[var(--text-muted)]">You haven&apos;t requested a payout yet.</div>}
             {payouts.map((p) => (
-              <div key={p.id} className="flex items-center px-[18px] py-3 text-[12.5px] border-b border-[var(--border-soft)]">
-                <div className="w-28 text-[var(--text-muted)]">{p.date}</div>
-                <div className="flex-1 font-semibold">{p.amountLabel}</div>
+              <div key={p.id} className="flex items-center gap-3 px-3 sm:px-[18px] py-3 text-[12.5px] border-b border-[var(--border-soft)]">
+                <div className="w-24 sm:w-28 shrink-0 text-[var(--text-muted)]">{p.date}</div>
+                <div className="flex-1 font-semibold truncate">{p.amountLabel}</div>
                 <span
-                  className="px-2.5 py-1 rounded-full text-[11px] font-semibold"
+                  className="px-2.5 py-1 rounded-full text-[11px] font-semibold shrink-0"
                   style={{
                     background: p.status === "paid" ? "var(--ok-soft)" : "var(--warn-soft)",
                     color: p.status === "paid" ? "var(--ok)" : "var(--warn)",
@@ -168,7 +171,7 @@ export default function ProfileView({
             ))}
           </div>
 
-          <div className="w-[300px] border border-[var(--border)] rounded-2xl bg-[var(--surface)] p-[18px] flex flex-col gap-3.5">
+          <div className="w-full lg:w-[300px] border border-[var(--border)] rounded-2xl bg-[var(--surface)] p-[18px] flex flex-col gap-3.5">
             <div className="font-display text-sm font-bold">Payout Wallet</div>
             <div className="text-[11.5px] text-[var(--text-muted)] leading-relaxed">
               When you request a payout, your earnings are sent to this address.

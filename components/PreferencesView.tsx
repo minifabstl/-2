@@ -24,7 +24,7 @@ export default function PreferencesView({ initial }: { initial: Prefs }) {
   }
 
   return (
-    <div className="p-9 pb-16 max-w-[720px]">
+    <div className="p-4 sm:p-9 pb-16 max-w-[720px]">
       <h1 className="font-display text-2xl font-bold mb-1">Preferences</h1>
       <p className="text-[13px] text-[var(--text-muted)] mb-7">Choose which emails you want to receive about your account.</p>
 

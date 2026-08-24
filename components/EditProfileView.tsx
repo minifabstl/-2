@@ -120,7 +120,7 @@ export default function EditProfileView({ user }: { user: { username: string; em
   }
 
   return (
-    <div className="p-9 pb-16 max-w-[720px] flex flex-col gap-5">
+    <div className="p-4 sm:p-9 pb-16 max-w-[720px] flex flex-col gap-5">
       <div>
         <h1 className="font-display text-2xl font-bold mb-1">Edit Profile</h1>
         <p className="text-[13px] text-[var(--text-muted)]">Manage your account details and security.</p>
@@ -175,7 +175,7 @@ export default function EditProfileView({ user }: { user: { username: string; em
             {savingInfo ? "Saving…" : "Save"}
           </button>
         </div>
-        <div className="grid grid-cols-2 gap-3.5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
           <Field label="Username" value={username} onChange={setUsername} placeholder="Username" />
           <Field label="Email" value={email} onChange={setEmail} placeholder="Email" type="email" />
         </div>
@@ -189,7 +189,7 @@ export default function EditProfileView({ user }: { user: { username: string; em
             {savingPassword ? "Saving…" : "Save"}
           </button>
         </div>
-        <div className="grid grid-cols-2 gap-3.5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
           <Field label="Old password" value={oldPassword} onChange={setOldPassword} placeholder="Old password" type="password" />
           <div />
           <Field label="New password" value={newPassword} onChange={setNewPassword} placeholder="New password" type="password" hint="Minimum 8 characters" />

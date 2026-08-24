@@ -3,7 +3,7 @@ import { LogoMark } from "@/components/Logo";
 
 export default function NotFound() {
   return (
-    <div className="min-h-[70vh] flex flex-col items-center justify-center gap-5 p-10 text-center">
+    <div className="min-h-[70vh] flex flex-col items-center justify-center gap-5 p-4 sm:p-10 text-center">
       <LogoMark size={44} />
       <div>
         <div className="font-display text-3xl font-bold">404</div>

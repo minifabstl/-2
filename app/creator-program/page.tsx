@@ -69,29 +69,29 @@ export default async function CreatorProgramPage() {
     <div id="top" className="min-w-0">
       {/* ---------------------------------------------------------------- Hero */}
       <div
-        className="px-10 pt-14 pb-16"
+        className="px-4 sm:px-10 pt-10 sm:pt-14 pb-10 sm:pb-16"
         style={{ background: "radial-gradient(1100px 480px at 8% -15%, rgba(219,26,109,0.14), transparent 60%), var(--bg)" }}
       >
-        <div className="max-w-5xl mx-auto grid grid-cols-[1fr_360px] gap-10 items-start">
+        <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-8 lg:gap-10 items-start">
           <div>
             <Pill>Professional Creator Program</Pill>
-            <h1 className="font-display text-[40px] leading-[1.12] font-bold mt-4 mb-4 max-w-lg">
+            <h1 className="font-display text-[28px] sm:text-[40px] leading-[1.15] sm:leading-[1.12] font-bold mt-4 mb-4 max-w-lg">
               Turn your uploads into real, ongoing earnings.
             </h1>
             <p className="text-[14px] text-[var(--text-muted)] leading-relaxed max-w-md mb-6">
               Join a creator program where the rules are clear, the rate is transparent, and every upload has a fair
               chance to earn from real views — no invite required.
             </p>
-            <div className="flex gap-2.5 mb-8">
-              <Link href="/upload" className="px-5 py-3 rounded-[10px] bg-[var(--accent)] text-white text-[13.5px] font-semibold">
+            <div className="flex flex-wrap gap-2.5 mb-8">
+              <Link href="/upload" className="px-5 py-3 rounded-[10px] bg-[var(--accent)] text-white text-[13.5px] font-semibold whitespace-nowrap">
                 Join as a creator
               </Link>
-              <a href="#rules" className="px-5 py-3 rounded-[10px] border border-[var(--border)] bg-[var(--surface)] text-[13.5px] font-semibold">
+              <a href="#rules" className="px-5 py-3 rounded-[10px] border border-[var(--border)] bg-[var(--surface)] text-[13.5px] font-semibold whitespace-nowrap">
                 Review the rules
               </a>
             </div>
 
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <HeroStat title={`$${RATE_USD_PER_1000_VIEWS.toFixed(2)} / 1,000 views`} body="One simple, transparent rate for every creator." />
               <HeroStat title="Reviewed, not gamed" body="Every upload is checked before it can earn." />
               <HeroStat title={`Payouts every ${PAYOUT_COOLDOWN_DAYS} days`} body="Request your accrued earnings once you're eligible." />
@@ -102,7 +102,7 @@ export default async function CreatorProgramPage() {
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto px-10">
+      <div className="max-w-5xl mx-auto px-4 sm:px-10">
         {/* --------------------------------------------------------- Why join */}
         <div className="py-12">
           <div className="font-display text-2xl font-bold mb-2">Why creators join</div>
@@ -110,7 +110,7 @@ export default async function CreatorProgramPage() {
             Creators come here for a clear, fair, performance-based way to earn from content they&apos;re already making —
             and to grow their audience while they do it.
           </p>
-          <div className="grid grid-cols-3 gap-3.5">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
             <WhyCard
               tag="Earnings"
               title="Earn from real views"
@@ -184,7 +184,7 @@ export default async function CreatorProgramPage() {
         </div>
 
         {/* ------------------------------------------ Requirements + Payout */}
-        <div id="rules" className="pb-12 grid grid-cols-[1fr_340px] gap-6 items-start scroll-mt-6">
+        <div id="rules" className="pb-12 grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-6 items-start scroll-mt-6">
           <div>
             <div className="font-display text-2xl font-bold mb-2">Creator requirements</div>
             <p className="text-[13.5px] text-[var(--text-muted)] leading-relaxed mb-5">
@@ -225,7 +225,7 @@ export default async function CreatorProgramPage() {
             There&apos;s no application — create an account and start uploading right away. Every upload goes through a
             quick review before it goes live and starts earning.
           </p>
-          <div className="grid grid-cols-3 gap-3.5">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
             <StepCard n={1} title="Create your account" body="Sign up and you can start uploading immediately — no application required." />
             <StepCard n={2} title="Upload content that follows the rules" body="Add a clear title, relevant tags, and content that follows our guidelines." />
             <StepCard n={3} title="Earn per view, request payouts" body="Track your views and earnings on your profile, and request a payout once you qualify." />
@@ -235,7 +235,7 @@ export default async function CreatorProgramPage() {
         {/* ------------------------------------------------------- Final CTA */}
         <div className="pb-14">
           <div
-            className="rounded-3xl p-[26px] flex items-center justify-between gap-6"
+            className="rounded-3xl p-5 sm:p-[26px] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6"
             style={{ background: "linear-gradient(115deg, rgba(219,26,109,0.14), var(--surface) 55%)" }}
           >
             <div className="max-w-md">
@@ -247,7 +247,7 @@ export default async function CreatorProgramPage() {
                 Clear rules, a transparent rate, and real payouts based on real views.
               </p>
             </div>
-            <div className="flex gap-2.5 shrink-0">
+            <div className="flex flex-wrap gap-2.5 shrink-0">
               <Link href="/upload" className="px-5 py-3 rounded-[10px] bg-[var(--accent)] text-white text-[13.5px] font-semibold whitespace-nowrap">
                 Create your account
               </Link>
@@ -382,13 +382,15 @@ function StepCard({ n, title, body }: { n: number; title: string; body: string }
 
 function TierRow({ label, boost, requirement }: { label: string; boost: string; requirement: string }) {
   return (
-    <div className="flex items-center gap-3.5 py-2 border-b border-[var(--border-soft)] last:border-b-0">
-      <div className="w-48 font-semibold text-[13px]">{label}</div>
-      <div
-        className="px-2.5 py-1 rounded-full text-[11px] font-semibold shrink-0"
-        style={{ background: "var(--accent-soft)", color: "var(--accent-dark)" }}
-      >
-        {boost}
+    <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-3.5 py-2.5 sm:py-2 border-b border-[var(--border-soft)] last:border-b-0">
+      <div className="flex items-center gap-2 sm:contents">
+        <div className="sm:w-48 font-semibold text-[13px]">{label}</div>
+        <div
+          className="px-2.5 py-1 rounded-full text-[11px] font-semibold shrink-0"
+          style={{ background: "var(--accent-soft)", color: "var(--accent-dark)" }}
+        >
+          {boost}
+        </div>
       </div>
       <div className="flex-1 text-[12px] text-[var(--text-muted)]">{requirement}</div>
     </div>

@@ -74,7 +74,7 @@ export default function LoginPage() {
       </div>
 
       <div className="flex-1 flex items-center justify-center p-6">
-        <form onSubmit={submit} className="w-[380px] flex flex-col gap-[22px]">
+        <form onSubmit={submit} className="w-full max-w-[380px] flex flex-col gap-[22px]">
           <div className="flex bg-[var(--surface)] border border-[var(--border)] rounded-xl p-1">
             <button
               type="button"

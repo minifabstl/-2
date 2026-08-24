@@ -40,7 +40,7 @@ const FAQ_JSON_LD = {
 
 export default function FaqPage() {
   return (
-    <div className="max-w-2xl mx-auto p-10">
+    <div className="max-w-2xl mx-auto p-4 sm:p-10">
       {/* eslint-disable-next-line react/no-danger */}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(FAQ_JSON_LD) }} />
       <h1 className="font-display text-2xl font-bold mb-1">Frequently Asked Questions</h1>
