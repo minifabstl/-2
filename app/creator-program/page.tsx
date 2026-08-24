@@ -241,7 +241,7 @@ export default async function CreatorProgramPage() {
             <div className="max-w-md">
               <Pill>Ready to start earning?</Pill>
               <div className="font-display text-[22px] font-bold leading-tight mt-3 mb-2">
-                Join creators already earning on LeakedFap.
+                Join creators already earning on <span className="notranslate" translate="no">LeakedFap</span>.
               </div>
               <p className="text-[12.5px] text-[var(--text-muted)] leading-relaxed">
                 Clear rules, a transparent rate, and real payouts based on real views.

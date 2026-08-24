@@ -37,7 +37,7 @@ export default function AdPopup() {
         <span className="text-[18px] shrink-0">📢</span>
         <span className="text-white text-[12.5px] font-semibold leading-snug">
           For advertising, you can reach us at{" "}
-          <a href="mailto:LeakedFap@protonmail.com" className="underline">
+          <a href="mailto:LeakedFap@protonmail.com" className="underline notranslate" translate="no">
             LeakedFap@protonmail.com
           </a>
         </span>

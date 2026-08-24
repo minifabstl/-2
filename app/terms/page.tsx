@@ -13,7 +13,7 @@ export default function TermsPage() {
 
       <div className="flex flex-col gap-6 text-[13.5px] leading-relaxed text-[var(--text)]">
         <Section title="1. Age requirement">
-          You must be over 18 years old to use LeakedFap and upload content. By uploading content, you represent that
+          You must be over 18 years old to use <span className="notranslate" translate="no">LeakedFap</span> and upload content. By uploading content, you represent that
           everyone appearing in it is over 18 years old and has consented to its being shared.
         </Section>
         <Section title="2. Content responsibility">

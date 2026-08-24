@@ -26,7 +26,7 @@ export default function Logo({ size = 26, withWordmark = true, className = "" }:
   return (
     <span className={`flex items-center justify-center gap-2 ${className}`}>
       {withWordmark && (
-        <span className="font-display font-bold tracking-tight" style={{ fontSize: size }}>
+        <span className="font-display font-bold tracking-tight notranslate" translate="no" style={{ fontSize: size }}>
           Leaked<span className="text-[var(--accent)]">Fap</span>
         </span>
       )}

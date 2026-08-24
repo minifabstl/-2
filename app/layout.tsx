@@ -65,7 +65,9 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
             components/LanguageSwitcher.tsx). It reads the `googtrans` cookie on load and
             translates whatever text it finds in the page, including content added afterward
             by client-side navigation. */}
-        <div id="google_translate_element" style={{ display: "none" }} />
+        {/* Positioned off-screen rather than display:none — some versions of the widget script
+            skip building the language <select> if the container has zero layout size. */}
+        <div id="google_translate_element" style={{ position: "absolute", top: "-9999px", left: "-9999px" }} />
         <Script id="google-translate-init" strategy="afterInteractive">
           {`function googleTranslateElementInit() {
             new window.google.translate.TranslateElement({ pageLanguage: "en", autoDisplay: false }, "google_translate_element");

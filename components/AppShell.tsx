@@ -117,7 +117,7 @@ export default function AppShell({
             <span className="text-[15px] shrink-0">📢</span>
             <span className="text-[11.5px] font-semibold leading-snug">
               You can advertise via{" "}
-              <a href="mailto:LeakedFap@protonmail.com" className="underline">
+              <a href="mailto:LeakedFap@protonmail.com" className="underline notranslate" translate="no">
                 LeakedFap@protonmail.com
               </a>
             </span>
@@ -143,7 +143,7 @@ export default function AppShell({
           </div>
           <div className="px-1 text-[10.5px] text-[var(--text-faint)] leading-snug">
             For advertising inquiries, contact us at{" "}
-            <a href="mailto:LeakedFap@protonmail.com" className="hover:text-[var(--text-muted)] underline">
+            <a href="mailto:LeakedFap@protonmail.com" className="hover:text-[var(--text-muted)] underline notranslate" translate="no">
               LeakedFap@protonmail.com
             </a>
           </div>

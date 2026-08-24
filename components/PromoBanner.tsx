@@ -24,7 +24,7 @@ export default function PromoBanner({ canDismiss }: { canDismiss: boolean }) {
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3">
             <path d="M4 12l6 6L20 6" />
           </svg>
-          <span className="font-display font-bold">LeakedFap</span>
+          <span className="font-display font-bold notranslate" translate="no">LeakedFap</span>
           <span className="px-1.5 py-0.5 rounded bg-white/20 text-[9.5px] font-bold tracking-wide">OFFICIAL</span>
         </span>
         <span className="opacity-60">|</span>

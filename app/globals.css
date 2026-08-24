@@ -55,13 +55,12 @@ body {
 
 /* Google Website Translator (see components/LanguageSwitcher.tsx) — we drive it entirely
    through our own flag dropdown, so hide its default top banner iframe and undo the top
-   offset it injects on <body> when a translation is active. */
+   offset it injects on <body> when a translation is active. We deliberately do NOT hide
+   .skiptranslate broadly — that class also wraps the widget's own <select>, and hiding it
+   with display:none can stop the widget from finishing initialization in some browsers. */
 .goog-te-banner-frame {
   display: none !important;
 }
 body {
   top: 0 !important;
-}
-.skiptranslate {
-  display: none !important;
 }

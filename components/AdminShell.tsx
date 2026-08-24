@@ -31,7 +31,7 @@ export default function AdminShell({
         <Link href="/" className="flex items-center gap-2 px-2 py-1">
           <LogoMark size={26} />
           <div>
-            <div className="font-display text-[15px] font-bold">
+            <div className="font-display text-[15px] font-bold notranslate" translate="no">
               Leaked<span className="text-[var(--accent)]">Fap</span>
             </div>
             <div className="text-[10.5px] text-[var(--text-faint)] tracking-wide">ADMIN PANEL</div>
