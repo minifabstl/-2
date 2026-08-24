@@ -11,9 +11,14 @@ const MAX_TITLE_LENGTH = 200;
 // Mirrors the limits shown in app/upload/page.tsx — but the client-side check there is only a
 // UX convenience. It's trivial to bypass by calling this endpoint directly (e.g. with curl), so
 // the real enforcement has to happen here, server-side, on the file the server actually receives.
+//
+// video maxBytes must stay well under Cloudflare Workers' fixed 128MB per-request memory
+// ceiling — this route buffers the incoming file in memory (formData() + arrayBuffer()), so a
+// limit close to 128MB crashes the Worker with "Error 1102: exceeded resource limits" instead
+// of returning this clean 400 response. Keep this in sync with MAX_MB in app/upload/page.tsx.
 const MEDIA_LIMITS: Record<"photo" | "video", { maxBytes: number; types: string[] }> = {
   photo: { maxBytes: 5 * 1024 * 1024, types: ["image/png", "image/jpeg", "image/webp"] },
-  video: { maxBytes: 95 * 1024 * 1024, types: ["video/mp4", "video/quicktime", "video/webm", "video/x-m4v"] },
+  video: { maxBytes: 20 * 1024 * 1024, types: ["video/mp4", "video/quicktime", "video/webm", "video/x-m4v"] },
 };
 const MAX_THUMBNAIL_BYTES = 3 * 1024 * 1024;
 

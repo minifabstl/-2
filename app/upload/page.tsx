@@ -6,7 +6,11 @@ import Link from "next/link";
 
 const MAX_TAGS = 5;
 
-const MAX_MB = { photo: 5, video: 95 };
+// Kept well under Cloudflare Workers' fixed 128MB per-request memory ceiling — the upload
+// route buffers the incoming file in memory (via formData()/arrayBuffer()), so a limit close
+// to 128MB crashes the Worker with "Error 1102: exceeded resource limits" instead of returning
+// a clean validation error. 20MB leaves generous headroom for that overhead.
+const MAX_MB = { photo: 5, video: 20 };
 const ACCEPT = { photo: "image/png,image/jpeg,image/webp,image/jpg", video: "video/mp4,video/quicktime,video/webm,video/x-m4v" };
 const FORMAT_HINT = { photo: "PNG, JPEG, WEBP, JPG", video: "MP4, MOV, WEBM, M4V" };
 
