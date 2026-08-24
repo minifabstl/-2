@@ -8,6 +8,7 @@ import LoginPromptModal from "@/components/LoginPromptModal";
 import Logo from "@/components/Logo";
 import ProfileMenu from "@/components/ProfileMenu";
 import PromoBanner from "@/components/PromoBanner";
+import AdPopup from "@/components/AdPopup";
 import TimeTracker from "@/components/TimeTracker";
 import { GIFT_MILESTONE_HOURS, GIFT_REWARD_LABEL, formatHoursOnSite } from "@/lib/gift";
 
@@ -33,6 +34,18 @@ export default function AppShell({
   const pathname = usePathname();
   const router = useRouter();
   const [promptOpen, setPromptOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  function submitSearch(e: React.FormEvent) {
+    e.preventDefault();
+    const q = searchQuery.trim();
+    if (q) router.push(`/search?q=${encodeURIComponent(q)}`);
+  }
+
+  function goToUpload() {
+    if (user) router.push("/upload");
+    else setPromptOpen(true);
+  }
 
   const isAuthPage = pathname === "/login" || pathname === "/reset-password" || pathname.startsWith("/admin");
 
@@ -44,6 +57,7 @@ export default function AppShell({
   return (
     <div className="flex flex-col min-h-screen" style={{ background: "linear-gradient(120deg, #fce4ee, #fdf3f7 45%, #ffffff 80%)" }}>
       {user && <TimeTracker />}
+      <AdPopup />
       <PromoBanner canDismiss={!!hasUploaded} />
       <div className="flex flex-1 min-h-0">
       <aside className="w-60 min-w-60 border-r border-[var(--border)] flex flex-col gap-6 p-3.5 sticky top-0 h-screen">
@@ -90,6 +104,18 @@ export default function AppShell({
         </nav>
 
         <div className="mt-auto flex flex-col gap-2.5">
+          <div
+            className="p-2.5 rounded-xl flex items-center gap-2 text-white"
+            style={{ background: "#00aff0" }}
+          >
+            <span className="text-[15px] shrink-0">📢</span>
+            <span className="text-[11.5px] font-semibold leading-snug">
+              You can advertise via{" "}
+              <a href="mailto:LeakedFap@protonmail.com" className="underline">
+                LeakedFap@protonmail.com
+              </a>
+            </span>
+          </div>
           {user && (
             <GiftCounter
               hoursOnSite={formatHoursOnSite(user.activeSeconds)}
@@ -128,6 +154,32 @@ export default function AppShell({
             </span>
           </Link>
           <div className="flex-1" />
+
+          <form
+            onSubmit={submitSearch}
+            className="hidden sm:flex items-center gap-2 bg-white/18 focus-within:bg-white/28 rounded-full px-3.5 py-2 w-[210px] shrink-0"
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" className="shrink-0 opacity-90">
+              <circle cx="11" cy="11" r="7" />
+              <path d="M21 21l-4.3-4.3" />
+            </svg>
+            <input
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search videos, creators…"
+              className="bg-transparent outline-none text-white placeholder-white/75 text-[12.5px] flex-1 min-w-0"
+            />
+          </form>
+
+          <button
+            onClick={goToUpload}
+            className="flex items-center gap-1.5 px-4 py-2.5 rounded-full font-bold text-[13px] text-white shrink-0"
+            style={{ background: "#db1a6d" }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><path d="M12 5v14M5 12h14" /></svg>
+            Add
+          </button>
+
           {user ? (
             <div className="flex items-center gap-3">
               {user.role === "admin" && (
@@ -138,7 +190,7 @@ export default function AppShell({
               <ProfileMenu user={user} avatarUrl={avatarUrl ?? null} />
             </div>
           ) : (
-            <Link href="/login" className="px-4 py-2.5 rounded-[10px] bg-white text-[#00aff0] text-[13.5px] font-bold">
+            <Link href="/login" className="px-4 py-2.5 rounded-[10px] bg-white text-[#00aff0] text-[13.5px] font-bold shrink-0">
               Log In
             </Link>
           )}
