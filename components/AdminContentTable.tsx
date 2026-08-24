@@ -6,7 +6,7 @@ type Item = {
   id: string;
   type: "video" | "photo";
   title: string;
-  category: string | null;
+  tags: string[];
   status: "pending" | "live" | "flagged" | "removed";
   viewsLabel: string;
   username: string;
@@ -103,7 +103,7 @@ export default function AdminContentTable({ initialItems }: { initialItems: Item
           <div className="flex-1">TITLE</div>
           <div className="w-32">TYPE</div>
           <div className="w-36">UPLOADER</div>
-          <div className="w-28">CATEGORY</div>
+          <div className="w-40">TAGS</div>
           <div className="w-24">VIEWS</div>
           <div className="w-24">DATE</div>
           <div className="w-28">STATUS</div>
@@ -139,7 +139,7 @@ export default function AdminContentTable({ initialItems }: { initialItems: Item
             <div className="flex-1 font-semibold truncate pr-2">{it.title}</div>
             <div className="w-32 text-[var(--text-muted)]">{it.type === "video" ? "Video" : "Photo"}</div>
             <div className="w-36 text-[var(--text-muted)]">@{it.username}</div>
-            <div className="w-28 text-[var(--text-muted)]">{it.category ?? "—"}</div>
+            <div className="w-40 text-[var(--text-muted)] truncate pr-2">{it.tags.length > 0 ? it.tags.map((t) => `#${t}`).join(" ") : "—"}</div>
             <div className="w-24">{it.viewsLabel}</div>
             <div className="w-24 text-[var(--text-muted)]">{it.createdAt}</div>
             <div className="w-28">
@@ -222,7 +222,7 @@ export default function AdminContentTable({ initialItems }: { initialItems: Item
               <div>
                 <div className="font-display text-[15px] font-bold">{previewItem.title}</div>
                 <div className="text-[11.5px] text-white/70 mt-0.5">
-                  @{previewItem.username} · {previewItem.category ?? "no category"} · {STATUS_LABEL[previewItem.status]}
+                  @{previewItem.username} · {previewItem.tags.length > 0 ? previewItem.tags.map((t) => `#${t}`).join(" ") : "no tags"} · {STATUS_LABEL[previewItem.status]}
                 </div>
               </div>
               <button onClick={() => setPreviewItem(null)} className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-lg">

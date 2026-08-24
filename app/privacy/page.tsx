@@ -15,7 +15,7 @@ export default function PrivacyPage() {
         <Section title="1. Data we collect">
           When you create an account, we store your username, email address, and (if you provide one) your payout
           wallet address. Your password is never stored as plain text — it is only stored in an irreversibly hashed
-          form. The videos/photos you upload, their title and category information, the likes/comments you receive,
+          form. The videos/photos you upload, their title and tag information, the likes/comments you receive,
           and the view counts of your content are also kept in our system.
         </Section>
         <Section title="2. How we use your data">

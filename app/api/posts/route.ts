@@ -4,6 +4,7 @@ import { desc, eq } from "drizzle-orm";
 import { getDb, posts, users } from "@/db";
 import { getCurrentUser, AuthError, requireUser } from "@/lib/auth";
 import { uploadMedia, mediaUrl } from "@/lib/storage";
+import { cleanTags, parseTags } from "@/lib/posts";
 
 /** Public feed — viewable without logging in. */
 export async function GET() {
@@ -15,7 +16,7 @@ export async function GET() {
       id: posts.id,
       type: posts.type,
       title: posts.title,
-      category: posts.category,
+      tags: posts.tags,
       mediaKey: posts.mediaKey,
       thumbnailKey: posts.thumbnailKey,
       viewCount: posts.viewCount,
@@ -32,6 +33,7 @@ export async function GET() {
     isLoggedIn: !!currentUser,
     posts: rows.map((p) => ({
       ...p,
+      tags: parseTags(p.tags),
       mediaUrl: mediaUrl(p.mediaKey),
       thumbnailUrl: p.thumbnailKey ? mediaUrl(p.thumbnailKey) : null,
     })),
@@ -52,7 +54,19 @@ export async function POST(req: NextRequest) {
   const file = form.get("file");
   const title = String(form.get("title") ?? "").trim();
   const type = form.get("type") === "photo" ? "photo" : "video";
-  const category = (form.get("category") as string) || null;
+
+  // Tags arrive as a JSON-stringified array of strings from the upload form (up to 5 SEO keyword tags).
+  let rawTags: unknown[] = [];
+  const tagsField = form.get("tags");
+  if (typeof tagsField === "string" && tagsField) {
+    try {
+      const parsed = JSON.parse(tagsField);
+      if (Array.isArray(parsed)) rawTags = parsed;
+    } catch {
+      // ignore malformed input — falls through to an empty tag list
+    }
+  }
+  const tags = cleanTags(rawTags);
 
   if (!(file instanceof File)) {
     return NextResponse.json({ error: "A media file is required." }, { status: 400 });
@@ -69,7 +83,7 @@ export async function POST(req: NextRequest) {
     userId: user.id,
     type,
     title,
-    category,
+    tags: tags.length > 0 ? JSON.stringify(tags) : null,
     mediaKey,
     // Newly uploaded content does not go live directly — it must pass admin approval.
     status: "pending",

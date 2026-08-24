@@ -77,7 +77,11 @@ export const posts = sqliteTable("posts", {
   userId: text("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
   type: text("type", { enum: ["video", "photo"] }).notNull(),
   title: text("title").notNull(),
-  category: text("category"), // muzik | oyun | egitim | spor | teknoloji | komedi (category slugs, do not translate)
+  category: text("category"), // deprecated, unused — kept so we don't need a DROP COLUMN migration
+  // JSON-stringified array of up to 5 user-supplied SEO keyword tags, e.g. ["amateur","turkish","2026"].
+  // Shown as clickable chips on post cards (each links to /search?q=tag) so the crawlable page text
+  // carries the keywords the uploader chose, for discoverability on Google.
+  tags: text("tags"),
   // Key of the media file stored in Cloudflare R2 (see lib/storage.ts)
   mediaKey: text("media_key").notNull(),
   thumbnailKey: text("thumbnail_key"),
@@ -142,4 +146,16 @@ export const payouts = sqliteTable("payouts", {
   status: text("status", { enum: ["pending", "paid"] }).notNull().default("pending"),
   createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
   paidAt: integer("paid_at", { mode: "timestamp" }),
+});
+
+// ---------------------------------------------------------------------------
+// Search logs — one row per search actually performed (from the header or
+// sidebar search box, or a direct /search?q= visit). Used to compute a real,
+// data-driven "Trending searches" top 5 — never a fabricated/static list.
+// ---------------------------------------------------------------------------
+export const searchLogs = sqliteTable("search_logs", {
+  id: text("id").primaryKey(),
+  query: text("query").notNull(),
+  userId: text("user_id").references(() => users.id, { onDelete: "set null" }),
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
 });

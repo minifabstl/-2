@@ -2,6 +2,7 @@ import { desc, eq } from "drizzle-orm";
 import { getDb, posts, users } from "@/db";
 import { formatViews } from "@/lib/earnings";
 import { mediaUrl } from "@/lib/storage";
+import { parseTags } from "@/lib/posts";
 import AdminContentTable from "@/components/AdminContentTable";
 
 export default async function AdminContentPage() {
@@ -12,7 +13,7 @@ export default async function AdminContentPage() {
       id: posts.id,
       type: posts.type,
       title: posts.title,
-      category: posts.category,
+      tags: posts.tags,
       status: posts.status,
       viewCount: posts.viewCount,
       createdAt: posts.createdAt,
@@ -29,7 +30,7 @@ export default async function AdminContentPage() {
       id: r.id,
       type: r.type as "video" | "photo",
       title: r.title,
-      category: r.category,
+      tags: parseTags(r.tags),
       status: r.status as "pending" | "live" | "flagged" | "removed",
       viewsLabel: formatViews(r.viewCount),
       username: r.username,

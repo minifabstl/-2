@@ -10,6 +10,7 @@ import ProfileMenu from "@/components/ProfileMenu";
 import PromoBanner from "@/components/PromoBanner";
 import AdPopup from "@/components/AdPopup";
 import TimeTracker from "@/components/TimeTracker";
+import SidebarSearch from "@/components/SidebarSearch";
 import { GIFT_MILESTONE_HOURS, GIFT_REWARD_LABEL, formatHoursOnSite } from "@/lib/gift";
 
 const NAV = [
@@ -24,11 +25,13 @@ export default function AppShell({
   user,
   avatarUrl,
   hasUploaded,
+  trending,
   children,
 }: {
   user: SafeUser | null;
   avatarUrl?: string | null;
   hasUploaded?: boolean;
+  trending?: string[];
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
@@ -57,14 +60,16 @@ export default function AppShell({
   return (
     <div className="flex flex-col min-h-screen" style={{ background: "linear-gradient(120deg, #fce4ee, #fdf3f7 45%, #ffffff 80%)" }}>
       {user && <TimeTracker />}
-      <AdPopup />
+      <AdPopup key={pathname} />
       <PromoBanner canDismiss={!!hasUploaded} />
       <div className="flex flex-1 min-h-0">
-      <aside className="w-60 min-w-60 border-r border-[var(--border)] flex flex-col gap-6 p-3.5 sticky top-0 h-screen">
+      <aside className="w-60 min-w-60 border-r border-[var(--border)] flex flex-col gap-6 p-3.5 sticky top-0 h-screen overflow-y-auto">
         <Link href="/" className="flex flex-col items-center justify-center px-2 pt-1 pb-3 gap-2">
           <Logo size={32} />
           <span className="w-24 h-[3px] rounded-full" style={{ background: "var(--accent)" }} />
         </Link>
+
+        <SidebarSearch trending={trending ?? []} />
 
         <nav className="flex flex-col gap-0.5">
           {NAV.map((item) => {

@@ -193,7 +193,7 @@ export default async function CreatorProgramPage() {
             </p>
             <div className="flex flex-col gap-2.5">
               <ReqRow n="01" title="Content compliance" body="Only upload content you have the right to share, and that follows our Terms of Service." />
-              <ReqRow n="02" title="Accurate title & category" body="Give your upload a clear title and the right category so it can be discovered and reviewed quickly." />
+              <ReqRow n="02" title="Accurate title & tags" body="Give your upload a clear title and relevant tags so it can be discovered and reviewed quickly." />
               <ReqRow n="03" title="Real, unique views only" body="Earnings are based on genuine viewer activity. Automated or self-generated views don't count, and abuse can lead to suspension." />
               <ReqRow n="04" title="Review before it's live" body="Every upload is checked by our team before it appears in the public feed and starts earning." />
             </div>
@@ -227,7 +227,7 @@ export default async function CreatorProgramPage() {
           </p>
           <div className="grid grid-cols-3 gap-3.5">
             <StepCard n={1} title="Create your account" body="Sign up and you can start uploading immediately — no application required." />
-            <StepCard n={2} title="Upload content that follows the rules" body="Add a clear title, the right category, and content that follows our guidelines." />
+            <StepCard n={2} title="Upload content that follows the rules" body="Add a clear title, relevant tags, and content that follows our guidelines." />
             <StepCard n={3} title="Earn per view, request payouts" body="Track your views and earnings on your profile, and request a payout once you qualify." />
           </div>
         </div>
@@ -289,7 +289,7 @@ function ChecklistCard() {
       <div className="font-display text-[17px] font-bold mt-3 mb-4">Creator review checklist</div>
       <div className="flex flex-col gap-2.5 mb-4">
         <ChecklistItem label="CONTENT QUALITY" body="Uploads should be clear and represent what they claim to be." />
-        <ChecklistItem label="UPLOAD SETUP" body="Add an accurate title and the right category before submitting." />
+        <ChecklistItem label="UPLOAD SETUP" body="Add an accurate title and relevant tags before submitting." />
         <ChecklistItem label="CONTENT COMPLIANCE" body="Only publish content you have the right to share, following our Terms." />
       </div>
       <div className="flex flex-col gap-2">

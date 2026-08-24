@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
 import { searchPosts } from "@/lib/posts";
+import { recordSearch } from "@/lib/search";
 import PostGrid from "@/components/PostGrid";
 
 export async function generateMetadata({ searchParams }: { searchParams: Promise<{ q?: string }> }): Promise<Metadata> {
@@ -20,6 +21,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
   const query = (q ?? "").trim();
   const user = await getCurrentUser();
   const results = query ? await searchPosts(query, user?.id ?? null) : [];
+  if (query) await recordSearch(query, user?.id ?? null);
 
   return (
     <>

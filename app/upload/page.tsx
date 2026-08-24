@@ -4,14 +4,7 @@ import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-const CATEGORIES = [
-  { slug: "muzik", label: "Music" },
-  { slug: "oyun", label: "Gaming" },
-  { slug: "egitim", label: "Education" },
-  { slug: "spor", label: "Sports" },
-  { slug: "teknoloji", label: "Technology" },
-  { slug: "komedi", label: "Comedy" },
-];
+const MAX_TAGS = 5;
 
 const MAX_MB = { photo: 5, video: 95 };
 const ACCEPT = { photo: "image/png,image/jpeg,image/webp,image/jpg", video: "video/mp4,video/quicktime,video/webm,video/x-m4v" };
@@ -23,7 +16,7 @@ export default function UploadPage() {
 
   const [title, setTitle] = useState("");
   const [type, setType] = useState<"video" | "photo">("video");
-  const [category, setCategory] = useState(CATEGORIES[0].slug);
+  const [tags, setTags] = useState<string[]>(Array(MAX_TAGS).fill(""));
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [readGuide, setReadGuide] = useState(false);
@@ -70,7 +63,7 @@ export default function UploadPage() {
     const form = new FormData();
     form.set("title", title);
     form.set("type", type);
-    form.set("category", category);
+    form.set("tags", JSON.stringify(tags.map((t) => t.trim()).filter(Boolean)));
     form.set("file", file);
 
     const res = await fetch("/api/posts", { method: "POST", body: form });
@@ -223,14 +216,30 @@ export default function UploadPage() {
               <input required value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Give your content a title" className="border border-[var(--border)] rounded-[10px] px-3.5 py-2.5 text-sm outline-none" />
             </label>
 
-            <label className="flex flex-col gap-1.5">
-              <span className="text-[12.5px] font-semibold">Category</span>
-              <select value={category} onChange={(e) => setCategory(e.target.value)} className="border border-[var(--border)] rounded-[10px] px-3.5 py-2.5 text-sm outline-none">
-                {CATEGORIES.map((c) => (
-                  <option key={c.slug} value={c.slug}>{c.label}</option>
+            <div className="flex flex-col gap-1.5">
+              <span className="text-[12.5px] font-semibold">
+                Meta Tags <span className="text-[var(--text-faint)] font-normal">(up to 5, optional)</span>
+              </span>
+              <span className="text-[11px] text-[var(--text-faint)] leading-snug -mt-0.5">
+                Keywords that describe your content — they help people find it through Google search.
+              </span>
+              <div className="grid grid-cols-2 gap-2">
+                {tags.map((tag, i) => (
+                  <input
+                    key={i}
+                    value={tag}
+                    onChange={(e) => {
+                      const next = [...tags];
+                      next[i] = e.target.value;
+                      setTags(next);
+                    }}
+                    maxLength={24}
+                    placeholder={`Tag ${i + 1}`}
+                    className="border border-[var(--border)] rounded-[10px] px-3 py-2 text-[13px] outline-none"
+                  />
                 ))}
-              </select>
-            </label>
+              </div>
+            </div>
 
             <div>
               <div className="text-[12.5px] font-semibold mb-1.5">
