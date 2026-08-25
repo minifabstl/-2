@@ -6,11 +6,11 @@ import Link from "next/link";
 
 const MAX_TAGS = 5;
 
-// Photo still goes straight through the Worker (buffered via formData()/arrayBuffer()), so it
-// has to stay well under Workers' fixed 128MB per-request memory ceiling — 5MB leaves generous
-// headroom. Video is uploaded directly from the browser to R2 over a presigned URL (see
-// uploadVideoDirectly() below) and never touches the Worker's memory, so its limit here just
-// mirrors the product-level cap enforced server-side in app/api/posts/presign/route.ts.
+// Both photo and video now upload directly from the browser to R2 over a presigned URL (see
+// uploadDirectly() below) and never touch the Worker's memory, so these limits are purely
+// product-level caps for regular members — mirrored server-side in
+// app/api/posts/presign/route.ts (USER_MAX_BYTES). Admins get a much higher ceiling there via
+// the separate bulk upload tool (app/admin/bulk-upload/page.tsx).
 const MAX_MB = { photo: 5, video: 100 };
 const ACCEPT = { photo: "image/png,image/jpeg,image/webp,image/jpg", video: "video/mp4,video/quicktime,video/webm,video/x-m4v" };
 const FORMAT_HINT = { photo: "PNG, JPEG, WEBP, JPG", video: "MP4, MOV, WEBM, M4V" };
@@ -118,10 +118,10 @@ export default function UploadPage() {
   /**
    * PUTs the raw file bytes straight to R2 over a short-lived presigned URL (minted by
    * POST /api/posts/presign), tracking progress via XHR since fetch() has no upload-progress
-   * event. The Worker never sees these bytes — that's what lets video be far bigger than the
-   * ~20MB a normal formData()-through-the-Worker upload could safely handle.
+   * event. The Worker never sees these bytes — that's what lets uploads be far bigger than the
+   * old formData()-through-the-Worker approach could safely handle.
    */
-  function uploadVideoDirectly(uploadUrl: string, f: File): Promise<void> {
+  function uploadDirectly(uploadUrl: string, f: File): Promise<void> {
     return new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
       xhr.open("PUT", uploadUrl);
@@ -148,29 +148,22 @@ export default function UploadPage() {
     setUploadPct(0);
 
     try {
-      let mediaKey: string | null = null;
-      if (type === "video") {
-        const presignRes = await fetch("/api/posts/presign", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ filename: file.name, contentType: file.type, size: file.size }),
-        });
-        const presignData = await presignRes.json();
-        if (!presignRes.ok) throw new Error(presignData.error ?? "Couldn't start the upload.");
-        await uploadVideoDirectly(presignData.uploadUrl, file);
-        mediaKey = presignData.key;
-        setUploadPct(100);
-      }
+      const presignRes = await fetch("/api/posts/presign", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ filename: file.name, contentType: file.type, size: file.size, type }),
+      });
+      const presignData = await presignRes.json();
+      if (!presignRes.ok) throw new Error(presignData.error ?? "Couldn't start the upload.");
+      await uploadDirectly(presignData.uploadUrl, file);
+      const mediaKey = presignData.key;
+      setUploadPct(100);
 
       const form = new FormData();
       form.set("title", title);
       form.set("type", type);
       form.set("tags", JSON.stringify(tags.map((t) => t.trim()).filter(Boolean)));
-      if (type === "photo") {
-        form.set("file", file);
-      } else if (mediaKey) {
-        form.set("mediaKey", mediaKey);
-      }
+      form.set("mediaKey", mediaKey);
       if (thumbnailBlob) form.set("thumbnail", thumbnailBlob, "thumbnail.jpg");
 
       const res = await fetch("/api/posts", { method: "POST", body: form });
@@ -381,7 +374,7 @@ export default function UploadPage() {
           type="submit"
           className="py-3 rounded-[10px] bg-[var(--accent)] text-white text-sm font-semibold disabled:opacity-50"
         >
-          {loading ? (type === "video" && uploadPct > 0 && uploadPct < 100 ? `Uploading… ${uploadPct}%` : "Uploading…") : "Share"}
+          {loading ? (uploadPct > 0 && uploadPct < 100 ? `Uploading… ${uploadPct}%` : "Uploading…") : "Share"}
         </button>
       </form>
     </div>

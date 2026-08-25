@@ -8,6 +8,7 @@ const NAV = [
   { href: "/admin", label: "Overview" },
   { href: "/admin/users", label: "Users" },
   { href: "/admin/content", label: "Content" },
+  { href: "/admin/bulk-upload", label: "Bulk Upload" },
   { href: "/admin/payouts", label: "Payouts" },
   { href: "/admin/gifts", label: "Gift Milestones" },
 ];
