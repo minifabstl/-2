@@ -5,6 +5,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { getModelBySlug } from "@/lib/models";
 import { getPostsByTag, TagSort } from "@/lib/posts";
 import PostGrid from "@/components/PostGrid";
+import ModelFilters from "@/components/ModelFilters";
 
 type SearchParams = { sort?: string; type?: string };
 
@@ -16,20 +17,6 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     description: model ? `Videos and photos posted under ${model.name} on LeakedFap.` : undefined,
   };
 }
-
-const SORT_TABS: { key: TagSort; label: string }[] = [
-  { key: "newest", label: "Newest" },
-  { key: "oldest", label: "First posted" },
-  { key: "views", label: "Most viewed" },
-  { key: "likes", label: "Most liked" },
-  { key: "comments", label: "Most commented" },
-];
-
-const TYPE_TABS: { key: "" | "video" | "photo"; label: string }[] = [
-  { key: "", label: "All" },
-  { key: "video", label: "Video" },
-  { key: "photo", label: "Photo" },
-];
 
 function isTagSort(value: string | undefined): value is TagSort {
   return value === "newest" || value === "oldest" || value === "views" || value === "likes" || value === "comments";
@@ -58,16 +45,6 @@ export default async function ModelPage({
     viewerIsAdmin: user?.role === "admin",
   });
 
-  function hrefFor(next: { sort?: TagSort; type?: string }) {
-    const params = new URLSearchParams();
-    const nextSort = next.sort ?? sortMode;
-    const nextType = next.type !== undefined ? next.type : (typeFilter ?? "");
-    if (nextSort !== "newest") params.set("sort", nextSort);
-    if (nextType) params.set("type", nextType);
-    const qs = params.toString();
-    return `/models/${slug}${qs ? `?${qs}` : ""}`;
-  }
-
   return (
     <>
       <nav aria-label="breadcrumb" className="px-6 pt-5 text-[11.5px] text-[var(--text-faint)] flex items-center gap-1.5">
@@ -91,37 +68,8 @@ export default async function ModelPage({
         </div>
 
         <div className="flex-1 min-w-0">
-          <div className="px-3 sm:px-7 pt-5 flex flex-col gap-2.5">
-            <div className="flex flex-wrap gap-1.5">
-              {TYPE_TABS.map((tab) => (
-                <Link
-                  key={tab.key}
-                  href={hrefFor({ type: tab.key })}
-                  className={`px-3.5 py-1.5 rounded-full text-[12.5px] font-semibold ${
-                    (typeFilter ?? "") === tab.key
-                      ? "bg-[var(--accent)] text-white"
-                      : "bg-[var(--bg)] text-[var(--text-muted)] hover:bg-[var(--accent-soft)]"
-                  }`}
-                >
-                  {tab.label}
-                </Link>
-              ))}
-            </div>
-            <div className="flex flex-wrap gap-1.5">
-              {SORT_TABS.map((tab) => (
-                <Link
-                  key={tab.key}
-                  href={hrefFor({ sort: tab.key })}
-                  className={`px-3.5 py-1.5 rounded-full text-[12.5px] font-semibold ${
-                    sortMode === tab.key
-                      ? "bg-[var(--accent-soft)] text-[var(--accent-dark)]"
-                      : "text-[var(--text-muted)] hover:bg-[var(--bg)]"
-                  }`}
-                >
-                  {tab.label}
-                </Link>
-              ))}
-            </div>
+          <div className="px-3 sm:px-7 pt-5">
+            <ModelFilters slug={slug} sortMode={sortMode} typeFilter={typeFilter} />
           </div>
 
           <PostGrid posts={posts} isLoggedIn={!!user} title="" />
