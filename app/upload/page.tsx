@@ -11,7 +11,7 @@ const MAX_TAGS = 5;
 // headroom. Video is uploaded directly from the browser to R2 over a presigned URL (see
 // uploadVideoDirectly() below) and never touches the Worker's memory, so its limit here just
 // mirrors the product-level cap enforced server-side in app/api/posts/presign/route.ts.
-const MAX_MB = { photo: 5, video: 300 };
+const MAX_MB = { photo: 5, video: 100 };
 const ACCEPT = { photo: "image/png,image/jpeg,image/webp,image/jpg", video: "video/mp4,video/quicktime,video/webm,video/x-m4v" };
 const FORMAT_HINT = { photo: "PNG, JPEG, WEBP, JPG", video: "MP4, MOV, WEBM, M4V" };
 

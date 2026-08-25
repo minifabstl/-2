@@ -7,7 +7,7 @@ import { createPresignedUploadUrl, R2NotConfiguredError } from "@/lib/r2Presign"
 // product limit for a "short clip" style upload, not a technical constraint like the old
 // Worker-memory-driven 20MB cap. Because the file goes straight from the browser to R2 (see
 // lib/r2Presign.ts), the Worker never buffers it, so raising this doesn't risk Error 1102.
-const MAX_VIDEO_BYTES = 300 * 1024 * 1024; // 300MB
+const MAX_VIDEO_BYTES = 100 * 1024 * 1024; // 100MB
 const ALLOWED_VIDEO_TYPES = ["video/mp4", "video/quicktime", "video/webm", "video/x-m4v"];
 
 /**
