@@ -15,7 +15,16 @@ export default async function ProfilePage({ searchParams }: { searchParams: Prom
   const db = getDb();
 
   const myPosts = await db
-    .select({ id: posts.id, type: posts.type, title: posts.title, status: posts.status, viewCount: posts.viewCount, createdAt: posts.createdAt })
+    .select({
+      id: posts.id,
+      type: posts.type,
+      title: posts.title,
+      status: posts.status,
+      viewCount: posts.viewCount,
+      createdAt: posts.createdAt,
+      thumbnailKey: posts.thumbnailKey,
+      mediaKey: posts.mediaKey,
+    })
     .from(posts)
     .where(eq(posts.userId, user.id))
     .orderBy(desc(posts.createdAt));
@@ -55,6 +64,7 @@ export default async function ProfilePage({ searchParams }: { searchParams: Prom
         status: p.status,
         viewsLabel: formatViews(p.viewCount) + " views",
         earnLabel: formatUsd(calculateEarningsUsd(p.viewCount, tier) + (bonusByPostId.get(p.id) ?? 0)),
+        thumbnailUrl: p.thumbnailKey ? mediaUrl(p.thumbnailKey) : p.type === "photo" ? mediaUrl(p.mediaKey) : null,
       }))}
       payouts={myPayouts.map((p) => ({
         id: p.id,

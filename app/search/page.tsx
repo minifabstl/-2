@@ -63,7 +63,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
 
   if (topic) {
     const sortMode: TagSort = isTagSort(sort) ? sort : "newest";
-    const results = await getPostsByTag(query, { sort: sortMode, viewerId: user?.id ?? null });
+    const results = await getPostsByTag(query, { sort: sortMode, viewerId: user?.id ?? null, viewerIsAdmin: user?.role === "admin" });
 
     return (
       <>
@@ -106,7 +106,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
     );
   }
 
-  const results = await searchPosts(query, user?.id ?? null);
+  const results = await searchPosts(query, user?.id ?? null, user?.role === "admin");
 
   return (
     <>

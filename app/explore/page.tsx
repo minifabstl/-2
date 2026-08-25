@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export default async function ExplorePage() {
   const user = await getCurrentUser();
-  const posts = await listPosts({ viewerId: user?.id ?? null });
+  const posts = await listPosts({ viewerId: user?.id ?? null, viewerIsAdmin: user?.role === "admin" });
 
   return (
     <>

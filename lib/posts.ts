@@ -30,6 +30,11 @@ export type FeedPost = {
   likeCount: number;
   commentCount: number;
   liked: boolean;
+  // True only for the post's own uploader and admins — everyone else gets the fields above with
+  // their real values still computed (sorting by views/likes elsewhere needs the real numbers),
+  // but the UI (PostCard, MediaLightbox) must not display view/like/comment counts unless this
+  // is true. Keeps engagement numbers private between the creator and moderation.
+  statsVisible: boolean;
 };
 
 /** Parses the JSON-stringified tags column back into a clean string array. Never throws. */
@@ -69,6 +74,7 @@ const SELECT_FIELDS = {
   thumbnailKey: posts.thumbnailKey,
   viewCount: posts.viewCount,
   username: users.username,
+  userId: posts.userId,
 };
 
 async function attachEngagement(
@@ -81,8 +87,10 @@ async function attachEngagement(
     thumbnailKey: string | null;
     viewCount: number;
     username: string;
+    userId: string;
   }[],
-  viewerId?: string | null
+  viewerId?: string | null,
+  viewerIsAdmin?: boolean
 ): Promise<FeedPost[]> {
   const db = getDb();
   if (rows.length === 0) return [];
@@ -113,11 +121,14 @@ async function attachEngagement(
     likeCount: likeCounts.get(r.id) ?? 0,
     commentCount: commentCounts.get(r.id) ?? 0,
     liked: likedByViewer.has(r.id),
+    statsVisible: !!viewerIsAdmin || (!!viewerId && viewerId === r.userId),
   }));
 }
 
 /** Public feed — visible to non-member visitors too. If `viewerId` is provided, like status is included. */
-export async function listPosts(opts: { viewerId?: string | null; type?: "video" | "photo" } = {}): Promise<FeedPost[]> {
+export async function listPosts(
+  opts: { viewerId?: string | null; viewerIsAdmin?: boolean; type?: "video" | "photo" } = {}
+): Promise<FeedPost[]> {
   const db = getDb();
 
   const where = opts.type ? and(eq(posts.status, "live"), eq(posts.type, opts.type)) : eq(posts.status, "live");
@@ -130,7 +141,7 @@ export async function listPosts(opts: { viewerId?: string | null; type?: "video"
     .orderBy(desc(posts.createdAt))
     .limit(60);
 
-  return attachEngagement(rows, opts.viewerId);
+  return attachEngagement(rows, opts.viewerId, opts.viewerIsAdmin);
 }
 
 /**
@@ -138,7 +149,7 @@ export async function listPosts(opts: { viewerId?: string | null; type?: "video"
  * surfaces their videos too), or by one of the video's SEO tags. Falls back to nothing for an
  * empty query — callers should check for that themselves so they can show a dedicated empty state.
  */
-export async function searchPosts(query: string, viewerId?: string | null): Promise<FeedPost[]> {
+export async function searchPosts(query: string, viewerId?: string | null, viewerIsAdmin?: boolean): Promise<FeedPost[]> {
   const db = getDb();
   const q = query.trim();
   if (!q) return [];
@@ -157,7 +168,7 @@ export async function searchPosts(query: string, viewerId?: string | null): Prom
     .orderBy(desc(posts.viewCount))
     .limit(60);
 
-  return attachEngagement(rows, viewerId);
+  return attachEngagement(rows, viewerId, viewerIsAdmin);
 }
 
 /**
@@ -185,7 +196,10 @@ export async function getTagAggregate(tag: string): Promise<{ count: number; tot
  * filter tabs ask for. "likes" sort is applied in JS after fetching engagement counts, same as
  * everywhere else in this file — fine at this MVP's scale (capped at 100 posts per topic).
  */
-export async function getPostsByTag(tag: string, opts: { sort?: TagSort; viewerId?: string | null } = {}): Promise<FeedPost[]> {
+export async function getPostsByTag(
+  tag: string,
+  opts: { sort?: TagSort; viewerId?: string | null; viewerIsAdmin?: boolean } = {}
+): Promise<FeedPost[]> {
   const t = tag.trim();
   if (!t) return [];
   const db = getDb();
@@ -201,7 +215,7 @@ export async function getPostsByTag(tag: string, opts: { sort?: TagSort; viewerI
     .orderBy(orderBy)
     .limit(100);
 
-  const attached = await attachEngagement(rows, opts.viewerId);
+  const attached = await attachEngagement(rows, opts.viewerId, opts.viewerIsAdmin);
   if (opts.sort === "likes") attached.sort((a, b) => b.likeCount - a.likeCount);
   return attached;
 }

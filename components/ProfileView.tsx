@@ -2,7 +2,15 @@
 
 import { useState } from "react";
 
-type Post = { id: string; type: string; title: string; status: "pending" | "live" | "flagged" | "removed"; viewsLabel: string; earnLabel: string };
+type Post = {
+  id: string;
+  type: string;
+  title: string;
+  status: "pending" | "live" | "flagged" | "removed";
+  viewsLabel: string;
+  earnLabel: string;
+  thumbnailUrl: string | null;
+};
 
 const POST_STATUS_LABEL: Record<Post["status"], string> = {
   pending: "Pending Approval",
@@ -97,7 +105,11 @@ export default function ProfileView({
           {posts.length === 0 && <div className="text-sm text-[var(--text-muted)] col-span-2 sm:col-span-3 lg:col-span-5">You don&apos;t have any posts yet.</div>}
           {posts.map((p) => (
             <div key={p.id} className="border border-[var(--border)] rounded-xl overflow-hidden bg-[var(--surface)]">
-              <div className="h-[110px] relative" style={{ background: "linear-gradient(135deg, oklch(0.86 0.06 25), oklch(0.94 0.03 25))" }}>
+              <div className="h-[110px] relative overflow-hidden" style={{ background: "linear-gradient(135deg, oklch(0.86 0.06 25), oklch(0.94 0.03 25))" }}>
+                {p.thumbnailUrl && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={p.thumbnailUrl} alt={p.title} className="absolute inset-0 w-full h-full object-cover" />
+                )}
                 {p.status !== "live" && (
                   <span
                     className="absolute top-1.5 left-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold"
