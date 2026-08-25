@@ -3,8 +3,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { getModelBySlug } from "@/lib/models";
-import { getPostsByTag } from "@/lib/posts";
+import { getPostsByTag, TagSort } from "@/lib/posts";
 import PostGrid from "@/components/PostGrid";
+
+type SearchParams = { sort?: string; type?: string };
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -15,13 +17,56 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   };
 }
 
-export default async function ModelPage({ params }: { params: Promise<{ slug: string }> }) {
+const SORT_TABS: { key: TagSort; label: string }[] = [
+  { key: "newest", label: "Newest" },
+  { key: "oldest", label: "First posted" },
+  { key: "views", label: "Most viewed" },
+  { key: "likes", label: "Most liked" },
+  { key: "comments", label: "Most commented" },
+];
+
+const TYPE_TABS: { key: "" | "video" | "photo"; label: string }[] = [
+  { key: "", label: "All" },
+  { key: "video", label: "Video" },
+  { key: "photo", label: "Photo" },
+];
+
+function isTagSort(value: string | undefined): value is TagSort {
+  return value === "newest" || value === "oldest" || value === "views" || value === "likes" || value === "comments";
+}
+
+export default async function ModelPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<SearchParams>;
+}) {
   const { slug } = await params;
+  const { sort, type } = await searchParams;
   const model = await getModelBySlug(slug);
   if (!model) notFound();
 
+  const sortMode: TagSort = isTagSort(sort) ? sort : "newest";
+  const typeFilter: "video" | "photo" | undefined = type === "video" || type === "photo" ? type : undefined;
+
   const user = await getCurrentUser();
-  const posts = await getPostsByTag(model.name, { sort: "newest", viewerId: user?.id ?? null, viewerIsAdmin: user?.role === "admin" });
+  const posts = await getPostsByTag(model.name, {
+    sort: sortMode,
+    type: typeFilter,
+    viewerId: user?.id ?? null,
+    viewerIsAdmin: user?.role === "admin",
+  });
+
+  function hrefFor(next: { sort?: TagSort; type?: string }) {
+    const params = new URLSearchParams();
+    const nextSort = next.sort ?? sortMode;
+    const nextType = next.type !== undefined ? next.type : (typeFilter ?? "");
+    if (nextSort !== "newest") params.set("sort", nextSort);
+    if (nextType) params.set("type", nextType);
+    const qs = params.toString();
+    return `/models/${slug}${qs ? `?${qs}` : ""}`;
+  }
 
   return (
     <>
@@ -46,6 +91,39 @@ export default async function ModelPage({ params }: { params: Promise<{ slug: st
         </div>
 
         <div className="flex-1 min-w-0">
+          <div className="px-3 sm:px-7 pt-5 flex flex-col gap-2.5">
+            <div className="flex flex-wrap gap-1.5">
+              {TYPE_TABS.map((tab) => (
+                <Link
+                  key={tab.key}
+                  href={hrefFor({ type: tab.key })}
+                  className={`px-3.5 py-1.5 rounded-full text-[12.5px] font-semibold ${
+                    (typeFilter ?? "") === tab.key
+                      ? "bg-[var(--accent)] text-white"
+                      : "bg-[var(--bg)] text-[var(--text-muted)] hover:bg-[var(--accent-soft)]"
+                  }`}
+                >
+                  {tab.label}
+                </Link>
+              ))}
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {SORT_TABS.map((tab) => (
+                <Link
+                  key={tab.key}
+                  href={hrefFor({ sort: tab.key })}
+                  className={`px-3.5 py-1.5 rounded-full text-[12.5px] font-semibold ${
+                    sortMode === tab.key
+                      ? "bg-[var(--accent-soft)] text-[var(--accent-dark)]"
+                      : "text-[var(--text-muted)] hover:bg-[var(--bg)]"
+                  }`}
+                >
+                  {tab.label}
+                </Link>
+              ))}
+            </div>
+          </div>
+
           <PostGrid posts={posts} isLoggedIn={!!user} title="" />
         </div>
       </div>

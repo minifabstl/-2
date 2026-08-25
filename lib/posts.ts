@@ -6,7 +6,7 @@ import { formatViews } from "@/lib/earnings";
 export const MAX_TAGS = 5;
 export const MAX_TAG_LENGTH = 24;
 
-export type TagSort = "newest" | "oldest" | "views" | "likes";
+export type TagSort = "newest" | "oldest" | "views" | "likes" | "comments";
 
 /**
  * True (case-insensitive, exact) membership test against the JSON-array tags column, using
@@ -193,12 +193,13 @@ export async function getTagAggregate(tag: string): Promise<{ count: number; tot
 
 /**
  * Every live post (from any user) tagged with `tag`, sorted the way the topic profile page's
- * filter tabs ask for. "likes" sort is applied in JS after fetching engagement counts, same as
- * everywhere else in this file — fine at this MVP's scale (capped at 100 posts per topic).
+ * filter tabs ask for, and optionally narrowed to just one media type. "likes" and "comments"
+ * sorts are applied in JS after fetching engagement counts, same as everywhere else in this
+ * file — fine at this MVP's scale (capped at 100 posts per topic).
  */
 export async function getPostsByTag(
   tag: string,
-  opts: { sort?: TagSort; viewerId?: string | null; viewerIsAdmin?: boolean } = {}
+  opts: { sort?: TagSort; type?: "video" | "photo"; viewerId?: string | null; viewerIsAdmin?: boolean } = {}
 ): Promise<FeedPost[]> {
   const t = tag.trim();
   if (!t) return [];
@@ -207,15 +208,20 @@ export async function getPostsByTag(
   const orderBy =
     opts.sort === "oldest" ? asc(posts.createdAt) : opts.sort === "views" ? desc(posts.viewCount) : desc(posts.createdAt);
 
+  const where = opts.type
+    ? and(eq(posts.status, "live"), eq(posts.type, opts.type), hasExactTag(t))
+    : and(eq(posts.status, "live"), hasExactTag(t));
+
   const rows = await db
     .select(SELECT_FIELDS)
     .from(posts)
     .innerJoin(users, eq(posts.userId, users.id))
-    .where(and(eq(posts.status, "live"), hasExactTag(t)))
+    .where(where)
     .orderBy(orderBy)
     .limit(100);
 
   const attached = await attachEngagement(rows, opts.viewerId, opts.viewerIsAdmin);
   if (opts.sort === "likes") attached.sort((a, b) => b.likeCount - a.likeCount);
+  if (opts.sort === "comments") attached.sort((a, b) => b.commentCount - a.commentCount);
   return attached;
 }
