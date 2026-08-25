@@ -126,11 +126,6 @@ export default function PostCard({
         <div className="absolute top-2.5 left-2.5 bg-black/45 text-white text-[11.5px] font-semibold px-2 py-1 rounded-[7px]">
           {post.type === "video" ? "VIDEO" : "PHOTO"}
         </div>
-        {post.statsVisible && (
-          <div className="absolute bottom-2.5 right-2.5 bg-black/45 text-white text-[11.5px] font-semibold px-2 py-1 rounded-[7px]">
-            {post.viewsLabel}
-          </div>
-        )}
         {/* Bottom gradient + caption overlay, so the tile stays image-forward like a photo mosaic */}
         <div className="absolute inset-x-0 bottom-0 pt-10 pb-3 px-3 bg-gradient-to-t from-black/75 via-black/25 to-transparent">
           <div className="text-white text-[15px] font-semibold leading-tight truncate">{post.title}</div>
@@ -159,13 +154,11 @@ export default function PostCard({
             <svg width="17" height="17" viewBox="0 0 24 24" fill={post.liked ? "var(--accent)" : "none"} stroke="currentColor" strokeWidth="2">
               <path d="M12 21s-7-4.35-9.5-9.06C.86 8.6 2.2 5 5.6 5c1.9 0 3.3 1 4.4 2.6C11.1 6 12.5 5 14.4 5c3.4 0 4.74 3.6 3.1 6.94C19 16.65 12 21 12 21z" />
             </svg>
-            {post.statsVisible && <span className="text-[13px] font-semibold">{post.likeCount}</span>}
           </button>
           <button onClick={onComment} className="flex items-center gap-1.5 text-[var(--text-muted)]">
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M21 11.5a8.38 8.38 0 01-8.5 8.5 8.5 8.5 0 01-4-1L3 20l1-4.5a8.38 8.38 0 01-1-4A8.5 8.5 0 0111.5 3a8.38 8.38 0 018.5 8.5z" />
             </svg>
-            {post.statsVisible && <span className="text-[13px] font-semibold">{post.commentCount}</span>}
           </button>
         </div>
       </div>

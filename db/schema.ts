@@ -161,6 +161,22 @@ export const searchLogs = sqliteTable("search_logs", {
 });
 
 // ---------------------------------------------------------------------------
+// Models — a curated directory of named people ("popular models/creators") that any logged-in
+// user can add. A model is really just a named profile page over the existing tag system: its
+// `name` is matched against post tags (see lib/posts.ts hasExactTag) to build "everything ever
+// uploaded under this person's name", the same mechanism that already powers /search topic pages.
+// This table just gives that name a browsable directory entry with a picture and a stable URL.
+// ---------------------------------------------------------------------------
+export const models = sqliteTable("models", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(), // matched case-insensitively against post tags, e.g. "Ronaldo"
+  slug: text("slug").notNull().unique(), // url-safe, unique — e.g. "ronaldo" or "ronaldo-2"
+  photoKey: text("photo_key").notNull(), // key of the model's photo in Cloudflare R2
+  createdByUserId: text("created_by_user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
+});
+
+// ---------------------------------------------------------------------------
 // Login attempts — one row per FAILED login, and per registration, keyed by
 // something the caller can't cheaply throw away (the username/email being
 // attempted, or the request's IP). See lib/rateLimit.ts. This is a basic,

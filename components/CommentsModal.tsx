@@ -50,7 +50,7 @@ export default function CommentsModal({
     <div className="fixed inset-0 z-50 bg-black/35 flex items-center justify-center" onClick={onClose}>
       <div className="w-[400px] max-h-[520px] bg-[var(--surface)] rounded-2xl flex flex-col overflow-hidden shadow-2xl" onClick={(e) => e.stopPropagation()}>
         <div className="px-[18px] py-4 border-b border-[var(--border)] flex items-center justify-between">
-          <div className="font-display text-[14.5px] font-bold">Comments · {post.commentCount}</div>
+          <div className="font-display text-[14.5px] font-bold">Comments</div>
           <button onClick={onClose} className="text-[var(--text-faint)] text-lg leading-none p-1">&#10005;</button>
         </div>
         <div className="flex-1 overflow-y-auto px-[18px] py-3.5 flex flex-col gap-3.5">

@@ -71,6 +71,13 @@
       "when": 1787540866619,
       "tag": "0009_dry_miracleman",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "6",
+      "when": 1787622723704,
+      "tag": "0010_awesome_black_knight",
+      "breakpoints": true
     }
   ]
 }

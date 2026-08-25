@@ -17,6 +17,7 @@ import { GIFT_MILESTONE_HOURS, GIFT_REWARD_LABEL, formatHoursOnSite } from "@/li
 const NAV = [
   { href: "/", label: "Home", locked: false, icon: "home" },
   { href: "/explore", label: "Explore", locked: false, icon: "compass" },
+  { href: "/models", label: "Models", locked: false, icon: "users" },
   { href: "/upload", label: "My Uploads", locked: true, icon: "upload" },
   { href: "/profile", label: "My Earnings", locked: true, icon: "wallet" },
   { href: "/creator-program", label: "Creator Program", locked: false, icon: "star" },
@@ -301,6 +302,8 @@ function NavIcon({ name }: { name: string }) {
       return <svg {...common}><circle cx="12" cy="12" r="9" /><path d="M12 7v10M9 9.5c0-1.4 1.3-2.5 3-2.5s3 1 3 2.3c0 3-6 1.5-6 4.5 0 1.4 1.3 2.4 3 2.4s3-1 3-2.4" /></svg>;
     case "star":
       return <svg {...common}><path d="M12 3l2.6 5.9 6.4.6-4.8 4.3 1.4 6.3L12 16.9 6.4 20.1l1.4-6.3-4.8-4.3 6.4-.6L12 3z" /></svg>;
+    case "users":
+      return <svg {...common}><circle cx="9" cy="8" r="3.2" /><path d="M2.5 20c0-3.5 2.9-6 6.5-6s6.5 2.5 6.5 6" /><circle cx="17" cy="8.5" r="2.6" /><path d="M15.5 14.2c2.7.4 4.5 2.5 4.5 5.3" /></svg>;
     default:
       return null;
   }
